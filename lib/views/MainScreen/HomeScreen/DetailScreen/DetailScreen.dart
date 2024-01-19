@@ -6,12 +6,11 @@ import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/controller/homeController.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
-import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class DetailScreen extends StatefulWidget {
   String? title;
   DetailScreen({super.key, this.title});

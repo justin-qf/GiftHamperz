@@ -99,7 +99,8 @@ class CategoryController extends GetxController {
         });
         return;
       }
-      var response = await Repository.get({}, ApiUrl.getCategory, list: true);
+      var response =
+          await Repository.get({}, ApiUrl.getCategory, allowHeader: true);
       logcat("RESPONSE::", response.body);
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);

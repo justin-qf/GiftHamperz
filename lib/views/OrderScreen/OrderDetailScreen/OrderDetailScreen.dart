@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
@@ -9,10 +10,10 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/OrderDetailController.dart';
 import 'package:gifthamperz/models/OrderModel.dart';
-import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
+import 'package:easy_stepper/easy_stepper.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   OrderDetailScreen({super.key, required this.data});
@@ -24,6 +25,17 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   var controller = Get.put(OrderDetailScreenController());
+
+  int activeStep = 2;
+  double progress = 0.2;
+
+  void increaseProgress() {
+    if (progress < 1) {
+      setState(() => progress += 0.2);
+    } else {
+      setState(() => progress = 0);
+    }
+  }
 
   @override
   void initState() {
@@ -65,17 +77,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   getDynamicSizedBox(height: 2.h),
                   controller.getLableText('Your Orders List',
                       isMainTitle: false),
-                  getDynamicSizedBox(height: 0.5.h),
+                  getDynamicSizedBox(height: 1.h),
                   SizedBox(
-                    height: 25.h,
                     child: Obx(
                       () {
                         return controller.orderDetailList.isNotEmpty
                             ? ListView.builder(
                                 physics: const BouncingScrollPhysics(),
-                                shrinkWrap: false,
+                                shrinkWrap: true,
                                 padding: EdgeInsets.only(left: 4.w),
-                                scrollDirection: Axis.horizontal,
+                                scrollDirection: Axis.vertical,
                                 clipBehavior: Clip.antiAlias,
                                 itemBuilder: (context, index) {
                                   // CategoryItem data =
@@ -84,8 +95,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   OrderDetail data =
                                       controller.orderDetailList[index];
                                   logcat("categoryList", data.name.toString());
-                                  return controller
-                                      .getOrderDetailItemList(data);
+                                  return controller.getListItem(data);
                                 },
                                 itemCount: controller.orderDetailList.length)
                             : Container();
@@ -125,6 +135,174 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   //       return controller.getGiftListItem(data);
                   //     },
                   //     itemCount: 1),
+                  controller.getLableText('Delivery Status:',
+                      isMainTitle: false),
+                  getDynamicSizedBox(height: 0.5.h),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 0),
+                    //color: grey,
+                    child: EasyStepper(
+                      activeStep: activeStep,
+                      //padding: EdgeInsets.only(top: 0.5.h, bottom: 0),
+                      showScrollbar: true,
+                      lineStyle: const LineStyle(
+                          lineLength: 93,
+                          lineThickness: 1,
+                          lineSpace: 5,
+                          activeLineColor: primaryColor,
+                          defaultLineColor: grey),
+                      stepRadius: 20,
+                      
+                      activeStepTextColor: primaryColor,
+                      finishedStepTextColor: black,
+                      alignment: Alignment.center,
+                      unreachedStepIconColor: primaryColor,
+                      activeStepIconColor: lightGrey,
+                      finishedStepIconColor: tileColour,
+                      unreachedStepBorderColor: Colors.black54,
+                      unreachedStepTextColor: black,
+                      finishedStepBackgroundColor: primaryColor,
+                      showLoadingAnimation: false,
+                      activeStepBorderColor: primaryColor,
+                      steps: const [
+                        EasyStep(
+                          icon: Icon(
+                            Icons.my_location,
+                            color: secondaryColor,
+                          ),
+                          enabled: true,
+                          title: 'Placed',
+                          lineText: '1.7 KM',
+                        ),
+                        EasyStep(
+                          icon: Icon(CupertinoIcons.cube_box),
+                          title: 'On The Way',
+                          lineText: '3 KM',
+                          enabled: true,
+                        ),
+                        EasyStep(
+                          icon: Icon(CupertinoIcons.flag),
+                          title: 'Completed',
+                          enabled: true,
+                        ),
+                      ],
+                      onStepReached: (index) =>
+                          setState(() => activeStep = index),
+                    ),
+                  ),
+                  // Container(
+                  //   color: Colors.grey.shade200,
+                  //   // clipBehavior: Clip.none,
+                  //   child: EasyStepper(
+                  //     activeStep: activeStep,
+                  //     enableStepTapping: true,
+                  //     alignment: Alignment.topLeft,
+                  //     direction: Axis.vertical,
+                  //     lineStyle: const LineStyle(
+                  //         lineLength: 100,
+                  //         lineSpace: 5,
+                  //         lineThickness: 1.5,
+                  //         defaultLineColor: Colors.orange,
+                  //         finishedLineColor: primaryColor,
+                  //         lineType: LineType.normal,
+                  //         unreachedLineType: LineType.dashed,
+                  //         activeLineColor: primaryColor),
+                  //     stepBorderRadius: 30,
+                  //     stepShape: StepShape.rRectangle,
+                  //     stepRadius: 20,
+                  //     finishedStepBorderColor: primaryColor,
+                  //     finishedStepTextColor: black,
+                  //     finishedStepBackgroundColor: primaryColor,
+                  //     activeStepIconColor: black,
+                  //     showLoadingAnimation: false,
+                  //     activeStepTextColor: black,
+                  //     internalPadding: 5,
+                  //     showStepBorder: true,
+                  //     // activeStep: activeStep,
+                  //     // alignment: Alignment.topLeft,
+                  //     // direction: Axis.vertical,
+                  //     // lineStyle: const LineStyle(
+                  //     //   lineLength: 70,
+                  //     //   lineSpace: 0,
+                  //     //   lineType: LineType.normal,
+                  //     //   defaultLineColor: Colors.white,
+                  //     //   finishedLineColor: Colors.orange,
+                  //     //   lineThickness: 1.5,
+                  //     // ),
+                  //     // activeStepTextColor: Colors.black87,
+                  //     // finishedStepTextColor: Colors.black87,
+                  //     // internalPadding: 0,
+                  //     // showLoadingAnimation: false,
+                  //     // stepRadius: 8,
+                  //     // showStepBorder: false,
+                  //     steps: [
+                  //       EasyStep(
+                  //         customStep: CircleAvatar(
+                  //           radius: 8,
+                  //           backgroundColor: tileColour,
+                  //           child: CircleAvatar(
+                  //             radius: 7,
+                  //             backgroundColor:
+                  //                 activeStep >= 0 ? secondTile : Colors.white,
+                  //           ),
+                  //         ),
+                  //         title: 'Waiting',
+                  //       ),
+                  //       EasyStep(
+                  //         customStep: CircleAvatar(
+                  //           radius: 8,
+                  //           backgroundColor: tileColour,
+                  //           child: CircleAvatar(
+                  //             radius: 7,
+                  //             backgroundColor:
+                  //                 activeStep >= 1 ? secondTile : Colors.white,
+                  //           ),
+                  //         ),
+                  //         title: 'Order Received',
+                  //         //topTitle: true,
+                  //       ),
+                  //       EasyStep(
+                  //         customStep: CircleAvatar(
+                  //           radius: 8,
+                  //           backgroundColor: tileColour,
+                  //           child: CircleAvatar(
+                  //             radius: 7,
+                  //             backgroundColor:
+                  //                 activeStep >= 2 ? secondTile : black,
+                  //           ),
+                  //         ),
+                  //         title: 'Preparing',
+                  //       ),
+                  //       EasyStep(
+                  //         customStep: CircleAvatar(
+                  //           radius: 8,
+                  //           backgroundColor: tileColour,
+                  //           child: CircleAvatar(
+                  //             radius: 7,
+                  //             backgroundColor:
+                  //                 activeStep >= 3 ? secondTile : black,
+                  //           ),
+                  //         ),
+                  //         title: 'On Way',
+                  //         //topTitle: true,
+                  //       ),
+                  //       EasyStep(
+                  //         customStep: CircleAvatar(
+                  //           radius: 8,
+                  //           backgroundColor: tileColour,
+                  //           child: CircleAvatar(
+                  //             radius: 7,
+                  //             backgroundColor:
+                  //                 activeStep >= 4 ? secondTile : black,
+                  //           ),
+                  //         ),
+                  //         title: 'Delivered',
+                  //       ),
+                  //     ],
+                  //     onStepReached: (index) =>
+                  //         setState(() => activeStep = index),
+                  //   ),
+                  // ),
                   controller.getLableText('Delivery Informations',
                       isMainTitle: false),
                   getDynamicSizedBox(height: 0.5.h),

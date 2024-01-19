@@ -4,14 +4,15 @@ import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/action_button.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/AddressController.dart';
 import 'package:gifthamperz/models/addressModel.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/DeliveryScreen/AddAddressScreen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
@@ -273,14 +274,20 @@ class _AddressScreenState extends State<AddressScreen> {
                   itemData: null,
                 ))!
                     .then((value) {
-                  logcat("AddAddressScreen:::", value.toString());
                   if (value == true) {
                     apiCalls();
                   }
                   Statusbar().trasparentStatusbarIsNormalScreen();
                 });
-              }, onClick: () {
-                controller.showCustomDialog(context);
+              }, onClick: () async {
+                bool isGuest = await UserPreferences().getGuestUser();
+                if (isGuest == true) {
+                  // ignore: use_build_context_synchronously
+                  getGuestUserAlertDialog(context);
+                } else {
+                  // ignore: use_build_context_synchronously
+                  controller.showCustomDialog(context);
+                }
               }))
         ]),
       ),
@@ -303,18 +310,21 @@ class _AddressScreenState extends State<AddressScreen> {
         },
       );
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
+      return Container(
+        height: SizerUtil.height,
+        width: SizerUtil.width,
+        padding: EdgeInsets.only(bottom: 20.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
               Common.datanotfound,
               textAlign: TextAlign.center,
               style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
   }
@@ -371,5 +381,4 @@ class _AddressScreenState extends State<AddressScreen> {
       ],
     );
   }
-
 }

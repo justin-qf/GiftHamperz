@@ -10,10 +10,9 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/get_storage_key.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
+import 'package:gifthamperz/controller/mainScreenController.dart';
 import 'package:gifthamperz/controller/profile_controller.dart';
 import 'package:gifthamperz/controller/theme_controller.dart';
-import 'package:gifthamperz/models/loginModel.dart';
-import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/BlogScreen/BlogScreen.dart';
@@ -27,22 +26,20 @@ class ProfileScreen extends StatefulWidget {
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
+
+  // @override
+  // void dependencies() {
+  //   Get.lazyPut<ProfileController>(() => ProfileController());
+  // }
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   var controller = Get.put(ProfileController());
-  UserData? getUserData;
 
   @override
   void initState() {
     super.initState();
-    setUserData();
-  }
-
-  setUserData() async {
-    getUserData = await UserPreferences().getSignInInfo();
-    controller.setData(getUserData!);
-    setState(() {});
+    controller.setData();
   }
 
   @override
@@ -82,69 +79,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 top: 30.h,
                 child: SizedBox(
                   width: SizerUtil.width,
-                  child: FadeInLeft(
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                        ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(50)),
-                          child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            height: 9.h,
-                            imageUrl: " item.thumbnailUrl",
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(
-                                  color: primaryColor),
-                            ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              Asset.avaterTwoholder,
-                              height: 9.h,
-                              width: 9.h,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 3.w),
-                            child: Obx(
-                              () {
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          controller.userName.value,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                              fontSize: 15.sp,
-                                              color: black,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ],
+                  child: FadeInLeft(child: Obx(
+                    () {
+                      return controller.userName.value.isNotEmpty
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                  ClipRRect(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(50)),
+                                    child: CachedNetworkImage(
+                                      fit: BoxFit.cover,
+                                      height: 9.h,
+                                      imageUrl: controller.profilePic.value,
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                        child: CircularProgressIndicator(
+                                            color: primaryColor),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Image.asset(
+                                        Asset.avaterTwoholder,
+                                        height: 9.h,
+                                        width: 9.h,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                    // SizedBox(
-                                    //   height: 1.h,
-                                    // ),
-                                    // Text(controller.email.value,
-                                    //     overflow: TextOverflow.ellipsis,
-                                    //     maxLines: 1,
-                                    //     style: TextStyle(
-                                    //         fontSize: 10.sp,
-                                    //         color: black,
-                                    //         fontWeight: FontWeight.w500)),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ])),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 3.w),
+                                      child: Obx(
+                                        () {
+                                          return Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    controller.userName.value,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                    style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        color: black,
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ])
+                          : Container();
+                    },
+                  )),
                 )),
             Positioned(
               bottom: 0,
@@ -289,12 +288,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: 13.h,
                             height: 13.h,
                             decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.black, width: 1.w),
+                              border: Border.all(color: black, width: 1.w),
                               borderRadius: BorderRadius.circular(80),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: black.withOpacity(0.1),
                                   blurRadius: 5.0,
                                 )
                               ],
@@ -337,33 +335,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
             horizontal: 3.w,
             vertical:
                 SizerUtil.deviceType == DeviceType.mobile ? 0.6.h : 0.8.h),
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.2.h),
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.8.h),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(2.8.h),
-          color: primaryColor.withOpacity(0.08),
-        ),
+            borderRadius: BorderRadius.circular(2.8.h), color: tileColour),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              height: 5.h,
-              width: 5.h,
-              decoration: BoxDecoration(
-                color: color!,
-                borderRadius: const BorderRadius.all(Radius.circular(50)),
+              height: 4.5.h,
+              width: 4.5.h,
+              decoration: const BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.all(Radius.circular(50)),
               ),
               child: Padding(
                 padding: EdgeInsets.all(1.w),
                 child: Icon(
                   iconDate,
-                  color: white,
-                  size: 3.h,
+                  color: tileColour,
+                  size: 2.5.h,
                 ),
               ),
             ),
             SizedBox(
-              width: 5.w,
+              width: 4.w,
             ),
             Flexible(
               flex: 1,
@@ -373,7 +369,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
-                    color: isDarkMode() ? white : headingTextColor),
+                    color: isDarkMode() ? black : headingTextColor),
               ),
             ),
             const Spacer(),
@@ -392,10 +388,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 logcat('DarkModeStatus',
                     (controller.getStorage.read(GetStorageKey.IS_DARK_MODE)));
                 setState(() {});
+                Get.find<MainScreenController>().updateDarkMode();
               },
               thumbColor: white,
-              activeColor: black,
-              trackColor: Colors.grey,
+              activeColor: primaryColor,
+              trackColor: lightGrey,
             )
           ],
         ),

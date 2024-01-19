@@ -183,126 +183,157 @@ class OrderDetailScreenController extends GetxController {
     );
   }
 
-  getListItem(OrderDetail data) {
+  Widget getListItem(OrderDetail data) {
     return FadeInUp(
-      child: Wrap(
-        children: [
-          Container(
-              width: SizerUtil.width,
-              margin: EdgeInsets.only(right: 2.w, bottom: 2.0.h),
-              padding: EdgeInsets.only(right: 2.w, top: 2.w),
-              decoration: BoxDecoration(
-                //color: grey.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(1.5.h),
+      child: Container(
+        width: SizerUtil.width,
+        margin: EdgeInsets.only(right: 2.w, bottom: 2.0.h),
+        padding: EdgeInsets.only(right: 2.w, top: 2.w, left: 2.w, bottom: 2.w),
+        decoration: BoxDecoration(
+          //color: grey.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(1.5.h),
+          // border: isDarkMode()
+          //     ? null
+          //     : Border.all(
+          //         color: grey, // Border color
+          //         width: 0.7, // Border width
+          //       ),
+          color: isDarkMode() ? tileColour : white,
+          boxShadow: [
+            BoxShadow(
+                color: grey.withOpacity(0.5),
+                blurRadius: 3.0,
+                offset: const Offset(0, 3),
+                spreadRadius: 0.5)
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(
+            SizerUtil.deviceType == DeviceType.mobile ? 1.5.w : 2.2.w,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              FadeInDown(
+                child: Container(
+                  //width: 30.w,
+                  decoration: BoxDecoration(
+                    border: isDarkMode()
+                        ? null
+                        : Border.all(
+                            color: grey, // Border color
+                            width: 0.6, // Border width
+                          ),
+                    color: isDarkMode() ? tileColour : white,
+                    // boxShadow: const [
+                    //   BoxShadow(
+                    //       color: grey,
+                    //       blurRadius: 3.0,
+                    //       offset: Offset(0, 3),
+                    //       spreadRadius: 0.5)
+                    // ],
+                    borderRadius: BorderRadius.circular(
+                        SizerUtil.deviceType == DeviceType.mobile
+                            ? 3.w
+                            : 2.2.w),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    child: CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      imageUrl: APIImageUrl.url + data.images,
+                      height: 13.h,
+                      width: 13.h,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(color: primaryColor),
+                      ),
+                      errorWidget: (context, url, error) => Image.asset(
+                        Asset.productPlaceholder,
+                        height: 15.h,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                      SizerUtil.deviceType == DeviceType.mobile
-                          ? 1.5.w
-                          : 2.2.w),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      FadeInDown(
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(12)),
-                          child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: APIImageUrl.url + data.images,
-                            height: 15.h,
-                            width: 13.5.h,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(
-                                  color: primaryColor),
-                            ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              Asset.placeholder,
-                              height: 9.h,
-                              fit: BoxFit.cover,
+              getDynamicSizedBox(width: 3.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.name,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontFamily: fontBold,
+                        fontWeight: FontWeight.w800,
+                        color: isDarkMode() ? black : black,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                    getDynamicSizedBox(height: 1.h),
+                    RichText(
+                      overflow: TextOverflow.clip,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      textScaleFactor: 1,
+                      text: TextSpan(
+                        text: '\u{20B9}${data.price} | ',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontFamily: fontRegular,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11.sp,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: data.tags,
+                            style: TextStyle(
+                              fontFamily: fontBold,
+                              color: isDarkMode() ? lableColor : black,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          // Image.asset(
-                          //   data.images,
-                          //   height: 15.h,
-                          //   width: 13.5.h,
-                          //   fit: BoxFit.cover,
-                          // ),
-                        ),
+                        ],
                       ),
-                      getDynamicSizedBox(width: 3.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(data.name,
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  fontFamily: fontBold,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 12.sp,
-                                )),
-                            getDynamicSizedBox(height: 1.h),
-                            RichText(
-                              overflow: TextOverflow.clip,
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              textScaleFactor: 1,
-                              text: TextSpan(
-                                text: '\u{20B9}${data.price} | ',
-                                style: TextStyle(
-                                    color: primaryColor,
-                                    fontFamily: fontRegular,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11.sp),
-                                children: [
-                                  TextSpan(
-                                    text: data.tags,
-                                    style: TextStyle(
-                                        fontFamily: fontBold,
-                                        color:
-                                            isDarkMode() ? lableColor : black,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w500),
-                                  )
-                                ],
-                              ),
-                            ),
-                            getDynamicSizedBox(height: 0.5.h),
-                            RichText(
-                              overflow: TextOverflow.clip,
-                              textAlign: TextAlign.start,
-                              softWrap: true,
-                              textScaleFactor: 1,
-                              text: TextSpan(
-                                text: 'Quantity:',
-                                style: TextStyle(
-                                    color: lableColor,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11.sp),
-                                children: [
-                                  TextSpan(
-                                    text: data.minQty.toString(),
-                                    style: TextStyle(
-                                        color:
-                                            isDarkMode() ? lableColor : black,
-                                        fontFamily: fontBold,
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w800),
-                                  )
-                                ],
-                              ),
-                            ),
-                            getDynamicSizedBox(height: 1.h),
-                            getDivider()
-                          ],
+                    ),
+                    getDynamicSizedBox(height: 0.5.h),
+                    RichText(
+                      overflow: TextOverflow.clip,
+                      textAlign: TextAlign.start,
+                      softWrap: true,
+                      textScaleFactor: 1,
+                      text: TextSpan(
+                        text: 'Quantity:',
+                        style: TextStyle(
+                          color: lableColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11.sp,
                         ),
-                      )
-                    ],
-                  ))),
-        ],
+                        children: [
+                          TextSpan(
+                            text: data.minQty.toString(),
+                            style: TextStyle(
+                              color: isDarkMode() ? lableColor : black,
+                              fontFamily: fontBold,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    getDynamicSizedBox(height: 1.h),
+                    //  getDivider(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

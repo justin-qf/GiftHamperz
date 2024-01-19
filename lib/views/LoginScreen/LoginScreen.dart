@@ -15,6 +15,7 @@ import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/ForgotPassword/ForgotPasswordScreen.dart';
 import 'package:gifthamperz/views/RegistrationScreen/RegistrationScreen.dart';
+import 'package:gifthamperz/views/SignUpScreen/SignUpScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../componant/input/form_inputs.dart';
 import '../../../../componant/toolbar/toolbar.dart';
@@ -256,7 +257,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             delay: const Duration(milliseconds: 500),
                             child: InkWell(
                               onTap: () {
-                                Get.to(const RegistrationScreen());
+                                Get.to(const SignUpScreen());
+                                //Get.to(const RegistrationScreen());
                               },
                               child: getFooter(true),
                             ),

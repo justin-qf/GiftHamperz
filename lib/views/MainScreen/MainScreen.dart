@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
+import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/views/MainScreen/HomeScreen/HomeScreen.dart';
 import 'package:gifthamperz/views/MainScreen/ProfileScreen/ProfileScreen.dart';
 import 'package:gifthamperz/views/MainScreen/SavedScreen/SavedScreen.dart';
@@ -47,6 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  void updateDarkMode() {
+    isDarkMode();
+    setState(() {});
+    ();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,7 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
         padding:
             const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
         decoration: BoxDecoration(
-          color: black.withOpacity(0.8),
+          color: isDarkMode()
+              ? bottomMenuColor.withOpacity(0.7)
+              : bottomNavBackground.withOpacity(0.8),
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           boxShadow: [
             BoxShadow(

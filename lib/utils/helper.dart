@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gifthamperz/configs/get_storage_key.dart';
+import 'package:gifthamperz/controller/homeController.dart';
+import 'package:gifthamperz/models/DashboadModel.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
+import 'package:gifthamperz/utils/log.dart';
 import 'package:intl/intl.dart';
 
 bool isDarkMode() {
@@ -57,4 +62,126 @@ String convert24HourTo12Hour(String time24Hour) {
 String getFormateDate(String date) {
   String formattedData = DateFormat('yyyy-MM-dd').format(DateTime.parse(date));
   return formattedData;
+}
+
+incrementDecrementCartItem({
+  bool? isFromIcr,
+  CommonProductList? data,
+  int? quantity,
+}) async {
+  if (isFromIcr == true) {
+    List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
+    int existingIndex = cartItems.indexWhere(
+      (item) => item.id == data!.id,
+    );
+    data!.isInCart!.value = true;
+    data.quantity!.value = 1;
+    if (existingIndex != -1) {
+      logcat("existingIndex", 'InCARTTTTT');
+      // Product already in the cart, update the quantity
+      cartItems[existingIndex].quantity!.value += 1;
+      // Save the updated cart back to preferences
+      await UserPreferences().addToCart(
+        data,
+        cartItems[existingIndex].quantity!.value,
+      );
+    } else {
+      logcat("existingIndex", 'ItemNotInCart');
+      // Product not in the cart, add it with quantity 1
+      CommonProductList newProduct = data.copyWith(quantity: 1);
+      cartItems.add(newProduct);
+      // Save the updated cart back to preferences
+      await UserPreferences().addToCart(data, 1);
+    }
+  } else {
+    // Fetch the current cart items from preferences
+    List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
+    // Check if the product is already in the cart
+    int existingIndex = cartItems.indexWhere(
+      (item) => item.id == data!.id,
+    );
+    if (quantity! > 0) {
+      logcat("isItemIsGreater", "DONE");
+      quantity--;
+      if (existingIndex != -1) {
+        // Product already in the cart, decrement the quantity
+        await UserPreferences().addToCart(
+          data!,
+          -1, // Pass a negative quantity for decrement
+        );
+      } else {
+        // Product not in the cart, add it with quantity 1
+        CommonProductList newProduct = data!.copyWith(quantity: 1);
+        cartItems.add(newProduct);
+        // Save the updated cart back to preferences
+        await UserPreferences().addToCart(data, 1);
+      }
+    } else {
+      logcat("isItemIsLess", "DONE");
+    }
+  }
+  Get.find<HomeScreenController>().getTotalProductInCart();
+}
+
+incrementDecrementCartItemInList({
+  bool? isFromIcr,
+  CommonProductList? data,
+  int? quantity,
+}) async {
+  // Fetch the current cart items from preferences
+  List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
+  // Check if the product is already in the cart
+  int existingIndex = cartItems.indexWhere(
+    (item) => item.id == data!.id,
+  );
+  if (isFromIcr == true) {
+    data!.quantity!.value++;
+    if (existingIndex != -1) {
+      // Product already in the cart, update the quantity
+      cartItems[existingIndex].quantity!.value += 1;
+      // Save the updated cart back to preferences
+      await UserPreferences().addToCart(
+        data,
+        cartItems[existingIndex].quantity!.value,
+      );
+    } else {
+      // Product not in the cart, add it with quantity 1
+      CommonProductList newProduct = data.copyWith(quantity: 1);
+      cartItems.add(newProduct);
+      // Save the updated cart back to preferences
+      await UserPreferences().addToCart(data, 1);
+    }
+  } else {
+    logcat("isItemIsLessssss", "DONE");
+
+    if (data!.quantity!.value == 1) {
+      data.isInCart!.value = false;
+      cartItems[existingIndex].quantity!.value -= 1;
+      await UserPreferences().addToCart(
+        data,
+        -1,
+      );
+    } else {
+      if (data.quantity!.value > 0) {
+        // Fetch the current cart items from preferences
+        data.quantity!.value--;
+        if (existingIndex != -1) {
+          cartItems[existingIndex].quantity!.value -= 1;
+          await UserPreferences().addToCart(
+            data,
+            -1,
+          );
+        } else {
+          CommonProductList newProduct = data.copyWith(quantity: 1);
+          cartItems.add(newProduct);
+          // Save the updated cart back to preferences
+          await UserPreferences().addToCart(data, 1);
+        }
+      } else {
+        data.isInCart!.value = false;
+      }
+    }
+
+    Get.find<HomeScreenController>().getTotalProductInCart();
+  }
 }

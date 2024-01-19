@@ -18,7 +18,7 @@ class PasswordController extends GetxController {
   late TextEditingController numberCtr;
   late FocusNode numberNode;
   var numberModel = ValidationModel(null, null, isValidate: false).obs;
-  RxBool isFormInvalidate = true.obs;
+  RxBool isFormInvalidate = false.obs;
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
 
@@ -105,6 +105,7 @@ class PasswordController extends GetxController {
             Get.to(OtpScreen(
               mobile: numberCtr.text.toString().trim(),
               otp: data['otp'].toString(),
+              isFromSignUp: false,
             ));
           });
         } else {
@@ -124,5 +125,4 @@ class PasswordController extends GetxController {
           callback: () {});
     }
   }
-
 }

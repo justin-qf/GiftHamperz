@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -7,7 +8,9 @@ import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/models/DashboadModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/FilterScreen/FIlterScreen.dart';
@@ -17,19 +20,20 @@ import 'internet_controller.dart';
 
 class ProductDetailScreenController extends GetxController {
   List pageNavigation = [];
-  RxInt currentTreeView = 2.obs;
-  RxBool isLiked = true.obs;
-  RxBool isTreeModeVertical = true.obs;
-  RxBool accessToDrawer = false.obs;
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
-  final InternetController etworkManager = Get.find<InternetController>();
-  RxList treeList = [].obs;
+  final InternetController networkManager = Get.find<InternetController>();
   var pageController = PageController();
   var currentPage = 0;
   var quantity = 0;
-  
   late Timer timer;
+  RxList<Map<String, dynamic>> cartItems = <Map<String, dynamic>>[].obs;
+
+  // Future<void> saveCartItems() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String cartItemsJson = cartItems.map((item) => item.toString()).join(',');
+  //   await prefs.setString('cartItems', cartItemsJson);
+  // }
 
   RxList<SavedItem> staticData = <SavedItem>[
     SavedItem(
@@ -160,7 +164,7 @@ class ProductDetailScreenController extends GetxController {
       () {
         return FadeInUp(
           child: Container(
-              width: 65.w,
+              width: 50.w,
               margin: EdgeInsets.only(right: 4.5.w),
               // padding: EdgeInsets.only(
               //     left: 5.w, right: 5.w, top: 5.w, bottom: 10.w),
@@ -191,7 +195,7 @@ class ProductDetailScreenController extends GetxController {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        height: 24.h,
+                        height: 15.h,
                         padding: EdgeInsets.only(top: 0.2.h),
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -215,7 +219,7 @@ class ProductDetailScreenController extends GetxController {
                         data.name,
                         TextStyle(
                             fontFamily: fontSemiBold,
-                            color: isDarkMode() ? white : black,
+                            color: isDarkMode() ? black : black,
                             fontSize: SizerUtil.deviceType == DeviceType.mobile
                                 ? 12.sp
                                 : 7.sp,
@@ -225,7 +229,7 @@ class ProductDetailScreenController extends GetxController {
                         height: 0.5.h,
                       ),
                       getText(
-                        data.price,
+                        '\u20B9${'100'}',
                         TextStyle(
                             fontFamily: fontBold,
                             color: primaryColor,
@@ -243,10 +247,8 @@ class ProductDetailScreenController extends GetxController {
                             minRating: 1,
                             direction: Axis.horizontal,
                             allowHalfRating: true,
-                            itemCount: 5,
-                            itemSize: 4.w,
-                            // itemPadding:
-                            //     const EdgeInsets.symmetric(horizontal: 5.0),
+                            itemCount: 1,
+                            itemSize: 3.5.w,
                             itemBuilder: (context, _) => const Icon(
                               Icons.star,
                               color: Colors.orange,
@@ -256,10 +258,12 @@ class ProductDetailScreenController extends GetxController {
                             },
                           ),
                           getText(
-                            "(35)",
+                            "3.5",
                             TextStyle(
-                                //fontFamily: fontMedium,
+                                fontFamily: fontSemiBold,
                                 color: lableColor,
+                                fontWeight:
+                                    isDarkMode() ? FontWeight.w600 : null,
                                 fontSize:
                                     SizerUtil.deviceType == DeviceType.mobile
                                         ? 9.sp
@@ -383,5 +387,25 @@ class ProductDetailScreenController extends GetxController {
             ],
           ),
         ));
+  }
+
+  Future<void> loadStoredQuantity(CommonProductList? data) async {
+    // Fetch the current cart items from preferences
+    List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
+
+    // Check if the product is already in the cart
+    int existingIndex = cartItems.indexWhere(
+      (item) => item.id == data!.id,
+    );
+
+    if (existingIndex != -1) {
+      // Product already in the cart, get the stored quantity
+      quantity = cartItems[existingIndex].getStoredQuantity();
+      update();
+    } else {
+      // Product not in the cart, set storedQuantity to 0
+      quantity = 0;
+      update();
+    }
   }
 }

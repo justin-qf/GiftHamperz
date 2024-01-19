@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/utils/helper.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
 
@@ -26,6 +27,11 @@ class MainScreenController extends GetxController {
 
   void updateDate(date) {
     picDate.value = date;
+    update();
+  }
+
+  void updateDarkMode() {
+    isDarkMode();
     update();
   }
 

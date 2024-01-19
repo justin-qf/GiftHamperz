@@ -1,8 +1,20 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:gifthamperz/componant/button/form_button.dart';
+import 'package:gifthamperz/componant/dialogs/customDialog.dart';
+import 'package:gifthamperz/componant/input/form_inputs.dart';
+import 'package:gifthamperz/componant/input/style.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
+import 'package:gifthamperz/controller/CartController.dart';
+import 'package:gifthamperz/controller/guest_login_controller.dart';
 import 'package:gifthamperz/utils/helper.dart';
+import 'package:gifthamperz/utils/log.dart';
+import 'package:pinput/pinput.dart';
 import 'package:sizer/sizer.dart';
 import '../../configs/colors_constant.dart';
 import '../../configs/font_constant.dart';
@@ -146,6 +158,10 @@ void showDropdownMessage(
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
+            backgroundColor:
+                isDarkMode() ? darkBackgroundColor.withOpacity(0.9) : white,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(32.0))),
             title: Padding(
               padding: EdgeInsets.only(
                   left:
@@ -367,6 +383,307 @@ Future showValidationDialog(
                     })
             ],
           ),
+        );
+      });
+}
+
+getGuestUserLogin(BuildContext context) async {
+  return await showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: const Duration(milliseconds: 600),
+    pageBuilder: (BuildContext buildContext, Animation<double> animation,
+        Animation<double> secondaryAnimation) {
+      return const Align(
+        alignment: Alignment.bottomCenter,
+        child: CustomLoginAlertRoundedDialog(),
+      );
+    },
+    transitionBuilder: (BuildContext buildContext, Animation<double> animation,
+        Animation<double> secondaryAnimation, Widget child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 1),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child,
+      );
+    },
+  );
+}
+
+var controller = Get.put(GuestLoginController());
+
+Future<Future> getLoginBottomSheetDialog(BuildContext parentContext) async {
+  controller.numberCtr.text = "";
+  controller.isFormInvalidate.value = false;
+  controller.isOtpFormInvalidate.value = false;
+  controller.otpController.text = '';
+  return showModalBottomSheet(
+      context: parentContext,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(13.w),
+      )),
+      constraints: BoxConstraints(
+        maxWidth: SizerUtil.width, // here increase or decrease in width
+      ),
+      useSafeArea: true,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Obx(
+                () {
+                  return Container(
+                    color: white,
+                    child: Wrap(
+                      children: [
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10.w),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: primaryColor.withOpacity(0.2),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10.w),
+                                    )),
+                                padding:
+                                    EdgeInsets.only(top: 2.5.h, bottom: 2.h),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    controller.isOtpVisible!.value == true
+                                        ? OtpConstant.title
+                                        : LoginConst.buttonLabel,
+                                    style: TextStyle(
+                                      color: black,
+                                      fontSize: 16.sp,
+                                      fontFamily: fontBold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              bottom: 0,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.only(
+                                    left: 10,
+                                    right: 10,
+                                  ),
+                                  child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(
+                                          Icons.close_rounded,
+                                          color: Colors.black,
+                                          size: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 25
+                                              : 50,
+                                        ),
+                                      ]),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        Container(
+                          height: 3.h,
+                        ),
+                        controller.isOtpVisible!.value == true
+                            ? Center(
+                                child: Pinput(
+                                  length: 4,
+                                  controller: controller.otpController,
+                                  focusNode: controller.otpNode,
+                                  defaultPinTheme: getPinTheme(),
+                                  onCompleted: (pin) {
+                                    if (controller.isFormInvalidate.value =
+                                        pin.length == 4) {}
+                                    setState(() => controller.showError =
+                                        // controller.isFormInvalidate.value =
+                                        pin.length != 4);
+                                  },
+                                  onChanged: (value) {
+                                    controller.enableButton(value);
+                                  },
+                                  focusedPinTheme: getPinTheme().copyWith(
+                                    height: 68.0,
+                                    width: 64.0,
+                                    decoration:
+                                        getPinTheme().decoration!.copyWith(
+                                              border: Border.all(
+                                                  color: const Color.fromRGBO(
+                                                      114, 178, 238, 1)),
+                                            ),
+                                  ),
+                                  errorPinTheme: getPinTheme().copyWith(
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromRGBO(
+                                          255, 234, 238, 1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : FadeInDown(
+                                child: AnimatedSize(
+                                  duration: const Duration(milliseconds: 300),
+                                  child: Obx(() {
+                                    return getReactiveFormField(
+                                        node: controller.numberNode,
+                                        controller: controller.numberCtr,
+                                        hintLabel: LoginConst.mobile,
+                                        onChanged: (val) {
+                                          controller.validatePhone(val);
+                                        },
+                                        obscuretext: false,
+                                        inputType: TextInputType.number,
+                                        errorText:
+                                            controller.numberModel.value.error);
+                                  }),
+                                ),
+                              ),
+                        Container(
+                            width: SizerUtil.width,
+                            margin: EdgeInsets.only(
+                              top: 2.h,
+                              left: 25.w,
+                              right: 25.w,
+                            ),
+                            child: FadeInUp(
+                                from: 50,
+                                child: Obx(() {
+                                  return commonBtn(Button.submit, () {
+                                    if (controller.isOtpVisible!.value ==
+                                        true) {
+                                      logcat("ISOTP::::", 'DONE');
+                                      if (controller
+                                              .isOtpFormInvalidate.value ==
+                                          true) {
+                                        controller.verifyOtpAPI(
+                                            context,
+                                            controller.otp!.value.toString(),
+                                            controller.numberCtr.text
+                                                .toString());
+                                      }
+                                    } else {
+                                      if (controller.isFormInvalidate.value ==
+                                          true) {
+                                        logcat("IS__SINUP", 'DONE');
+                                        controller.getSignUpOtp(
+                                            context,
+                                            controller.numberCtr.text
+                                                .toString());
+                                      }
+                                    }
+                                  },
+                                      isvalidate: controller
+                                                  .isOtpVisible!.value ==
+                                              true
+                                          ? controller.isOtpFormInvalidate.value
+                                          : controller.isFormInvalidate.value);
+                                }))),
+                        controller.isOtpVisible!.value == true
+                            ? Center(
+                                child: FadeInUp(
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 1.h),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 14.w),
+                                    child: FadeInUp(
+                                      child: Obx(
+                                        () {
+                                          return InkWell(
+                                            canRequestFocus: false,
+                                            onTap: () {
+                                              controller.clearFocuseNode();
+                                            },
+                                            child: controller.countdown.value ==
+                                                    0
+                                                ? GestureDetector(
+                                                    onTap: () {
+                                                      controller.getSignUpOtp(
+                                                        context,
+                                                        controller
+                                                            .numberCtr.text
+                                                            .toString(),
+                                                      );
+                                                    },
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          VerificationScreen
+                                                              .didtReceivedCode,
+                                                          style:
+                                                              styleDidtReceiveOTP(
+                                                                  context),
+                                                        ),
+                                                        Text(
+                                                          VerificationScreen
+                                                              .resend,
+                                                          style:
+                                                              styleResentButton(),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : Text(
+                                                    'Time remaining: ${controller.countdown} seconds',
+                                                    style: TextStyle(
+                                                        fontSize: SizerUtil
+                                                                    .deviceType ==
+                                                                DeviceType
+                                                                    .mobile
+                                                            ? 11.5.sp
+                                                            : 9.sp,
+                                                        fontWeight:
+                                                            FontWeight.w100,
+                                                        fontFamily: fontRegular,
+                                                        color: isDarkMode()
+                                                            ? white
+                                                            : labelTextColor),
+                                                  ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        SizedBox(
+                          height: 2.h,
+                          width: double.infinity,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          },
         );
       });
 }

@@ -104,7 +104,7 @@ getMiniButton(Function fun, str, {bool? icon}) {
   );
 }
 
-getSecondaryFormButton(Function fun, str, {isvalidate}) {
+getSecondaryFormButton(Function fun, str, {isvalidate, bool? isFromDialog}) {
   return InkWell(
     onTap: () {
       fun();
@@ -133,7 +133,7 @@ getSecondaryFormButton(Function fun, str, {isvalidate}) {
             color: white,
             fontFamily: fontBold,
             fontWeight: FontWeight.w900,
-            fontSize: 13.sp),
+            fontSize: isFromDialog == true ? 12.5.sp : 13.sp),
       ),
     ),
   );

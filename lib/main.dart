@@ -93,13 +93,14 @@ class HomeState extends State<MainScreen> {
                         child: child!,
                       );
                     },
+                    enableLog: true,
                     title: AppConstant.name,
                     theme: !ctr.isDark.value
                         ? ThemeData.light()
                         : ThemeData.dark(),
                     debugShowCheckedModeBanner: false,
                     home: const Splashscreen(),
-                    defaultTransition: Transition.rightToLeftWithFade,
+                    defaultTransition: Transition.cupertino,
                   );
                 });
           }));

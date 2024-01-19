@@ -4,11 +4,13 @@ class LoginConst {
   static const signup = 'Sign up';
   static const subText =
       "For log in, please enter your phone number and password";
-  static const buttonLabel = 'LOG IN';
+  static const buttonLabel = 'LOGIN';
   static const dontHaveAccount = 'Don’t have an account?';
   static const username = 'Username';
   static const number = 'Enter Number';
   static const email = 'Enter Email';
+  static const mobileLable = 'Mobile Number';
+  static const mobile = 'Enter Mobile Number';
   static const password = 'Enter Password';
   static const forgotpass = 'Forgot Password ?';
   static const emailLable = 'Email';
@@ -19,7 +21,7 @@ class LoginConst {
 }
 
 class APIImageUrl {
-  static const url = 'http://192.168.1.16/qfs_ecommerce/public/storage/';
+  static const url = 'http://192.168.1.11/qfs_ecommerce/public/storage/';
 }
 
 class AddAddressText {
@@ -45,6 +47,7 @@ class AddAddressText {
   static const addAddressBtn = 'NEW DELIVERY ADDRESS';
   static const add = 'ADD';
   static const payment = 'PAYMENT';
+  static const startShopping = 'Start Shopping';
 }
 
 class OtpConstant {
@@ -72,6 +75,7 @@ class Button {
   static const check = 'ORDER';
   static const checkOut = 'PROCEED TO CHECKOUT';
   static const close = 'Close';
+  static const continueShopping = 'Continue Shopping';
 }
 
 class SignupConstant {
@@ -157,6 +161,10 @@ class BlogScreenConstant {
 
 class OrderDetailScreenConstant {
   static const title = "Orders Detail";
+}
+
+class ProductDetailScreenConstant {
+  static const title = "Product Detail";
 }
 
 class ReviewsScreenConstant {
@@ -247,7 +255,7 @@ class DashboardText {
   static const dashboard = 'Dashboard';
   static const categoryTitle = 'Category';
   static const trendingTitle = 'Trending';
-  static const populerTitle = 'Populer';
+  static const populerTitle = 'Popular';
   static const addprescription = 'Add\nPrescription';
   static const viewmedicalhistory = "View Medical\nHistory";
   static const addfamilymember = 'Add Family\nMember';

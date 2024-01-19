@@ -596,4 +596,5 @@ class RegistrationController extends GetxController {
           callback: () {});
     }
   }
+
 }

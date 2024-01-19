@@ -170,18 +170,23 @@ class OrderScreenController extends GetxController {
                     color: grey, // Border color
                     width: 0.5, // Border width
                   )
-                : Border.all(
-                    color: grey, // Border color
-                    width: 0.5, // Border width
-                  ),
+                : null,
             color: isDarkMode() ? itemDarkBackgroundColor : white,
             borderRadius: const BorderRadius.all(Radius.circular(10)),
+            // boxShadow: [
+            //   BoxShadow(
+            //       color: isDarkMode() ? transparent : grey.withOpacity(0.1),
+            //       spreadRadius: 2,
+            //       blurRadius: 6,
+            //       offset: const Offset(0.3, 0.3)),
+            // ],
+
             boxShadow: [
               BoxShadow(
-                  color: isDarkMode() ? transparent : grey.withOpacity(0.1),
-                  spreadRadius: 2,
-                  blurRadius: 6,
-                  offset: const Offset(0.3, 0.3)),
+                  color: grey.withOpacity(0.5),
+                  blurRadius: 3.0,
+                  offset: const Offset(0, 3),
+                  spreadRadius: 0.5)
             ],
           ),
           child: Row(
@@ -264,7 +269,7 @@ class OrderScreenController extends GetxController {
                               : 6.sp,
                           fontFamily: fontBold,
                           fontWeight: FontWeight.w700,
-                          color: isDarkMode() ? white : black),
+                          color: isDarkMode() ? black : black),
                     ),
                     getDynamicSizedBox(height: 0.5.h),
                     Text(
@@ -275,9 +280,7 @@ class OrderScreenController extends GetxController {
                               : 6.sp,
                           fontFamily: fontRegular,
                           fontWeight: isDarkMode() ? FontWeight.w600 : null,
-                          color: isDarkMode()
-                              ? grey
-                              : lableColor),
+                          color: isDarkMode() ? grey : lableColor),
                     ),
                     // getDynamicSizedBox(height: 0.5.h),
                     // Text(
@@ -307,7 +310,7 @@ class OrderScreenController extends GetxController {
                                           ? 11.sp
                                           : 6.sp,
                                   fontFamily: fontExtraBold,
-                                  color: isDarkMode() ? white : black),
+                                  color: isDarkMode() ? black : black),
                             ),
                             RatingBar.builder(
                               initialRating: 3.5,

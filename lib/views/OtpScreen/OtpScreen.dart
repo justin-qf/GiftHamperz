@@ -22,10 +22,12 @@ class OtpScreen extends StatefulWidget {
   OtpScreen({
     this.mobile,
     this.otp,
+    this.isFromSignUp,
     Key? key,
   }) : super(key: key);
   String? otp;
   String? mobile;
+  bool? isFromSignUp;
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
@@ -218,10 +220,17 @@ class _OtpScreenState extends State<OtpScreen> {
                                     return getSecondaryFormButton(() {
                                       if (controller.isFormInvalidate.value ==
                                           true) {
-                                        controller.getOtpScreen(
-                                            context,
-                                            widget.otp.toString(),
-                                            widget.mobile.toString());
+                                        if (widget.isFromSignUp == true) {
+                                          controller.getSignUpOtpApi(
+                                              context,
+                                              widget.otp.toString(),
+                                              widget.mobile.toString());
+                                        } else {
+                                          controller.getOtpApi(
+                                              context,
+                                              widget.otp.toString(),
+                                              widget.mobile.toString());
+                                        }
                                       }
                                     }, BottomConstant.buttonLabel,
                                         isvalidate:
@@ -248,11 +257,19 @@ class _OtpScreenState extends State<OtpScreen> {
                                       child: controller.countdown.value == 0
                                           ? GestureDetector(
                                               onTap: () {
-                                                controller.getForgotOtp(
+                                                if (widget.isFromSignUp ==
+                                                    true) {
+                                                  controller.getSignUpOtp(
                                                     context,
-                                                    widget.mobile
-                                                        .toString()
-                                                        .trim());
+                                                    widget.mobile.toString(),
+                                                  );
+                                                } else {
+                                                  controller.getForgotOtp(
+                                                      context,
+                                                      widget.mobile
+                                                          .toString()
+                                                          .trim());
+                                                }
                                               },
                                               child: Row(
                                                 mainAxisAlignment:

@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/CommonApiStructure.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
@@ -17,6 +18,7 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/productDetailController.dart';
 import 'package:gifthamperz/models/DashboadModel.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
@@ -24,6 +26,7 @@ import 'package:gifthamperz/views/ReviewsScreen/ReviewsScreen.dart';
 import 'package:marquee/marquee.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class ProductDetailScreen extends StatefulWidget {
   ProductDetailScreen(this.title, {super.key, this.data});
   CommonProductList? data;
@@ -36,13 +39,44 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
   var controller = Get.put(ProductDetailScreenController());
+  bool? isGuest = true;
 
   @override
   void initState() {
     controller.pageController =
         PageController(initialPage: controller.currentPage);
     startAutoScroll();
+    loadStoredQuantity();
+    getGuestUser();
+    //controller.loadStoredQuantity(widget.data);
     super.initState();
+  }
+
+  getGuestUser() async {
+    isGuest = await UserPreferences().getGuestUser();
+    setState(() {});
+  }
+
+  Future<void> loadStoredQuantity() async {
+    // Fetch the current cart items from preferences
+    List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
+
+    // Check if the product is already in the cart
+    int existingIndex = cartItems.indexWhere(
+      (item) => item.id == widget.data!.id,
+    );
+
+    if (existingIndex != -1) {
+      // Product already in the cart, get the stored quantity
+      setState(() {
+        controller.quantity = cartItems[existingIndex].getStoredQuantity();
+      });
+    } else {
+      // Product not in the cart, set storedQuantity to 0
+      setState(() {
+        controller.quantity = 0;
+      });
+    }
   }
 
   void startAutoScroll() {
@@ -219,6 +253,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                                             index
                                                         ? primaryColor
                                                         : white,
+                                                    border: Border.all(
+                                                      color:
+                                                          black, // Border color
+                                                      width:
+                                                          0.5, // Border width
+                                                    ),
                                                     boxShadow: [
                                                       BoxShadow(
                                                           color: grey
@@ -250,7 +290,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                             child: SvgPicture.asset(
                               Asset.arrowBack,
                               // ignore: deprecated_member_use
-                              color: isDarkMode() ? white : black,
+                              color: isDarkMode() ? black : black,
                               height: SizerUtil.deviceType == DeviceType.mobile
                                   ? 4.h
                                   : 5.h,
@@ -265,13 +305,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                 : 3.w),
                         child: GestureDetector(
                           onTap: () {
-                            Get.back();
+                            if (isGuest == true) {
+                              getGuestUserAlertDialog(context);
+                            } else {
+                              addFavouriteAPI(
+                                  context,
+                                  controller.networkManager,
+                                  widget.data!.id.toString(),
+                                  '1',
+                                  ProductDetailScreenConstant.title);
+                            }
                           },
                           child: Container(
                               padding: const EdgeInsets.all(10),
                               child: Icon(
                                 Icons.favorite_rounded,
-                                color: isDarkMode() ? white : black,
+                                color: isDarkMode() ? black : black,
                                 size: SizerUtil.deviceType == DeviceType.mobile
                                     ? 3.5.h
                                     : 5.h,
@@ -296,40 +345,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                               controller.getLableText(widget.data!.name,
                                   isMainTitle: true),
                               getDynamicSizedBox(height: 0.5.h),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  RatingBar.builder(
-                                    initialRating: 3.5,
-                                    minRating: 1,
-                                    direction: Axis.horizontal,
-                                    allowHalfRating: true,
-                                    itemCount: 5,
-                                    itemSize: 4.5.w,
-                                    // itemPadding:
-                                    //     const EdgeInsets.symmetric(horizontal: 5.0),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.orange,
+                              GestureDetector(
+                                onTap: () {
+                                  Get.to(const ReviewsScreen())!.then((value) {
+                                    Statusbar()
+                                        .trasparentStatusbarProfile(true);
+                                  });
+                                },
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    RatingBar.builder(
+                                      initialRating: 3.5,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 5,
+                                      itemSize: 4.5.w,
+                                      // itemPadding:
+                                      //     const EdgeInsets.symmetric(horizontal: 5.0),
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.orange,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        logcat("RATING", rating);
+                                      },
                                     ),
-                                    onRatingUpdate: (rating) {
-                                      logcat("RATING", rating);
-                                    },
-                                  ),
-                                  getDynamicSizedBox(width: 0.5.w),
-                                  controller.getCommonText("35 Reviews",
-                                      isHint: true),
-                                  const Spacer(),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Get.to(const ReviewsScreen())!
-                                          .then((value) {
-                                        Statusbar()
-                                            .trasparentStatusbarProfile(true);
-                                      });
-                                    },
-                                    child: Row(
+                                    getDynamicSizedBox(width: 0.5.w),
+                                    controller.getCommonText("35 Reviews",
+                                        isHint: true),
+                                    const Spacer(),
+                                    Row(
                                       children: [
                                         controller.getColorText(
                                             "Write a Reviews",
@@ -345,9 +393,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                           ),
                                         )
                                       ],
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
                               getDynamicSizedBox(height: 1.h),
                               Row(
@@ -359,72 +407,162 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                       isReviews: false),
                                   const Spacer(),
                                   Container(
-                                      padding: EdgeInsets.only(
-                                          left: 2.7.w,
-                                          right: 2.7.w,
-                                          top: 0.4.h,
-                                          bottom: 0.4.h),
-                                      decoration: BoxDecoration(
-                                          color: isDarkMode()
-                                              ? darkBackgroundColor
-                                              : white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: grey.withOpacity(0.2),
-                                                blurRadius: 1.0,
-                                                offset: const Offset(0, 1),
-                                                spreadRadius: 1.0)
-                                          ],
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(5.h),
-                                          )),
-                                      child: Row(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              if (controller.quantity > 1) {
-                                                controller.quantity--;
-                                              }
-                                              setState(() {});
-                                            },
-                                            child: Icon(
-                                              Icons.remove,
-                                              size: 3.h,
-                                            ),
-                                          ),
-                                          getDynamicSizedBox(width: 0.8.w),
-                                          getVerticalDivider(),
-                                          getDynamicSizedBox(width: 1.8.w),
-                                          Text(
-                                            controller.quantity.toString(),
-                                            style: TextStyle(
-                                              //fontFamily: fontBold,
-                                              color:
-                                                  isDarkMode() ? white : black,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: SizerUtil.deviceType ==
-                                                      DeviceType.mobile
-                                                  ? 12.sp
-                                                  : 13.sp,
-                                            ),
-                                          ),
-                                          getDynamicSizedBox(width: 1.8.w),
-                                          getVerticalDivider(),
-                                          GestureDetector(
-                                            onTap: () {
-                                              controller.quantity++;
-                                              setState(() {});
-                                            },
-                                            child: Icon(
-                                              Icons.add,
-                                              size: 3.h,
-                                            ),
-                                          ),
+                                    padding: EdgeInsets.only(
+                                        left: 2.7.w,
+                                        right: 2.7.w,
+                                        top: 0.4.h,
+                                        bottom: 0.4.h),
+                                    decoration: BoxDecoration(
+                                        color: isDarkMode()
+                                            ? darkBackgroundColor
+                                            : white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: grey.withOpacity(0.2),
+                                              blurRadius: 1.0,
+                                              offset: const Offset(0, 1),
+                                              spreadRadius: 1.0)
                                         ],
-                                      )),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.h),
+                                        )),
+                                    child: Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            if (controller.quantity > 0) {
+                                              controller.quantity--;
+                                              incrementDecrementCartItem(
+                                                  isFromIcr: false,
+                                                  data: widget.data!,
+                                                  quantity:
+                                                      controller.quantity);
+                                              setState(() {});
+                                            }
+                                            // // Fetch the current cart items from preferences
+                                            // List<CommonProductList> cartItems =
+                                            //     await UserPreferences()
+                                            //         .loadCartItems();
+                                            // // Check if the product is already in the cart
+                                            // int existingIndex =
+                                            //     cartItems.indexWhere(
+                                            //   (item) =>
+                                            //       item.id == widget.data!.id,
+                                            // );
+                                            // if (controller.quantity > 0) {
+                                            //   controller.quantity--;
+                                            //   if (existingIndex != -1) {
+                                            //     // Product already in the cart, decrement the quantity
+                                            //     await UserPreferences()
+                                            //         .addToCart(
+                                            //       widget.data!,
+                                            //       -1, // Pass a negative quantity for decrement
+                                            //     );
+                                            //   } else {
+                                            //     // Product not in the cart, add it with quantity 1
+                                            //     CommonProductList newProduct =
+                                            //         widget.data!
+                                            //             .copyWith(quantity: 1);
+                                            //     cartItems.add(newProduct);
+
+                                            //     // Save the updated cart back to preferences
+                                            //     await UserPreferences()
+                                            //         .addToCart(widget.data!, 1);
+                                            //   }
+                                            //   // Update your UI
+                                            //
+                                            // }
+                                          },
+                                          child: Icon(
+                                            Icons.remove,
+                                            size: 3.h,
+                                          ),
+                                        ),
+                                        getDynamicSizedBox(width: 0.8.w),
+                                        getVerticalDivider(),
+                                        getDynamicSizedBox(width: 1.8.w),
+                                        Text(
+                                          controller.quantity.toString(),
+                                          style: TextStyle(
+                                            color: isDarkMode() ? white : black,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: SizerUtil.deviceType ==
+                                                    DeviceType.mobile
+                                                ? 12.sp
+                                                : 13.sp,
+                                          ),
+                                        ),
+                                        getDynamicSizedBox(width: 1.8.w),
+                                        getVerticalDivider(),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            controller.quantity++;
+                                            logcat("COUNTER",
+                                                controller.quantity.toString());
+                                            incrementDecrementCartItem(
+                                                isFromIcr: true,
+                                                data: widget.data!,
+                                                quantity: controller.quantity);
+
+                                            // // Fetch the current cart items from preferences
+                                            // List<CommonProductList> cartItems =
+                                            //     await UserPreferences()
+                                            //         .loadCartItems();
+
+                                            // // Check if the product is already in the cart
+                                            // int existingIndex =
+                                            //     cartItems.indexWhere(
+                                            //   (item) =>
+                                            //       item.id == widget.data!.id,
+                                            // );
+                                            // if (existingIndex != -1) {
+                                            //   // Product already in the cart, update the quantity
+                                            //   cartItems[existingIndex]
+                                            //       .quantity!
+                                            //       .value += 1;
+                                            //   setState(() {
+                                            //     controller.quantity =
+                                            //         cartItems[existingIndex]
+                                            //             .quantity!
+                                            //             .value;
+                                            //   });
+                                            //   // Save the updated cart back to preferences
+                                            //   await UserPreferences().addToCart(
+                                            //     widget.data!,
+                                            //     cartItems[existingIndex]
+                                            //         .quantity!
+                                            //         .value,
+                                            //   );
+                                            //   // Update your UI if needed
+                                            //   setState(() {});
+                                            // } else {
+                                            //   // Product not in the cart, add it with quantity 1
+                                            //   CommonProductList newProduct =
+                                            //       widget.data!
+                                            //           .copyWith(quantity: 1);
+                                            //   cartItems.add(newProduct);
+
+                                            //   // Save the updated cart back to preferences
+                                            //   await UserPreferences()
+                                            //       .addToCart(widget.data!, 1);
+                                            //   // Update your UI
+                                            //   setState(() {
+                                            //     controller.quantity = 1;
+                                            //   });
+                                            // }
+                                            setState(() {});
+                                          },
+                                          child: Icon(
+                                            Icons.add,
+                                            size: 3.h,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                              getDynamicSizedBox(height: 2.h),
+                              getDynamicSizedBox(height: 1.h),
                               controller.getLableText('About',
                                   isMainTitle: false),
                               getDynamicSizedBox(height: 0.5.h),
@@ -432,7 +570,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                   widget.data!.description.toString(),
                                   isHint: true),
                               getDynamicSizedBox(height: 1.h),
-                              controller.getLableText('Specifications',
+                              controller.getLableText('Specifications:',
                                   isMainTitle: false),
                               SizedBox(
                                 width: 27.w,
@@ -528,12 +666,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     children: [
                       getCommonContainer(
                           'Add to Cart', true, Icons.shopping_cart,
-                          AddCartClick: () {
-                        Get.to(const CartScreen())!.then((value) =>
-                            {Statusbar().trasparentStatusbarProfile(true)});
+                          addCartClick: () {
+                        Get.to(const CartScreen())!.then((value) {
+                          Statusbar().trasparentStatusbarProfile(true);
+                          loadStoredQuantity();
+                        });
                       }),
                       getCommonContainer('Buy Now', false, Icons.shopping_bag,
-                          BuyNowClick: () {}),
+                          buyNowClick: () {
+                        logcat("Buy", 'Click');
+                        if (isGuest == true) {
+                          getGuestUserAlertDialog(context);
+                        } else {
+                          Get.to(const CartScreen())!.then((value) {
+                            Statusbar().trasparentStatusbarProfile(true);
+                          });
+                        }
+                      }),
                     ],
                   )),
             ],

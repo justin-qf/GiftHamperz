@@ -14,6 +14,12 @@
       "languageVersion": "2.14"
     },
     {
+      "name": "archive",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/archive-3.4.10",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "args",
       "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/args-2.4.2",
       "packageUri": "lib/",
@@ -39,19 +45,19 @@
     },
     {
       "name": "cached_network_image",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/cached_network_image-3.3.0",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/cached_network_image-3.3.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "cached_network_image_platform_interface",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/cached_network_image_platform_interface-3.0.0",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/cached_network_image_platform_interface-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "cached_network_image_web",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/cached_network_image_web-1.1.0",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/cached_network_image_web-1.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -116,10 +122,22 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "dio",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/dio-5.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "dropdown_button2",
       "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/dropdown_button2-1.9.4",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "easy_stepper",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/easy_stepper-0.8.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
     },
     {
       "name": "encrypt",
@@ -171,9 +189,9 @@
     },
     {
       "name": "file_selector_platform_interface",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/file_selector_platform_interface-2.6.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/file_selector_platform_interface-2.6.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "file_selector_windows",
@@ -291,25 +309,25 @@
     },
     {
       "name": "image_picker",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker-1.0.5",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker-1.0.7",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "image_picker_android",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_android-0.8.9+1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_android-0.8.9+3",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "image_picker_for_web",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_for_web-3.0.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_for_web-3.0.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "image_picker_ios",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_ios-0.8.9",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_ios-0.8.9+1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -327,9 +345,9 @@
     },
     {
       "name": "image_picker_platform_interface",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.9.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.9.3",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "image_picker_windows",
@@ -360,6 +378,12 @@
       "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/loading_animation_widget-1.2.0+4",
       "packageUri": "lib/",
       "languageVersion": "2.16"
+    },
+    {
+      "name": "lottie",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/lottie-2.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "marquee",
@@ -417,21 +441,21 @@
     },
     {
       "name": "path_provider",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider-2.1.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider-2.1.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "path_provider_foundation",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_foundation-2.3.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_foundation-2.3.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "path_provider_linux",
@@ -441,9 +465,9 @@
     },
     {
       "name": "path_provider_platform_interface",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_platform_interface-2.1.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_platform_interface-2.1.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "path_provider_windows",
@@ -465,21 +489,21 @@
     },
     {
       "name": "platform",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/platform-3.1.3",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/platform-3.1.4",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "plugin_platform_interface",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/plugin_platform_interface-2.1.7",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/plugin_platform_interface-2.1.8",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "pointycastle",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/pointycastle-3.7.3",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/pointycastle-3.7.4",
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "3.0"
     },
     {
       "name": "pull_to_refresh",
@@ -513,9 +537,9 @@
     },
     {
       "name": "shared_preferences_foundation",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_foundation-2.3.4",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_foundation-2.3.5",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "shared_preferences_linux",
@@ -525,9 +549,9 @@
     },
     {
       "name": "shared_preferences_platform_interface",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_platform_interface-2.3.1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_platform_interface-2.3.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "shared_preferences_web",
@@ -657,19 +681,19 @@
     },
     {
       "name": "vector_graphics",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics-1.1.9+1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics-1.1.9+2",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
     {
       "name": "vector_graphics_codec",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_codec-1.1.9+1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_codec-1.1.9+2",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
     {
       "name": "vector_graphics_compiler",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_compiler-1.1.9+1",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_compiler-1.1.9+2",
       "packageUri": "lib/",
       "languageVersion": "2.19"
     },
@@ -693,9 +717,9 @@
     },
     {
       "name": "xdg_directories",
-      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.0.3",
+      "rootUri": "file:///C:/Users/Hp/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.0.4",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "xml",
@@ -710,7 +734,7 @@
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2023-12-26T07:18:35.009743Z",
+  "generated": "2024-01-19T05:22:05.379495Z",
   "generator": "pub",
   "generatorVersion": "3.1.2"
 }

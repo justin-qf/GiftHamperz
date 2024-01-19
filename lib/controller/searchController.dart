@@ -7,20 +7,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
+import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/models/searchModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
+import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/FilterScreen/FIlterScreen.dart';
 import 'package:sizer/sizer.dart';
-import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
 
@@ -141,7 +144,7 @@ class SearchScreenController extends GetxController {
 
       var response = await Repository.get({},
           "${ApiUrl.getSearch}?search_product=${searchText.isNotEmpty ? searchText : ""}",
-          list: true);
+          allowHeader: true);
 
       logcat("SEARCH_RESPONSE::", response.body);
       if (response.statusCode == 200) {
@@ -234,7 +237,8 @@ class SearchScreenController extends GetxController {
     );
   }
 
-  getItemListItem(SearchDataList data) {
+  getItemListItem(
+      BuildContext context, SearchDataList data, bool? isGuestUser) {
     return FadeInUp(
       child: Wrap(
         children: [
@@ -298,26 +302,26 @@ class SearchScreenController extends GetxController {
                           ),
                         ),
                       ),
-                      Positioned(
-                        right: 3.w,
-                        top: 1.0.h,
-                        child: GestureDetector(
-                          onTap: () {
-                            // data.isSelected.value =
-                            //     !data.isSelected.value;
-                            update();
-                          },
-                          child: Icon(
-                            Icons.favorite_border,
-                            size: 3.h,
-                            color: primaryColor,
-                          ),
-                        ),
-                      )
+                      // Positioned(
+                      //   right: 3.w,
+                      //   top: 1.0.h,
+                      //   child: GestureDetector(
+                      //     onTap: () {
+                      //       // data.isSelected.value =
+                      //       //     !data.isSelected.value;
+                      //       update();
+                      //     },
+                      //     child: Icon(
+                      //       Icons.favorite_border,
+                      //       size: 3.h,
+                      //       color: primaryColor,
+                      //     ),
+                      //   ),
+                      // )
                     ],
                   ),
                   SizedBox(
-                    height: 1.5.h,
+                    height: 1.h,
                   ),
                   getText(
                     data.name,
@@ -325,7 +329,7 @@ class SearchScreenController extends GetxController {
                         fontFamily: fontSemiBold,
                         overflow: TextOverflow.ellipsis,
                         fontWeight: FontWeight.w500,
-                        color: isDarkMode() ? white : black,
+                        color: isDarkMode() ? black : black,
                         fontSize: SizerUtil.deviceType == DeviceType.mobile
                             ? 10.sp
                             : 7.sp,
@@ -340,7 +344,7 @@ class SearchScreenController extends GetxController {
                         fontFamily: fontBold,
                         color: primaryColor,
                         fontSize: SizerUtil.deviceType == DeviceType.mobile
-                            ? 9.sp
+                            ? 10.sp
                             : 7.sp,
                         height: 1.2),
                   ),
@@ -351,27 +355,25 @@ class SearchScreenController extends GetxController {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: RatingBar.builder(
-                          initialRating: 3.5,
-                          minRating: 1,
-                          direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 5,
-                          itemSize: 3.5.w,
-                          // itemPadding:
-                          //     const EdgeInsets.symmetric(horizontal: 5.0),
-                          itemBuilder: (context, _) => const Icon(
-                            Icons.star,
-                            color: Colors.orange,
-                          ),
-                          onRatingUpdate: (rating) {
-                            logcat("RATING", rating);
-                          },
+                      RatingBar.builder(
+                        initialRating: 3.5,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 1,
+                        itemSize: 3.5.w,
+                        // itemPadding:
+                        //     const EdgeInsets.symmetric(horizontal: 5.0),
+                        itemBuilder: (context, _) => const Icon(
+                          Icons.star,
+                          color: Colors.orange,
                         ),
+                        onRatingUpdate: (rating) {
+                          logcat("RATING", rating);
+                        },
                       ),
                       getText(
-                        "35 Reviews",
+                        "3.2",
                         TextStyle(
                             fontFamily: fontSemiBold,
                             color: lableColor,
@@ -381,6 +383,17 @@ class SearchScreenController extends GetxController {
                                 : 7.sp,
                             height: 1.2),
                       ),
+                      const Spacer(),
+                      getAddToCartBtn('Add to Cart', Icons.shopping_cart,
+                          addCartClick: () {
+                        if (isGuestUser == true) {
+                          getGuestUserAlertDialog(context);
+                        } else {
+                          Get.to(const CartScreen())!.then((value) {
+                            Statusbar().trasparentStatusbarProfile(true);
+                          });
+                        }
+                      })
                     ],
                   ),
                   getDynamicSizedBox(

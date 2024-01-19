@@ -10,6 +10,7 @@ import 'package:gifthamperz/controller/changePasswordController.dart';
 import 'package:gifthamperz/controller/login_controller.dart';
 import 'package:gifthamperz/controller/registration_controller.dart';
 import 'package:gifthamperz/controller/signup_controller.dart';
+import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
 import '../../configs/assets_constant.dart';
@@ -38,6 +39,7 @@ class CustomFormField extends StatefulWidget {
       this.isDataValidated,
       this.onTap,
       this.isReport,
+      this.isReadOnly,
       this.isPass,
       this.onAddBtn,
       this.isVisible = true,
@@ -81,6 +83,7 @@ class CustomFormField extends StatefulWidget {
   bool isReferenceField = false;
   bool obsecuretext = false;
   bool isVisible = true;
+  final bool? isReadOnly;
 
   @override
   State<CustomFormField> createState() => _CustomFormFieldState();
@@ -91,13 +94,14 @@ class _CustomFormFieldState extends State<CustomFormField> {
   Widget build(BuildContext context) {
     return TextFormField(
       enabled: widget.isEnable,
-      readOnly: widget.isCalender == true ? true : false,
+      readOnly:
+          widget.isCalender == true || widget.isReadOnly == true ? true : false,
       cursorColor: primaryColor,
       obscureText: widget.fromObsecureText == "LOGIN"
           ? Get.find<LoginController>().obsecureText.value
           : widget.fromObsecureText == "SIGNUP"
               ? Get.find<SignUpController>().obsecureText.value
-              : widget.fromObsecureText == "RESETPASS"
+              : widget.fromObsecureText == "CHANGEPASS"
                   ? widget.index == "0"
                       ? Get.find<ChangePassController>()
                           .obsecureOldPasswordText
@@ -111,17 +115,27 @@ class _CustomFormFieldState extends State<CustomFormField> {
                                   .obsecureConfirmPasswordText
                                   .value
                               : widget.obsecuretext
-                  : widget.fromObsecureText == "REGISTER"
+                  : widget.fromObsecureText == "RESETPASS"
                       ? widget.index == "0"
-                          ? Get.find<RegistrationController>()
-                              .obsecurePasswordText
+                          ? Get.find<ResetpassController>()
+                              .obsecureNewPasswordText
                               .value
                           : widget.index == "1"
-                              ? Get.find<RegistrationController>()
+                              ? Get.find<ResetpassController>()
                                   .obsecureConfirmPasswordText
                                   .value
                               : widget.obsecuretext
-                      : widget.obsecuretext,
+                      : widget.fromObsecureText == "REGISTER"
+                          ? widget.index == "0"
+                              ? Get.find<RegistrationController>()
+                                  .obsecurePasswordText
+                                  .value
+                              : widget.index == "1"
+                                  ? Get.find<RegistrationController>()
+                                      .obsecureConfirmPasswordText
+                                      .value
+                                  : widget.obsecuretext
+                          : widget.obsecuretext,
       obscuringCharacter: '*',
       onTap: () {
         if (widget.onTap != null) widget.onTap!();
@@ -287,7 +301,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
                                     logcat(
                                         "SignUpInfoController", widget.index);
                                   } else if (widget.fromObsecureText ==
-                                      "RESETPASS") {
+                                      "CHANGEPASS") {
                                     if (widget.index == "0") {
                                       Get.find<ChangePassController>()
                                               .obsecureOldPasswordText
@@ -311,6 +325,25 @@ class _CustomFormFieldState extends State<CustomFormField> {
                                               .obsecureConfirmPasswordText
                                               .value =
                                           !Get.find<ChangePassController>()
+                                              .obsecureConfirmPasswordText
+                                              .value;
+                                      setState(() {});
+                                    }
+                                  } else if (widget.fromObsecureText ==
+                                      "RESETPASS") {
+                                    if (widget.index == "0") {
+                                      Get.find<ResetpassController>()
+                                              .obsecureNewPasswordText
+                                              .value =
+                                          !Get.find<ResetpassController>()
+                                              .obsecureNewPasswordText
+                                              .value;
+                                      setState(() {});
+                                    } else {
+                                      Get.find<ResetpassController>()
+                                              .obsecureConfirmPasswordText
+                                              .value =
+                                          !Get.find<ResetpassController>()
                                               .obsecureConfirmPasswordText
                                               .value;
                                       setState(() {});
@@ -360,7 +393,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
                                                       ? Icons.visibility_off
                                                       : Icons.visibility
                                                   : widget.fromObsecureText ==
-                                                          "RESETPASS"
+                                                          "CHANGEPASS"
                                                       ? widget.index == "0"
                                                           ? Get.find<ChangePassController>()
                                                                   .obsecureOldPasswordText
@@ -416,11 +449,30 @@ class _CustomFormFieldState extends State<CustomFormField> {
                                                                           .visibility_off
                                                                       : Icons
                                                                           .visibility
-                                                          : widget.obsecuretext
-                                                              ? Icons
-                                                                  .visibility_off
-                                                              : Icons
-                                                                  .visibility,
+                                                          : widget.fromObsecureText ==
+                                                                  "RESETPASS"
+                                                              ? widget.index ==
+                                                                      "0"
+                                                                  ? Get.find<ResetpassController>()
+                                                                          .obsecureNewPasswordText
+                                                                          .value
+                                                                      ? Icons
+                                                                          .visibility_off
+                                                                      : Icons
+                                                                          .visibility
+                                                                  : widget.index ==
+                                                                          "1"
+                                                                      ? Get.find<ResetpassController>()
+                                                                              .obsecureConfirmPasswordText
+                                                                              .value
+                                                                          ? Icons.visibility_off
+                                                                          : Icons.visibility
+                                                                      : widget.obsecuretext
+                                                                          ? Icons.visibility_off
+                                                                          : Icons.visibility
+                                                              : widget.obsecuretext
+                                                                  ? Icons.visibility_off
+                                                                  : Icons.visibility,
                                           color: grey,
                                           size: SizerUtil.deviceType ==
                                                   DeviceType.mobile
@@ -469,8 +521,10 @@ class _CustomFormFieldState extends State<CustomFormField> {
                                                             DeviceType.mobile
                                                         ? 30
                                                         : 40,
-                                                    color: Colors.black
-                                                        .withOpacity(0.2),
+                                                    color: isDarkMode()
+                                                        ? white
+                                                        : black
+                                                            .withOpacity(0.2),
                                                   ),
                                                 ),
                                               )

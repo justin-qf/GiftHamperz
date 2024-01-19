@@ -22,14 +22,15 @@ class _SplashscreenState extends State<Splashscreen> {
   @override
   void initState() {
     super.initState();
+    UserPreferences().setGuestUserDialogVisible(false);
     Timer(const Duration(seconds: 3), () async {
       UserData? retrievedObject = await UserPreferences().getSignInInfo();
-      // if (retrievedObject != null) {
-      //   Get.offAll(const BottomNavScreen());
-      // } else {
-      //   Get.offAll(const IntroScreen());
-      // }
-      Get.offAll(const BottomNavScreen());
+      if (retrievedObject != null) {
+        Get.offAll(const BottomNavScreen());
+      } else {
+        Get.offAll(const IntroScreen());
+      }
+      //Get.offAll(const BottomNavScreen());
     });
   }
 

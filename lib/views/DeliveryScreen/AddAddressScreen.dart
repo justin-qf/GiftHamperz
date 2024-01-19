@@ -1,10 +1,9 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
+import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/input/form_inputs.dart';
-import 'package:gifthamperz/componant/input/style.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
@@ -16,6 +15,7 @@ import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class AddAddressScreen extends StatefulWidget {
   AddAddressScreen({
     super.key,
@@ -35,9 +35,31 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   @override
   void initState() {
     setState(() {});
-    logcat("widget.isFromEdit", widget.isFromEdit.toString());
-    controller.setDataInFormFields(widget.isFromEdit!, widget.itemData);
+    controller.setDataInFormFields(
+        context, widget.isFromEdit!, widget.itemData);
+    //controller.getCityList(context, '');
+    getCity(context);
     super.initState();
+  }
+
+  void getCity(BuildContext context) async {
+    try {
+      if (mounted) {
+        await Future.delayed(const Duration(seconds: 1)).then((value) {
+          if (widget.isFromEdit == true) {
+            if (widget.itemData!.cityId != "null" &&
+                widget.itemData!.cityId.toString().isNotEmpty) {
+              controller.getCityList(
+                  context, widget.itemData!.cityId.toString());
+            }
+          } else {
+            controller.getCityList(context, '');
+          }
+        });
+      }
+    } catch (e) {
+      logcat("ERROR", e);
+    }
   }
 
   @override
@@ -176,86 +198,111 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     SizedBox(
                       height: 1.0.h,
                     ),
-                    Container(
-                      margin: EdgeInsets.only(left: 7.w, right: 7.w),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton2(
-                          buttonPadding: EdgeInsets.only(
-                              left: 1.w,
-                              top: SizerUtil.deviceType == DeviceType.mobile
-                                  ? 0.5.h
-                                  : 1.2.w,
-                              bottom: SizerUtil.deviceType == DeviceType.mobile
-                                  ? 0.5.h
-                                  : 1.2.w),
-                          isExpanded: true,
-                          buttonDecoration: BoxDecoration(
-                            border: Border.all(color: inputBorderColor),
-                            borderRadius: BorderRadius.circular(1.5.h),
-                          ),
-                          hint: Text(
-                            AddFamilylist.city,
-                            style: styleTextForFieldHint(),
-                          ),
-                          items: controller.city
-                              .map((item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: SizerUtil.deviceType ==
-                                            DeviceType.mobile
-                                        ? Text(
-                                            item,
-                                            style: styleTextFormFieldText(),
-                                          )
-                                        : Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 15, bottom: 15, left: 10),
-                                            child: Text(
-                                              item,
-                                              style: styleTextFormFieldText(),
-                                            ),
-                                          ),
-                                  ))
-                              .toList(),
-                          value: controller.selectCity,
-                          onChanged: (value) {
-                            //controller.validategender(value);
-                            setState(() {
-                              controller.selectCity = value as String;
-                            });
-                          },
-                          itemHeight: SizerUtil.deviceType == DeviceType.mobile
-                              ? 30
-                              : 60,
-                          dropdownMaxHeight:
-                              SizerUtil.deviceType == DeviceType.mobile
-                                  ? SizerUtil.height / 2
-                                  : SizerUtil.height / 1,
-                          dropdownDecoration: BoxDecoration(
-                            color: isDarkMode() ? darkBackgroundColor : white,
-                            borderRadius: BorderRadius.circular(2.h),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: grey.withOpacity(0.2),
-                                  blurRadius: 10.0,
-                                  offset: const Offset(0, 1),
-                                  spreadRadius: 3.0)
-                            ],
-                          ),
-                          icon: Container(
-                            padding: EdgeInsets.only(right: 1.h),
-                            child: Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              size: SizerUtil.deviceType == DeviceType.mobile
-                                  ? 40
-                                  : 40,
-                              color: isDarkMode()
-                                  ? rightMenuDarkBackgroundColor
-                                  : grey.withOpacity(0.7),
-                            ),
-                          ),
-                        ),
+                    FadeInDown(
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        child: Obx(() {
+                          return getReactiveFormField(
+                              node: controller.citynode,
+                              controller: controller.cityctr,
+                              hintLabel: "Select City",
+                              onChanged: (val) {
+                                controller.validateCity(val);
+                              },
+                              onTap: () {
+                                controller.searchCityctr.text = "";
+                                showDropdownMessage(context,
+                                    controller.setCityDialog(), "City List");
+                              },
+                              isReadOnly: true,
+                              wantSuffix: true,
+                              isdown: true,
+                              isEnable: true,
+                              inputType: TextInputType.none,
+                              errorText: controller.cityModel.value.error);
+                        }),
                       ),
                     ),
+                    // Container(
+                    //   margin: EdgeInsets.only(left: 7.w, right: 7.w),
+                    //   child: DropdownButtonHideUnderline(
+                    //     child: DropdownButton2(
+                    //       buttonPadding: EdgeInsets.only(
+                    //           left: 1.w,
+                    //           top: SizerUtil.deviceType == DeviceType.mobile
+                    //               ? 0.5.h
+                    //               : 1.2.w,
+                    //           bottom: SizerUtil.deviceType == DeviceType.mobile
+                    //               ? 0.5.h
+                    //               : 1.2.w),
+                    //       isExpanded: true,
+                    //       buttonDecoration: BoxDecoration(
+                    //         border: Border.all(color: inputBorderColor),
+                    //         borderRadius: BorderRadius.circular(1.5.h),
+                    //       ),
+                    //       hint: Text(
+                    //         AddFamilylist.city,
+                    //         style: styleTextForFieldHint(),
+                    //       ),
+                    //       items: controller.city
+                    //           .map((item) => DropdownMenuItem<String>(
+                    //                 value: item,
+                    //                 child: SizerUtil.deviceType ==
+                    //                         DeviceType.mobile
+                    //                     ? Text(
+                    //                         item,
+                    //                         style: styleTextFormFieldText(),
+                    //                       )
+                    //                     : Padding(
+                    //                         padding: const EdgeInsets.only(
+                    //                             top: 15, bottom: 15, left: 10),
+                    //                         child: Text(
+                    //                           item,
+                    //                           style: styleTextFormFieldText(),
+                    //                         ),
+                    //                       ),
+                    //               ))
+                    //           .toList(),
+                    //       value: controller.selectCity,
+                    //       onChanged: (value) {
+                    //         //controller.validategender(value);
+                    //         setState(() {
+                    //           controller.selectCity = value as String;
+                    //         });
+                    //       },
+                    //       itemHeight: SizerUtil.deviceType == DeviceType.mobile
+                    //           ? 30
+                    //           : 60,
+                    //       dropdownMaxHeight:
+                    //           SizerUtil.deviceType == DeviceType.mobile
+                    //               ? SizerUtil.height / 2
+                    //               : SizerUtil.height / 1,
+                    //       dropdownDecoration: BoxDecoration(
+                    //         color: isDarkMode() ? darkBackgroundColor : white,
+                    //         borderRadius: BorderRadius.circular(2.h),
+                    //         boxShadow: [
+                    //           BoxShadow(
+                    //               color: grey.withOpacity(0.2),
+                    //               blurRadius: 10.0,
+                    //               offset: const Offset(0, 1),
+                    //               spreadRadius: 3.0)
+                    //         ],
+                    //       ),
+                    //       icon: Container(
+                    //         padding: EdgeInsets.only(right: 1.h),
+                    //         child: Icon(
+                    //           Icons.keyboard_arrow_down_rounded,
+                    //           size: SizerUtil.deviceType == DeviceType.mobile
+                    //               ? 40
+                    //               : 40,
+                    //           color: isDarkMode()
+                    //               ? rightMenuDarkBackgroundColor
+                    //               : grey.withOpacity(0.7),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(
                       height: 2.h,
                     ),
@@ -267,7 +314,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         Expanded(
                           child: Obx(
                             () {
-                              return RadioListTile(
+                              return getRadio(
+                                  "HOME", controller.addressType.value,
+                                  (value) {
+                                controller.addressType.value = value.toString();
+                                controller.apiPassingAddressType.value = "0";
+                                setState(() {});
+                              });
+
+                              RadioListTile(
                                 activeColor: primaryColor,
                                 contentPadding: EdgeInsets.only(
                                     left: SizerUtil.deviceType ==
@@ -299,7 +354,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         Expanded(
                           child: Obx(
                             () {
-                              return RadioListTile(
+                              return getRadio(
+                                  "WORK", controller.addressType.value,
+                                  (value) {
+                                controller.addressType.value = value.toString();
+                                controller.apiPassingAddressType.value = "1";
+                                setState(() {});
+                              });
+
+                              RadioListTile(
                                 activeColor: primaryColor,
                                 contentPadding: EdgeInsets.only(
                                     left: SizerUtil.deviceType ==

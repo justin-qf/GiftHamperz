@@ -1,8 +1,13 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/utils/helper.dart';
+import 'package:gifthamperz/utils/log.dart';
 import 'package:pinput/pinput.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sizer/sizer.dart';
@@ -103,6 +108,61 @@ Widget getLoginFooter() {
   );
 }
 
+void showCustomToast(BuildContext context, String message) {
+  OverlayEntry overlayEntry;
+  overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      bottom: 10.h,
+      width: SizerUtil.width,
+      child: Material(
+        color: transparent,
+        child: Container(
+          margin: EdgeInsets.only(left: 10.w, right: 10.w),
+          padding:
+              EdgeInsets.only(top: 1.5.h, bottom: 1.5.h, left: 5.w, right: 5.w),
+          decoration: BoxDecoration(
+            color: isDarkMode() ? darkBackgroundColor : primaryColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: isDarkMode() ? white : white,
+                fontSize:
+                    SizerUtil.deviceType == DeviceType.mobile ? 12.sp : 10.sp),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Overlay.of(context).insert(overlayEntry);
+  // Close the overlay after a certain duration
+  Future.delayed(const Duration(seconds: 2), () {
+    overlayEntry.remove();
+  });
+}
+
+Widget getRadio(String title, String groupValue, Function onChange) {
+  return RadioListTile(
+    activeColor: primaryColor,
+    contentPadding: EdgeInsets.only(
+        left: SizerUtil.deviceType == DeviceType.mobile ? 5.5.w : 15.w),
+    visualDensity: const VisualDensity(horizontal: -4),
+    title: Text(
+      title,
+      style: TextStyle(
+          fontSize: SizerUtil.deviceType == DeviceType.mobile ? 12.sp : 10.sp),
+    ),
+    value: title,
+    groupValue: groupValue,
+    onChanged: (value) {
+      onChange(value);
+    },
+  );
+}
+
 Widget getFooter(isLogin) {
   return RichText(
     overflow: TextOverflow.clip,
@@ -165,7 +225,7 @@ Widget getHomeLable(String title, Function onCLick) {
           getDynamicSizedBox(width: 0.3.w),
           Icon(
             Icons.chevron_right_sharp,
-            color: primaryColor,
+            color: isDarkMode() ? white : primaryColor,
             size: 6.w,
           )
         ],
@@ -199,6 +259,31 @@ Widget getLable(String title, {bool? isFromFilter}) {
               )),
         ],
       ),
+    ),
+  );
+}
+
+Widget getLogo(islogo) {
+  return Container(
+    margin: EdgeInsets.only(left: 3.w),
+    child: GestureDetector(
+      onTap: () {
+        islogo();
+      },
+      child: Container(
+          padding: EdgeInsets.only(left: 1.w, right: 1.w),
+          margin: EdgeInsets.only(right: 5.w, left: 4.w),
+          height: 3.5.h,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          // gradient: LinearGradient(
+          //     colors: [primaryColor, primaryColor.withOpacity(0.5)],
+          //     begin: const FractionalOffset(1.0, 0.0),
+          //     end: const FractionalOffset(0.0, 0.0),
+          //     stops: const [0.0, 1.0],
+          //     tileMode: TileMode.clamp)),
+          child: const Image(image: AssetImage(Asset.logoIcon))),
     ),
   );
 }
@@ -301,11 +386,11 @@ Widget getComplaintRow(title, desc) {
 }
 
 Widget getCommonContainer(title, isFromAddCart, icon,
-    {Function? AddCartClick, Function? BuyNowClick}) {
+    {Function? addCartClick, Function? buyNowClick}) {
   return Expanded(
     child: GestureDetector(
       onTap: () {
-        isFromAddCart == true ? AddCartClick!() : BuyNowClick!();
+        isFromAddCart == true ? addCartClick!() : buyNowClick!();
       },
       child: Container(
         decoration: BoxDecoration(
@@ -340,6 +425,57 @@ Widget getCommonContainer(title, isFromAddCart, icon,
             ]),
       ),
     ),
+  );
+}
+
+Widget getAddToCartBtn(title, icon,
+    {Function? addCartClick, RxBool? isAddToCartClicked}) {
+  return GestureDetector(
+    onTap: () {
+      addCartClick!();
+    },
+    child: Container(
+      decoration: BoxDecoration(
+        color: isAddToCartClicked != null && isAddToCartClicked.value == true
+            ? grey
+            : bottomNavBackground,
+        borderRadius: BorderRadius.all(
+          Radius.circular(7.w),
+        ),
+      ),
+      padding:
+          EdgeInsets.only(top: 0.5.h, bottom: 0.5.h, left: 1.5.w, right: 1.5.w),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 1.5.h,
+            color: isDarkMode() ? lightGrey : black,
+          ),
+          getDynamicSizedBox(width: 0.5.w),
+          Text(
+            title,
+            style: TextStyle(
+              color: isDarkMode() ? lightGrey : black,
+              fontFamily: fontBold,
+              fontWeight: FontWeight.w700,
+              fontSize: 8.sp,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+getGuestUserAlertDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const CustomLoginAlertRoundedDialog(); // Use your custom dialog widget
+    },
   );
 }
 
@@ -416,4 +552,61 @@ Widget getCounterUi() {
           ),
         ],
       ));
+}
+
+Widget cartIncDecUi({String? qty, Function? increment, Function? decrement}) {
+  return Container(
+    padding:
+        EdgeInsets.only(left: 2.5.w, right: 2.5.w, top: 0.3.h, bottom: 0.3.h),
+    decoration: BoxDecoration(
+        color: isDarkMode() ? darkBackgroundColor : white,
+        boxShadow: [
+          BoxShadow(
+              color: grey.withOpacity(0.2),
+              blurRadius: 1.0,
+              offset: const Offset(0, 1),
+              spreadRadius: 1.0)
+        ],
+        borderRadius: BorderRadius.all(
+          Radius.circular(5.h),
+        )),
+    child: Row(
+      children: [
+        GestureDetector(
+          onTap: () async {
+            decrement!();
+          },
+          child: Icon(
+            Icons.remove,
+            size: 2.h,
+            color: isDarkMode() ? white : black,
+          ),
+        ),
+        getDynamicSizedBox(width: 0.8.w),
+        getVerticalDivider(),
+        getDynamicSizedBox(width: 1.5.w),
+        Text(
+          qty.toString(),
+          style: TextStyle(
+            color: isDarkMode() ? white : black,
+            fontWeight: FontWeight.w600,
+            fontSize: SizerUtil.deviceType == DeviceType.mobile ? 12.sp : 13.sp,
+          ),
+        ),
+        getDynamicSizedBox(width: 2.w),
+        getVerticalDivider(),
+        getDynamicSizedBox(width: 0.5.w),
+        GestureDetector(
+          onTap: () async {
+            increment!();
+          },
+          child: Icon(
+            Icons.add,
+            size: 2.h,
+            color: isDarkMode() ? white : black,
+          ),
+        ),
+      ],
+    ),
+  );
 }

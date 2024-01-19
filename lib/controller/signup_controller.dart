@@ -1,18 +1,23 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/Repository.dart';
+import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/models/validation_model.dart';
 import 'package:gifthamperz/utils/enum.dart';
+import 'package:gifthamperz/utils/log.dart';
+import 'package:gifthamperz/views/OtpScreen/OtpScreen.dart';
 import '../../configs/string_constant.dart';
 import '../../componant/dialogs/dialogs.dart';
 
 class SignUpController extends GetxController {
   final GlobalKey<FormState> signupkey = GlobalKey<FormState>();
   final InternetController networkManager = Get.find<InternetController>();
-  late TextEditingController emailCtr, passwordctr, confirmpassCtr;
-  late FocusNode emailNode, passNode, confirmNode;
-  var emailModel = ValidationModel(null, null, isValidate: false).obs;
+  late TextEditingController mobileCtr, passwordctr, confirmpassCtr;
+  late FocusNode mobileNode, passNode, confirmNode;
+  var mobileModel = ValidationModel(null, null, isValidate: false).obs;
   var passModel = ValidationModel(null, null, isValidate: false).obs;
   var confirmpassModel = ValidationModel(null, null, isValidate: false).obs;
   RxBool isFormInvalidate = false.obs;
@@ -25,10 +30,10 @@ class SignUpController extends GetxController {
 
   @override
   void onInit() {
-    emailNode = FocusNode();
+    mobileNode = FocusNode();
     passNode = FocusNode();
     confirmNode = FocusNode();
-    emailCtr = TextEditingController();
+    mobileCtr = TextEditingController();
     passwordctr = TextEditingController();
     confirmpassCtr = TextEditingController();
     super.onInit();
@@ -37,13 +42,13 @@ class SignUpController extends GetxController {
   RxList imageObjectList = [].obs;
   RxString loginImgPath = "".obs;
 
-  void validateEmail(String? val) {
-    emailModel.update((model) {
-      if (val != null && val.toString().trim().isEmpty) {
-        model!.error = "Enter Email Id";
+  void validateMobile(String? val) {
+    mobileModel.update((model) {
+      if (val == null || val.isEmpty) {
+        model!.error = 'Enter Phone Number';
         model.isValidate = false;
-      } else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(emailCtr.text.trim())) {
-        model!.error = "Enter Valid Email Id";
+      } else if (val.replaceAll(' ', '').length != 10) {
+        model!.error = 'Enter 10 digit Number';
         model.isValidate = false;
       } else {
         model!.error = null;
@@ -68,9 +73,14 @@ class SignUpController extends GetxController {
   }
 
   void enableSignUpButton() {
-    if (emailModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (passModel.value.isValidate == false) {
+    // if (emailModel.value.isValidate == false) {
+    //   isFormInvalidate.value = false;
+    // } else if (passModel.value.isValidate == false) {
+    //   isFormInvalidate.value = false;
+    // } else {
+    //   isFormInvalidate.value = true;
+    // }
+    if (mobileModel.value.isValidate == false) {
       isFormInvalidate.value = false;
     } else {
       isFormInvalidate.value = true;
@@ -84,18 +94,56 @@ class SignUpController extends GetxController {
     }
   }
 
-  showDialogForScreen(context, String message, {Function? callback}) {
-    showMessage(
-        context: context,
-        callback: () {
-          if (callback != null) {
-            callback();
-          }
-          return true;
-        },
-        message: message,
-        title: LoginConst.signIn,
-        negativeButton: '',
-        positiveButton: Common.continues);
+  void getSignUpOtp(context, number) async {
+    var loadingIndicator = LoadingProgressDialog();
+    loadingIndicator.show(context, '');
+    try {
+      if (networkManager.connectionType == 0) {
+        loadingIndicator.hide(context);
+        showDialogForScreen(
+            context, SignupConstant.title, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+
+      var response = await Repository.post({
+        "mobile_no": number,
+      }, ApiUrl.getSignUpOtp, allowHeader: false);
+      loadingIndicator.hide(context);
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (data['status'] == 1) {
+          showDialogForScreen(
+              context, SignupConstant.title, data['otp'].toString(),
+              callback: () {
+            Get.to(OtpScreen(
+              mobile: number.toString().trim(),
+              otp: data['otp'].toString(),
+              isFromSignUp: true,
+            ));
+          });
+        } else {
+          showDialogForScreen(
+              context, SignupConstant.title, data['message'],
+              callback: () {});
+        }
+      } else {
+        showDialogForScreen(
+            context,
+            SignupConstant.title,
+            data['message'] != null && data['message'].toString().isNotEmpty
+                ? data['message'].toString()
+                : ServerError.servererror,
+            callback: () {});
+      }
+    } catch (e) {
+      logcat("Exception", e);
+      showDialogForScreen(
+          context, SignupConstant.title, ServerError.servererror,
+          callback: () {});
+    }
   }
+
 }

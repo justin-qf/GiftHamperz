@@ -108,8 +108,8 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                                 child: Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
-                                    widget.data.description,
-                                    textAlign: TextAlign.start,
+                                    widget.data.shortDescription,
+                                    textAlign: TextAlign.justify,
                                     style: TextStyle(
                                         color: isDarkMode() ? white : black,
                                         fontFamily: fontRegular,

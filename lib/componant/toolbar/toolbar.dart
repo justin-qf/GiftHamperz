@@ -8,32 +8,27 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/LoginScreen/LoginScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../configs/string_constant.dart';
 
-getToolbar(title, Function onClick) {
+getToolbar(String title, Function onClick, Function cartOnClick, int budget) {
   return Stack(
     children: [
+      Positioned(left: 0, top: 0, child: getLogo()),
       Center(
         child: FadeInDown(
           child: Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontFamily: fontBold,
-                color: isDarkMode() ? white : black,
-                fontWeight: FontWeight.bold,
-                fontSize: 18.sp),
+              fontFamily: fontBold,
+              color: isDarkMode() ? white : black,
+              fontWeight: FontWeight.bold,
+              fontSize: 18.sp,
+            ),
           ),
         ),
-        // FadeInLeft(
-        //   child: Image.asset(
-        //     Asset.appLogo,
-        //     height: 4.5.h,
-        //   ),
-        // )
       ),
       Positioned(
         top: -5,
@@ -43,26 +38,150 @@ getToolbar(title, Function onClick) {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              color: isDarkMode() ? white : black,
-              iconSize: 3.5.h,
-              onPressed: () {
-                onClick();
-              },
+            Container(
+              color: Colors.blueGrey,
+              child: IconButton(
+                alignment: Alignment.centerRight,
+                icon: const Icon(Icons.search),
+                color: isDarkMode() ? white : black,
+                iconSize: 3.5.h,
+                onPressed: () {
+                  onClick();
+                },
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.shopping_cart),
-              color: isDarkMode() ? white : black,
-              iconSize: 3.3.h,
-              onPressed: () {
-                Get.to(const CartScreen());
-              },
+            Container(
+              color: Colors.amber,
+              child: Stack(
+                alignment: Alignment.centerRight,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.shopping_cart),
+                    color: isDarkMode() ? white : black,
+                    iconSize: 3.3.h,
+                    onPressed: () {
+                      cartOnClick();
+                    },
+                  ),
+                  Positioned(
+                    right: 3,
+                    top: 5,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        budget.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     ],
+  );
+}
+
+homeAppbar(String title, Function onClick, Function cartOnClick, RxInt budget) {
+  return Padding(
+    padding: EdgeInsets.only(left: 1.w, right: 2.w, top: 0.5.h),
+    child: Row(
+      children: [
+        getLogo(),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 1, left: 9, right: 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: 16.5.sp,
+                    color: isDarkMode() ? white : black,
+                    fontFamily: fontBold,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            onClick();
+          },
+          child: Container(
+            padding:
+                const EdgeInsets.only(left: 2, right: 1, top: 2, bottom: 2),
+            child: Icon(
+              color: isDarkMode() ? white : primaryColor,
+              Icons.search,
+              size: 3.3.h,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            cartOnClick();
+          },
+          child: Stack(
+            alignment: Alignment.centerRight,
+            children: [
+              Container(
+                  padding: const EdgeInsets.all(2),
+                  child: Icon(
+                    color: isDarkMode() ? white : primaryColor,
+                    Icons.shopping_cart,
+                    size: 3.3.h,
+                  )),
+              Positioned(
+                right: 3,
+                top: 2,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: bottomNavBackground,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 4.0.w,
+                    minHeight: 0.6.h,
+                  ),
+                  child: Text(
+                    budget.value.toString(),
+                    style: TextStyle(
+                      color: isDarkMode() ? white : black,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
   );
 }
 
@@ -609,7 +728,7 @@ getDividerForShowDialog() {
     indent: 0.1.h,
     endIndent: 0.1.h,
     thickness: 1,
-    color: primaryColor.withOpacity(0.5),
+    color: isDarkMode() ? white : primaryColor.withOpacity(0.5),
   );
 }
 
@@ -828,28 +947,19 @@ Widget viewFamilyBackPress(callback, {bool? fromFilter}) {
   );
 }
 
-Widget getLogo(islogo) {
+Widget getLogo() {
   return Container(
-    margin: EdgeInsets.only(left: 3.w),
-    child: GestureDetector(
-      onTap: () {
-        islogo();
-      },
-      child: Container(
-          padding: EdgeInsets.only(left: 1.w, right: 1.w),
-          margin: EdgeInsets.only(right: 5.w, left: 4.w),
-          height: 3.5.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: FadeInLeft(
-            child: SvgPicture.asset(
-              Asset.logo,
-              height: 5.h,
-            ),
-          )),
-    ),
-  );
+      padding: EdgeInsets.only(left: 2.5.w, right: 1.w),
+      height: 3.6.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: FadeInLeft(
+        child: SvgPicture.asset(
+          Asset.logo,
+          height: 5.h,
+        ),
+      ));
 }
 
 Widget notification(isNotify) {

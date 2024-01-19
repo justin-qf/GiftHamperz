@@ -36,10 +36,10 @@ class Repository {
       'Content-Type': "application/json",
       'Authorization': token,
     };
-    logcat("PassignData", {
-      'Content-Type': "application/json",
-      'Authorization': token,
-    });
+    // logcat("PassignData", {
+    //   'Content-Type': "application/json",
+    //   'Authorization': token,
+    // });
     var response = await client.post(buildUrl(endPoint),
         body: jsonEncode(body),
         headers: allowHeader == true ? headers : await buildHeader);
@@ -67,12 +67,17 @@ class Repository {
   }
 
   static Future<http.Response> get(Map<String, String> body, String endPoint,
-      {bool? allowHeader, bool? list}) async {
+      {bool? allowHeader, bool? isToken}) async {
     logcat("APIURL:::", buildUrl(endPoint));
 
-    var response = await client.get(buildUrl(endPoint), headers: {
-      HttpHeaders.contentTypeHeader: "application/json",
-    });
+    String token = await UserPreferences().getToken();
+    logcat("Token::::", token.toString());
+    Map<String, String> headers = {
+      'Content-Type': "multipart/form-data",
+      'Authorization': token,
+    };
+    var response = await client.get(buildUrl(endPoint),
+        headers: allowHeader == true ? headers : await buildHeader);
     return response;
   }
 
@@ -81,9 +86,10 @@ class Repository {
       http.MultipartFile? multiPart,
       http.MultipartFile? multiPartData}) async {
     String token = await UserPreferences().getToken();
+    logcat("Token::::", token.toString());
     Map<String, String> headers = {
       'Content-Type': "multipart/form-data",
-      'x-access-token': token,
+      'Authorization': token,
     };
 
     var request = http.MultipartRequest(

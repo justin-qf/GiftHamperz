@@ -14,7 +14,6 @@ import 'package:gifthamperz/controller/signup_controller.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/LoginScreen/LoginScreen.dart';
-import 'package:gifthamperz/views/PrepareScreen/PrepareScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../componant/input/form_inputs.dart';
 import '../../../../configs/colors_constant.dart';
@@ -32,13 +31,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void initState() {
-    controller.passwordctr.text = "";
+    controller.mobileCtr.text = "";
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.passwordctr.text = "";
+    controller.mobileCtr.text = "";
     super.dispose();
   }
 
@@ -74,7 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
           Positioned(
-            top: isSmallDevice(context) ? 10.h : 13.h,
+            top: isSmallDevice(context) ? 12.h : 20.h,
             child: FadeInLeft(
               child: Container(
                 margin: EdgeInsets.only(left: 10.w, bottom: 2.h),
@@ -158,70 +157,70 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 getDynamicSizedBox(
                                   height: 2.h,
                                 ),
-                                getLable(LoginConst.emailLable),
+                                getLable(LoginConst.mobileLable),
                                 FadeInDown(
                                   child: AnimatedSize(
                                     duration: const Duration(milliseconds: 300),
                                     child: Obx(() {
                                       return getReactiveFormField(
-                                          node: controller.emailNode,
-                                          controller: controller.emailCtr,
-                                          hintLabel: LoginConst.email,
+                                          node: controller.mobileNode,
+                                          controller: controller.mobileCtr,
+                                          hintLabel: LoginConst.mobile,
                                           onChanged: (val) {
-                                            controller.validateEmail(val);
+                                            controller.validateMobile(val);
                                           },
                                           obscuretext: false,
                                           inputType: TextInputType.emailAddress,
                                           errorText: controller
-                                              .emailModel.value.error);
+                                              .mobileModel.value.error);
                                     }),
                                   ),
                                 ),
-                                getLable(LoginConst.passwordLable),
-                                FadeInDown(
-                                  child: AnimatedSize(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Obx(() {
-                                      return getReactiveFormField(
-                                          node: controller.passNode,
-                                          controller: controller.passwordctr,
-                                          hintLabel: LoginConst.password,
-                                          wantSuffix: true,
-                                          isPass: true,
-                                          obscuretext: true,
-                                          onChanged: (val) {
-                                            controller.validatePassword(val);
-                                          },
-                                          fromObsecureText: "SIGNUP",
-                                          inputType: TextInputType.text,
-                                          errorText:
-                                              controller.passModel.value.error);
-                                    }),
-                                  ),
-                                ),
-                                getLable(LoginConst.confirmPasswordLable),
-                                FadeInDown(
-                                  child: AnimatedSize(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Obx(() {
-                                      return getReactiveFormField(
-                                          node: controller.confirmNode,
-                                          controller: controller.confirmpassCtr,
-                                          hintLabel:
-                                              LoginConst.confirmPasswordHint,
-                                          wantSuffix: true,
-                                          isPass: true,
-                                          obscuretext: true,
-                                          onChanged: (val) {
-                                            controller.validatePassword(val);
-                                          },
-                                          fromObsecureText: "LOGIN",
-                                          inputType: TextInputType.text,
-                                          errorText:
-                                              controller.passModel.value.error);
-                                    }),
-                                  ),
-                                ),
+                                // getLable(LoginConst.passwordLable),
+                                // FadeInDown(
+                                //   child: AnimatedSize(
+                                //     duration: const Duration(milliseconds: 300),
+                                //     child: Obx(() {
+                                //       return getReactiveFormField(
+                                //           node: controller.passNode,
+                                //           controller: controller.passwordctr,
+                                //           hintLabel: LoginConst.password,
+                                //           wantSuffix: true,
+                                //           isPass: true,
+                                //           obscuretext: true,
+                                //           onChanged: (val) {
+                                //             controller.validatePassword(val);
+                                //           },
+                                //           fromObsecureText: "SIGNUP",
+                                //           inputType: TextInputType.text,
+                                //           errorText:
+                                //               controller.passModel.value.error);
+                                //     }),
+                                //   ),
+                                // ),
+                                // getLable(LoginConst.confirmPasswordLable),
+                                // FadeInDown(
+                                //   child: AnimatedSize(
+                                //     duration: const Duration(milliseconds: 300),
+                                //     child: Obx(() {
+                                //       return getReactiveFormField(
+                                //           node: controller.confirmNode,
+                                //           controller: controller.confirmpassCtr,
+                                //           hintLabel:
+                                //               LoginConst.confirmPasswordHint,
+                                //           wantSuffix: true,
+                                //           isPass: true,
+                                //           obscuretext: true,
+                                //           onChanged: (val) {
+                                //             controller.validatePassword(val);
+                                //           },
+                                //           fromObsecureText: "LOGIN",
+                                //           inputType: TextInputType.text,
+                                //           errorText:
+                                //               controller.passModel.value.error);
+                                //     }),
+                                //   ),
+                                // ),
                                 getDynamicSizedBox(
                                   height: 2.h,
                                 ),
@@ -236,7 +235,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       return getSecondaryFormButton(() {
                                         if (controller.isFormInvalidate.value ==
                                             true) {
-                                          Get.to(const PrepareScreen());
+                                          controller.getSignUpOtp(
+                                              context,
+                                              controller.mobileCtr.text
+                                                  .toString());
+                                          //Get.to(const PrepareScreen());
                                         }
                                       }, SignupConstant.buttonLabel,
                                           isvalidate: controller

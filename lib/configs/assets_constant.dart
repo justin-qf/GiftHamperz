@@ -38,6 +38,7 @@ class Asset {
   static const orders = '$assets${svgFolder}orders.svg';
   static const gift = '$assets${svgFolder}gift.svg';
   static const cartEmpty = '$assets${svgFolder}cart_empty.svg';
+  static const alertLogin = '$assets${svgFolder}login.svg';
 
   //PNGS//
   static const introOne = '$assets${pngFolder}intro_one.png';

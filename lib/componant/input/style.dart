@@ -4,10 +4,14 @@ import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:sizer/sizer.dart';
 
-styleTextFormFieldText() {
+styleTextFormFieldText({isWhite}) {
   return TextStyle(
     fontFamily: fontRegular,
-    color: isDarkMode() ? white : black,
+    color: isDarkMode()
+        ? isWhite == true
+            ? white
+            : black
+        : black,
     fontWeight: FontWeight.w300,
     fontSize: 12.sp,
   );

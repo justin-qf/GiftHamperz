@@ -77,7 +77,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     SizerUtil.deviceType == DeviceType.mobile
                                         ? 0.5.h
                                         : 0.h),
-                                         getDynamicSizedBox(
+                            getDynamicSizedBox(
                               height: 1.h,
                             ),
                             getLable(RegistrationConstant.firstName),
@@ -143,7 +143,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 }),
                               ),
                             ),
-                           getDynamicSizedBox(
+                            getDynamicSizedBox(
                               height: 1.h,
                             ),
                             getLable(RegistrationConstant.mobile),
@@ -188,7 +188,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 }),
                               ),
                             ),
-                            
                             getDynamicSizedBox(
                               height: 1.h,
                             ),

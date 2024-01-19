@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
+import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
@@ -84,21 +85,27 @@ class AddressScreenController extends GetxController {
 
       logcat("URL", pageURL.toString());
       var response = await Repository.post({
-        "city_id": 25,
+        // "city_id": 25,
       }, pageURL, allowHeader: true);
 
       // loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
+      logcat("RESPONSE", jsonEncode(data));
+      logcat("StatusCode", response.statusCode.toString());
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           state.value = ScreenState.apiSuccess;
           message.value = '';
           isLoading.value = false;
-          update();
           var responseData = AddressModel.fromJson(data);
-          addressList.clear();
-          addressList.addAll(responseData.data.data);
-          nextPageURL.value = responseData.data.nextPageUrl.toString();
+          logcat("LISTEMPTY", responseData.data.data.length.toString());
+          if (responseData.data.data.isNotEmpty) {
+            addressList.clear();
+            addressList.addAll(responseData.data.data);
+            nextPageURL.value = responseData.data.nextPageUrl.toString();
+          } else {
+            //state.value = ScreenState.noDataFound;
+          }
           logcat("NextPageURL", nextPageURL.value.toString());
           // currentPage++;
           update();
@@ -122,6 +129,54 @@ class AddressScreenController extends GetxController {
       isLoading.value = false;
       state.value = ScreenState.apiError;
       message.value = ServerError.servererror;
+    }
+  }
+
+  void addDefaultAddressAPI(context, String addressId) async {
+    var loadingIndicator = LoadingProgressDialog();
+    loadingIndicator.show(context, '');
+    try {
+      if (networkManager.connectionType == 0) {
+        loadingIndicator.hide(context);
+        showDialogForScreen(
+            context, AddAddressText.addressTitle, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+      logcat('loginPassingData', {
+        "address_id": addressId.toString().trim(),
+      });
+
+      var response = await Repository.post({
+        "address_id": addressId.toString().trim(),
+      }, ApiUrl.addDefaultAddress, allowHeader: true);
+      loadingIndicator.hide(context);
+      var data = jsonDecode(response.body);
+      logcat("tag", data);
+      if (response.statusCode == 200) {
+        if (data['status'] == 1) {
+          showDialogForScreen(
+              context, AddAddressText.addressTitle, data['message'],
+              callback: () {
+            Get.back(result: true);
+          });
+        } else {
+          showDialogForScreen(
+              context, AddAddressText.addressTitle, data['message'],
+              callback: () {});
+        }
+      } else {
+        showDialogForScreen(
+            context, AddAddressText.addressTitle, data['message'] ?? "",
+            callback: () {});
+      }
+    } catch (e) {
+      logcat("Exception", e);
+      showDialogForScreen(
+          context, AddAddressText.addressTitle, ServerError.servererror,
+          callback: () {});
     }
   }
 
@@ -251,7 +306,7 @@ class AddressScreenController extends GetxController {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        Statusbar().trasparentStatusbarProfile(true);
+        // Statusbar().trasparentStatusbarProfile(true);
         return const CustomRoundedDialog(); // Use your custom dialog widget
       },
     );

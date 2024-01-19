@@ -6,8 +6,11 @@ import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
+import 'package:gifthamperz/models/loginModel.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/log.dart';
+import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
 import 'package:gifthamperz/views/RecoveryPassword/RecoveryScreen.dart';
 import '../../componant/dialogs/dialogs.dart';
 import 'internet_controller.dart';
@@ -146,7 +149,7 @@ class OtpController extends GetxController {
 
   void verifyButtonAction(context, id) async {}
 
-  void getOtpScreen(context, String otp, String mobile) async {
+  void getOtpApi(context, String otp, String mobile) async {
     var loadingIndicator = LoadingProgressDialog();
     loadingIndicator.show(context, '');
 
@@ -167,11 +170,63 @@ class OtpController extends GetxController {
       }, ApiUrl.getVerifyOtp);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
+      logcat("RESPONSE", jsonEncode(data));
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           Get.to(RecoveryScreen(
             mobile: mobile,
           ));
+        } else {
+          showDialogForScreen(
+              context, VerificationScreen.title, data['message'], callback: () {
+            FocusScope.of(context).requestFocus(otpNode);
+            otpController.text = "";
+          });
+        }
+      } else {
+        showDialogForScreen(context, VerificationScreen.title, data['message'],
+            callback: () {
+          startTimer();
+          FocusScope.of(context).requestFocus(otpNode);
+          otpController.text = "";
+        });
+      }
+    } catch (e) {
+      logcat("Exception", e);
+      showDialogForScreen(
+          context, VerificationScreen.title, ServerError.servererror,
+          callback: () {});
+    }
+  }
+
+  void getSignUpOtpApi(context, String otp, String mobile) async {
+    var loadingIndicator = LoadingProgressDialog();
+    loadingIndicator.show(context, '');
+
+    try {
+      if (networkManager.connectionType == 0) {
+        loadingIndicator.hide(context);
+        showDialogForScreen(
+            context, VerificationScreen.title, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+      var response = await Repository.post({
+        "mobile_no": mobile,
+        "otp": otpController.text,
+      }, ApiUrl.getVerifyGuestOtp);
+      loadingIndicator.hide(context);
+      var data = jsonDecode(response.body);
+      logcat("RESPONSE", jsonEncode(data));
+      if (response.statusCode == 200) {
+        if (data['status'] == 1) {
+          var loginData = LoginModel.fromJson(data);
+          UserPreferences().saveSignInInfo(loginData.user);
+          UserPreferences().setToken(loginData.user.token);
+          UserPreferences().setIsGuestUser(false);
+          Get.offAll(const BottomNavScreen());
         } else {
           showDialogForScreen(
               context, VerificationScreen.title, data['message'],
@@ -180,6 +235,8 @@ class OtpController extends GetxController {
       } else {
         showDialogForScreen(context, VerificationScreen.title, data['message'],
             callback: () {
+          startTimer();
+          FocusScope.of(context).requestFocus(otpNode);
           otpController.text = "";
         });
       }
@@ -198,7 +255,7 @@ class OtpController extends GetxController {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
         showDialogForScreen(
-            context, ForgotPassScreenConstant.title, Connection.noConnection,
+            context, VerificationScreen.title, Connection.noConnection,
             callback: () {
           Get.back();
         });
@@ -214,7 +271,7 @@ class OtpController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           showDialogForScreen(
-              context, ForgotPassScreenConstant.title, data['otp'].toString(),
+              context, VerificationScreen.title, data['otp'].toString(),
               callback: () {
             otpController.text = '';
             FocusScope.of(context).requestFocus(otpNode);
@@ -222,18 +279,67 @@ class OtpController extends GetxController {
           });
         } else {
           showDialogForScreen(
-              context, ForgotPassScreenConstant.title, data['message'],
+              context, VerificationScreen.title, data['message'],
               callback: () {});
         }
       } else {
         showDialogForScreen(
-            context, RegistrationConstant.title, ServerError.servererror,
+            context, VerificationScreen.title, ServerError.servererror,
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
       showDialogForScreen(
-          context, RegistrationConstant.title, ServerError.servererror,
+          context, VerificationScreen.title, ServerError.servererror,
+          callback: () {});
+    }
+  }
+
+  void getSignUpOtp(context, number) async {
+    var loadingIndicator = LoadingProgressDialog();
+    loadingIndicator.show(context, '');
+    try {
+      if (networkManager.connectionType == 0) {
+        loadingIndicator.hide(context);
+        showDialogForScreen(
+            context, VerificationScreen.title, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+
+      var response = await Repository.post({
+        "mobile_no": number,
+      }, ApiUrl.getSignUpOtp, allowHeader: false);
+      loadingIndicator.hide(context);
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (data['status'] == 1) {
+          showDialogForScreen(
+              context, VerificationScreen.title, data['otp'].toString(),
+              callback: () {
+            otpController.text = '';
+            FocusScope.of(context).requestFocus(otpNode);
+          });
+        } else {
+          showDialogForScreen(
+              context, VerificationScreen.title, data['message'],
+              callback: () {});
+        }
+      } else {
+        showDialogForScreen(
+            context,
+            VerificationScreen.title,
+            data['message'] != null && data['message'].toString().isNotEmpty
+                ? data['message'].toString()
+                : ServerError.servererror,
+            callback: () {});
+      }
+    } catch (e) {
+      logcat("Exception", e);
+      showDialogForScreen(
+          context, VerificationScreen.title, ServerError.servererror,
           callback: () {});
     }
   }

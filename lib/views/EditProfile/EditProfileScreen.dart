@@ -1,8 +1,10 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/input/form_inputs.dart';
+import 'package:gifthamperz/componant/input/style.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
@@ -12,6 +14,7 @@ import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/edit_controller.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -72,17 +75,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             height: SizerUtil.deviceType == DeviceType.mobile
                                 ? 0.5.h
                                 : 0.h),
-                        getLable(RegistrationConstant.hintFirstName),
+                        getLable(RegistrationConstant.userName),
                         FadeInDown(
                           child: AnimatedSize(
                             duration: const Duration(milliseconds: 300),
                             child: Obx(() {
                               return getReactiveFormField(
-                                  node: controller.fullnamenode,
-                                  controller: controller.fullnamectr,
-                                  hintLabel: RegistrationConstant.firstName,
+                                  node: controller.userNameNode,
+                                  controller: controller.userNamectr,
+                                  hintLabel: RegistrationConstant.hintUserName,
                                   onChanged: (val) {
-                                    controller.validateFullName(val);
+                                    //controller.validateFullName(val);
                                   },
                                   obscuretext: false,
                                   inputType: TextInputType.name,
@@ -91,27 +94,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             }),
                           ),
                         ),
-                        SizedBox(
-                          height: 1.h,
-                        ),
-                        getLable(LoginConst.phonenumber),
-                        FadeInDown(
-                          child: AnimatedSize(
-                            duration: const Duration(milliseconds: 300),
-                            child: Obx(() {
-                              return getReactiveFormField(
-                                  node: controller.phonenumbernode,
-                                  controller: controller.phonenumberctr,
-                                  hintLabel: LoginConst.number,
-                                  onChanged: (val) {
-                                    controller.validatePhone(val);
-                                  },
-                                  obscuretext: false,
-                                  inputType: TextInputType.number,
-                                  errorText: controller.phonemodel.value.error);
-                            }),
-                          ),
-                        ),
+                        // SizedBox(
+                        //   height: 1.h,
+                        // ),
+                        // getLable(LoginConst.phonenumber),
+                        // FadeInDown(
+                        //   child: AnimatedSize(
+                        //     duration: const Duration(milliseconds: 300),
+                        //     child: Obx(() {
+                        //       return getReactiveFormField(
+                        //           node: controller.phonenumbernode,
+                        //           controller: controller.phonenumberctr,
+                        //           hintLabel: LoginConst.number,
+                        //           onChanged: (val) {
+                        //             controller.validatePhone(val);
+                        //           },
+                        //           obscuretext: false,
+                        //           inputType: TextInputType.number,
+                        //           errorText: controller.phonemodel.value.error);
+                        //     }),
+                        //   ),
+                        // ),
                         SizedBox(
                           height: 1.h,
                         ),
@@ -125,7 +128,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   controller: controller.emailCtr,
                                   hintLabel: LoginConst.email,
                                   onChanged: (val) {
-                                    controller.validateEmail(val);
+                                    //  controller.validateEmail(val);
                                   },
                                   obscuretext: false,
                                   inputType: TextInputType.emailAddress,
@@ -133,30 +136,182 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             }),
                           ),
                         ),
-                        SizedBox(
+                        getDynamicSizedBox(
                           height: 1.h,
                         ),
-                        getLable(LoginConst.passwordLable),
+                        getLable(RegistrationConstant.dob),
                         FadeInDown(
                           child: AnimatedSize(
                             duration: const Duration(milliseconds: 300),
                             child: Obx(() {
                               return getReactiveFormField(
-                                  node: controller.passNode,
-                                  controller: controller.passwordctr,
-                                  hintLabel: LoginConst.password,
+                                  node: controller.dobNode,
+                                  controller: controller.dobCtr,
+                                  hintLabel: AddPrescriptionHintText.date,
                                   wantSuffix: true,
-                                  isPass: true,
-                                  obscuretext: true,
-                                  onChanged: (val) {
-                                    controller.validatePassword(val);
+                                  isCalender: true,
+                                  onTap: () async {
+                                    DateTime? pickedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: controller.selectedDate,
+                                        firstDate: DateTime(1950),
+                                        lastDate: DateTime.now()
+                                            .add(const Duration(days: 0)));
+                                    if (pickedDate != null &&
+                                        pickedDate != controller.selectedDate) {
+                                      setState(() {
+                                        controller.selectedDate = pickedDate;
+                                      });
+                                    }
+                                    if (pickedDate != null) {
+                                      String formattedDate =
+                                          DateFormat(Date.dateFormat)
+                                              .format(pickedDate);
+                                      controller.updateDate(formattedDate);
+                                      //controller.validatedob(formattedDate);
+                                    }
                                   },
-                                  fromObsecureText: "EDIT",
+                                  onChanged: (val) {
+                                    //controller.validatedob(val);
+                                  },
                                   inputType: TextInputType.text,
-                                  errorText: controller.passModel.value.error);
+                                  errorText: controller.dobModel.value.error);
                             }),
                           ),
                         ),
+                        getDynamicSizedBox(
+                          height: 1.h,
+                        ),
+                        getLable(RegistrationConstant.gender),
+                        getSizedBoxForDropDown(),
+                        FadeInDown(
+                            child: AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          child: Container(
+                              margin: EdgeInsets.only(
+                                left: 8.w,
+                                right: 8.w,
+                              ),
+                              child: Obx(
+                                () {
+                                  return DropdownButtonHideUnderline(
+                                    child: DropdownButton2(
+                                      buttonPadding: EdgeInsets.only(
+                                          left: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 0.5.w
+                                              : 2.0.w,
+                                          top: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 4.5
+                                              : 1.2.w,
+                                          bottom: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 4.5
+                                              : 1.2.w),
+                                      isExpanded: true,
+                                      buttonDecoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: inputBorderColor),
+                                        borderRadius:
+                                            BorderRadius.circular(1.5.h),
+                                      ),
+                                      hint: Text(
+                                        AddFamilylist.gender,
+                                        style: styleTextForFieldHintDropDown(),
+                                      ),
+                                      items: controller.gender
+                                          .map(
+                                              (item) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: item,
+                                                    child:
+                                                        SizerUtil.deviceType ==
+                                                                DeviceType
+                                                                    .mobile
+                                                            ? Text(
+                                                                item,
+                                                                style:
+                                                                    styleTextFormFieldText(),
+                                                              )
+                                                            : Padding(
+                                                                padding: EdgeInsets.only(
+                                                                    top: SizerUtil.deviceType ==
+                                                                            DeviceType
+                                                                                .mobile
+                                                                        ? 20
+                                                                        : 1.3.h,
+                                                                    bottom: SizerUtil.deviceType ==
+                                                                            DeviceType.mobile
+                                                                        ? 10
+                                                                        : 2.w,
+                                                                    left: 10),
+                                                                child: Text(
+                                                                  item,
+                                                                  style:
+                                                                      styleTextFormFieldText(),
+                                                                ),
+                                                              ),
+                                                  ))
+                                          .toList(),
+                                      value: controller
+                                              .selectGender.value.isNotEmpty
+                                          ? controller.selectGender.value
+                                          : null,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          controller.selectGender.value =
+                                              value as String;
+                                        });
+                                        //controller.validategender(value);
+                                      },
+                                      itemHeight: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 40
+                                          : 60,
+                                      dropdownMaxHeight: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? SizerUtil.height / 1.8
+                                          : SizerUtil.height / 1,
+                                      dropdownDecoration: BoxDecoration(
+                                        color: isDarkMode()
+                                            ? darkBackgroundColor
+                                            : white,
+                                        borderRadius:
+                                            BorderRadius.circular(2.h),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.2),
+                                              blurRadius: 10.0,
+                                              offset: const Offset(0, 1),
+                                              spreadRadius: 3.0)
+                                        ],
+                                      ),
+                                      icon: Container(
+                                        padding: EdgeInsets.only(
+                                            right: SizerUtil.deviceType ==
+                                                    DeviceType.mobile
+                                                ? 10
+                                                : 3.w),
+                                        child: Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          size: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 30
+                                              : 40,
+                                          color: Colors.black.withOpacity(0.2),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              )),
+                        )),
+                        SizedBox(
+                          height: 1.h,
+                        ),
+
                         SizedBox(
                           height: 3.h,
                         ),
@@ -169,8 +324,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             from: 50,
                             child: Obx(() {
                               return getSecondaryFormButton(() {
-                                if (controller.isFormInvalidate.value ==
-                                    true) {}
+                                if (controller.isFormInvalidate.value == true) {
+                                  controller.editProfileApi(context);
+                                }
                               }, Button.update,
                                   isvalidate:
                                       controller.isFormInvalidate.value);

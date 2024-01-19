@@ -11,8 +11,7 @@ import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/controller/intro_controller.dart';
 import 'package:gifthamperz/views/LoginScreen/LoginScreen.dart';
-import 'package:gifthamperz/views/PrepareScreen/PrepareScreen.dart';
-import 'package:gifthamperz/views/RegistrationScreen/RegistrationScreen.dart';
+import 'package:gifthamperz/views/SignUpScreen/SignUpScreen.dart';
 import 'package:sizer/sizer.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -131,7 +130,8 @@ class _IntroScreenState extends State<IntroScreen> {
                                 }, IntroPageConstant.signIn, isWhite: true),
                                 getDynamicSizedBox(width: 3.w),
                                 getFormButton(() {
-                                  Get.to(const RegistrationScreen());
+                                  //Get.to(const RegistrationScreen());
+                                  Get.to(const SignUpScreen());
                                 }, IntroPageConstant.signUp, isWhite: false),
                               ],
                             ),

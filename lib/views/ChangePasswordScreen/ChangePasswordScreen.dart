@@ -86,7 +86,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   wantSuffix: true,
                                   isPass: true,
                                   index: "0",
-                                  fromObsecureText: "RESETPASS",
+                                  fromObsecureText: "CHANGEPASS",
                                   inputType: TextInputType.emailAddress,
                                   errorText:
                                       controller.currentPassModel.value.error);
@@ -110,7 +110,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                     controller.validateNewPass(val);
                                   },
                                   index: "1",
-                                  fromObsecureText: "RESETPASS",
+                                  fromObsecureText: "CHANGEPASS",
                                   obscuretext: true,
                                   wantSuffix: true,
                                   isPass: true,
@@ -138,7 +138,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                     controller.validateConfirmPass(val);
                                   },
                                   index: "2",
-                                  fromObsecureText: "RESETPASS",
+                                  fromObsecureText: "CHANGEPASS",
                                   obscuretext: true,
                                   wantSuffix: true,
                                   isPass: true,

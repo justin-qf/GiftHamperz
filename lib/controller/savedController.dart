@@ -1,17 +1,24 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/CommonApiStructure.dart';
+import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
+import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/filter_controller.dart';
+import 'package:gifthamperz/models/favouriteModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -30,7 +37,7 @@ class SavedScreenController extends GetxController {
   RxBool accessToDrawer = false.obs;
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
-  final InternetController etworkManager = Get.find<InternetController>();
+  final InternetController networkManager = Get.find<InternetController>();
   RxList treeList = [].obs;
   var pageController = PageController();
   var currentPage = 0;
@@ -46,19 +53,19 @@ class SavedScreenController extends GetxController {
   }
 
   final RxString searchQuery = ''.obs; // For storing the search query
-  RxList<SavedItem> get filteredList {
-    if (searchQuery.isEmpty) {
-      update();
-      return staticList;
-    } else {
-      update();
-      return staticList
-          .where((item) =>
-              item.name.toLowerCase().contains(searchQuery.value.toLowerCase()))
-          .toList()
-          .obs;
-    }
-  }
+  // RxList<SavedItem> get filteredList {
+  //   if (searchQuery.isEmpty) {
+  //     update();
+  //     return staticList;
+  //   } else {
+  //     update();
+  //     return staticList
+  //         .where((item) =>
+  //             item.name.toLowerCase().contains(searchQuery.value.toLowerCase()))
+  //         .toList()
+  //         .obs;
+  //   }
+  // }
 
   void setSearchQuery(String query) {
     searchQuery.value = query;
@@ -172,147 +179,197 @@ class SavedScreenController extends GetxController {
     );
   }
 
-  getItemListItem(SavedItem data) {
-    return Obx(
-      () {
-        return FadeInUp(
-          child: Wrap(
-            children: [
-              ClipRRect(
+  getItemListItem(BuildContext context, FavouriteList item) {
+    return FadeInUp(
+      child: Wrap(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(
+                SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
+            child: Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: 0.5.h, left: 1.w, right: 2.w),
+              padding: EdgeInsets.only(left: 1.2.w, right: 1.2.w, top: 1.2.w),
+              decoration: BoxDecoration(
+                border: isDarkMode()
+                    ? null
+                    : Border.all(
+                        color: grey, // Border color
+                        width: 0.5, // Border width
+                      ),
+                color: isDarkMode() ? itemDarkBackgroundColor : white,
                 borderRadius: BorderRadius.circular(
                     SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
-                child: Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.only(bottom: 0.5.h, left: 1.w, right: 2.w),
-                  padding:
-                      EdgeInsets.only(left: 1.2.w, right: 1.2.w, top: 1.2.w),
-                  decoration: BoxDecoration(
-                    border: isDarkMode()
-                        ? null
-                        : Border.all(
-                            color: grey, // Border color
-                            width: 0.5, // Border width
-                          ),
-                    color: isDarkMode() ? itemDarkBackgroundColor : white,
-                    borderRadius: BorderRadius.circular(
-                        SizerUtil.deviceType == DeviceType.mobile
-                            ? 4.w
-                            : 2.2.w),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              SizerUtil.deviceType == DeviceType.mobile
-                                  ? 3.5.w
-                                  : 2.5.w),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: SizerUtil.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                          SizerUtil.deviceType == DeviceType.mobile
+                              ? 3.5.w
+                              : 2.5.w),
+                      border: Border.all(
+                        color: grey, // Border color
+                        width: 0.3, // Border width
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                          SizerUtil.deviceType == DeviceType.mobile
+                              ? 3.5.w
+                              : 2.5.w),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        height: 22.h,
+                        imageUrl: '${APIImageUrl.url}widget.data.imgUrl',
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(color: primaryColor),
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              SizerUtil.deviceType == DeviceType.mobile
-                                  ? 3.5.w
-                                  : 2.5.w),
-                          child: data.icon,
+                        errorWidget: (context, url, error) => Image.asset(
+                          Asset.productPlaceholder,
+                          height: 25.h,
+                          width: 25.h,
+                          fit: BoxFit.contain,
+                        ),
+                        imageBuilder: (context, imageProvider) => Image(
+                          image: imageProvider,
+                          height: 25.h,
+                          width: 25.h,
+                          fit: BoxFit.contain,
                         ),
                       ),
-                      SizedBox(
-                        height: 1.5.h,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 1.5.h,
+                  ),
+                  getText(
+                    item.name,
+                    TextStyle(
+                        fontFamily: fontSemiBold,
+                        fontWeight: FontWeight.w500,
+                        overflow: TextOverflow.ellipsis,
+                        color: isDarkMode() ? black : black,
+                        fontSize: SizerUtil.deviceType == DeviceType.mobile
+                            ? 10.sp
+                            : 7.sp,
+                        height: 1.2),
+                  ),
+                  getDynamicSizedBox(
+                    height: 0.5.h,
+                  ),
+                  getText(
+                    '\u20B9${'100'}',
+                    TextStyle(
+                        fontFamily: fontBold,
+                        color: primaryColor,
+                        fontSize: SizerUtil.deviceType == DeviceType.mobile
+                            ? 9.sp
+                            : 7.sp,
+                        height: 1.2),
+                  ),
+                  getDynamicSizedBox(
+                    height: 0.5.h,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // Expanded(
+                      //   child: RatingBar.builder(
+                      //     initialRating: 3.5,
+                      //     minRating: 1,
+                      //     direction: Axis.horizontal,
+                      //     allowHalfRating: true,
+                      //     itemCount: 5,
+                      //     itemSize: 3.5.w,
+                      //     // itemPadding:
+                      //     //     const EdgeInsets.symmetric(horizontal: 5.0),
+                      //     itemBuilder: (context, _) => const Icon(
+                      //       Icons.star,
+                      //       color: Colors.orange,
+                      //     ),
+                      //     onRatingUpdate: (rating) {
+                      //       logcat("RATING", rating);
+                      //     },
+                      //   ),
+                      // ),
+                      // Expanded(
+                      //   child: getText(
+                      //     "35 Reviews",
+                      //     TextStyle(
+                      //         fontFamily: fontSemiBold,
+                      //         color: lableColor,
+                      //         fontWeight: isDarkMode() ? FontWeight.w900 : null,
+                      //         fontSize:
+                      //             SizerUtil.deviceType == DeviceType.mobile
+                      //                 ? 8.sp
+                      //                 : 7.sp,
+                      //         height: 1.2),
+                      //   ),
+                      // ),
+                      RatingBar.builder(
+                        initialRating: 3.5,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 1,
+                        itemSize: 3.5.w,
+                        itemBuilder: (context, _) => const Icon(
+                          Icons.star,
+                          color: Colors.orange,
+                        ),
+                        onRatingUpdate: (rating) {
+                          logcat("RATING", rating);
+                        },
                       ),
                       getText(
-                        data.name,
+                        "3.5",
                         TextStyle(
                             fontFamily: fontSemiBold,
-                            fontWeight: FontWeight.w500,
-                            color: isDarkMode() ? white : black,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 10.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      getDynamicSizedBox(
-                        height: 0.5.h,
-                      ),
-                      getText(
-                        data.price,
-                        TextStyle(
-                            fontFamily: fontBold,
-                            color: primaryColor,
+                            color: lableColor,
+                            fontWeight: isDarkMode() ? FontWeight.w600 : null,
                             fontSize: SizerUtil.deviceType == DeviceType.mobile
                                 ? 9.sp
                                 : 7.sp,
                             height: 1.2),
                       ),
-                      getDynamicSizedBox(
-                        height: 0.5.h,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: RatingBar.builder(
-                              initialRating: 3.5,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemSize: 3.5.w,
-                              // itemPadding:
-                              //     const EdgeInsets.symmetric(horizontal: 5.0),
-                              itemBuilder: (context, _) => const Icon(
-                                Icons.star,
-                                color: Colors.orange,
-                              ),
-                              onRatingUpdate: (rating) {
-                                logcat("RATING", rating);
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: getText(
-                              "35 Reviews",
-                              TextStyle(
-                                  fontFamily: fontSemiBold,
-                                  color: lableColor,
-                                  fontWeight:
-                                      isDarkMode() ? FontWeight.w900 : null,
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
-                                          ? 8.sp
-                                          : 7.sp,
-                                  height: 1.2),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              data.isSelected.value = !data.isSelected.value;
-                              update();
-                            },
-                            child: Icon(
-                              data.isSelected.value
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border,
-                              size: 3.h,
-                              color: primaryColor,
-                            ),
-                          )
-                        ],
-                      ),
-                      getDynamicSizedBox(
-                        height: 1.h,
-                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          addFavouriteAPI(
+                              context,
+                              networkManager,
+                              item.id.toString(),
+                              '1',
+                              ProductDetailScreenConstant.title,
+                              isFromList: true,
+                              item: item,
+                              favouriteFilterList: favouriteFilterList);
+                          // data.isSelected.value = !data.isSelected.value;
+                          update();
+                        },
+                        child: Icon(
+                          Icons.favorite_rounded,
+                          size: 3.h,
+                          color: primaryColor,
+                        ),
+                      )
                     ],
                   ),
-                ),
+                  getDynamicSizedBox(
+                    height: 1.h,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -321,6 +378,7 @@ class SavedScreenController extends GetxController {
       padding: EdgeInsets.only(left: 0.5.w, right: 0.5.w),
       child: Text(
         title,
+        maxLines: 2,
         style: style,
       ),
     );
@@ -496,5 +554,80 @@ class SavedScreenController extends GetxController {
         });
       },
     );
+  }
+
+  void applyFilter(String keyword, isFilter) {
+    favouriteFilterList.clear();
+    if (isFilter == true) {
+      for (FavouriteList model in favouriteList) {
+        if (model.name.toLowerCase().contains(keyword.toLowerCase())) {
+          favouriteFilterList.add(model);
+          logcat('applyFilter::::', favouriteFilterList);
+        }
+      }
+    } else {
+      favouriteFilterList.addAll(favouriteList);
+    }
+
+    update();
+  }
+
+  RxList favouriteList = [].obs;
+  RxList favouriteFilterList = [].obs;
+  void getFavouriteList(context) async {
+    state.value = ScreenState.apiLoading;
+    try {
+      if (networkManager.connectionType == 0) {
+        showDialogForScreen(
+            context, SavedScreenText.title, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+      var response =
+          await Repository.get({}, ApiUrl.getFavourite, allowHeader: true);
+      logcat("RESPONSE::", response.body);
+      var responseData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (responseData['status'] == 1) {
+          state.value = ScreenState.apiSuccess;
+          message.value = '';
+          var categoryData = FavouriteModel.fromJson(responseData);
+          favouriteList.clear();
+          favouriteFilterList.clear();
+          if (categoryData.data.isNotEmpty) {
+            favouriteList.addAll(categoryData.data);
+            favouriteFilterList.addAll(categoryData.data);
+            update();
+          }
+        } else {
+          message.value = responseData['message'];
+          showDialogForScreen(
+              context, SavedScreenText.title, responseData['message'],
+              callback: () {});
+        }
+      } else {
+        if (responseData['message'].toString().isNotEmpty) {
+          state.value = ScreenState.apiError;
+          showDialogForScreen(
+              context, SavedScreenText.title, responseData['message'],
+              callback: () {});
+        } else {
+          state.value = ScreenState.apiError;
+          message.value = APIResponseHandleText.serverError;
+          showDialogForScreen(
+              context, SavedScreenText.title, ServerError.servererror,
+              callback: () {});
+        }
+      }
+    } catch (e) {
+      logcat("Ecxeption", e);
+      state.value = ScreenState.apiError;
+      message.value = ServerError.servererror;
+      showDialogForScreen(
+          context, CategoryScreenConstant.title, ServerError.servererror,
+          callback: () {});
+    }
   }
 }

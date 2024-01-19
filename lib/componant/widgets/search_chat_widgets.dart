@@ -19,7 +19,7 @@ setSearchBar(context, controller, String tag,
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode() ? searchBackgroundColor : white,
+              color: isDarkMode() ? tileColour : white,
               borderRadius: BorderRadius.circular(
                   SizerUtil.deviceType == DeviceType.mobile ? 5.h : 1.2.h),
               boxShadow: [
@@ -64,14 +64,16 @@ setSearchBar(context, controller, String tag,
                 if (tag == "saved") {
                   Get.find<SavedScreenController>()
                       .setSearchQuery(controller.text.toString());
+                  Get.find<SavedScreenController>()
+                      .applyFilter(controller.text.toString(), true);
                 }
               },
-              style: styleTextFormFieldText(),
+              style: styleTextFormFieldText(isWhite: false),
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.search,
-                  color: isDarkMode() ? white : black,
+                  color: isDarkMode() ? primaryColor : black,
                   size: SizerUtil.deviceType == DeviceType.mobile ? 20 : 25,
                 ),
                 labelStyle: styleTextForFieldHint(),
@@ -83,7 +85,7 @@ setSearchBar(context, controller, String tag,
                     padding: EdgeInsets.only(right: 1.w),
                     child: Icon(
                       Icons.cancel,
-                      color: isDarkMode() ? white : black,
+                      color: isDarkMode() ? primaryColor : black,
                       size: SizerUtil.deviceType == DeviceType.mobile ? 20 : 25,
                     ),
                   ),
@@ -115,7 +117,7 @@ setSearchBar(context, controller, String tag,
                       SearchConstant.cancle,
                       style: TextStyle(
                         fontFamily: fontRegular,
-                        color: isDarkMode() ? white : black,
+                        color: isDarkMode() ? primaryColor : black,
                         fontSize: 12.sp,
                       ),
                     ),

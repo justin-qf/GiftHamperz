@@ -5,7 +5,6 @@ import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
-import 'package:gifthamperz/main.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/models/validation_model.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
@@ -44,14 +43,18 @@ class LoginController extends GetxController {
 
   void validatePhone(String? val) {
     numberModel.update((model) {
-      if (val != null && val.isEmpty) {
-        model!.error = "Enter Phone Number";
+      if (val == null || val.isEmpty) {
+        model!.error = 'Enter Phone Number';
+        model.isValidate = false;
+      } else if (val.replaceAll(' ', '').length != 10) {
+        model!.error = 'Enter 10 digit Number';
         model.isValidate = false;
       } else {
         model!.error = null;
         model.isValidate = true;
       }
     });
+
     enableSignUpButton();
   }
 

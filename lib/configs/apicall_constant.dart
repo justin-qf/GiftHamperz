@@ -1,12 +1,14 @@
 class ApiUrl {
 //  static const liveApiUrl = "https://queryfinders.com/meditrack/public/api/";
-  static const buildApiUrl = "http://192.168.1.16/qfs_ecommerce/api/";
+  static const buildApiUrl = "http://192.168.1.11/qfs_ecommerce/api/";
   static const register = 'registration';
   static const login = 'login';
   static const banner = 'banner/list';
   static const updatePassword = 'update_forgot_password';
   static const getForgotPasswordOtp = 'forgot_password_otp';
   static const getVerifyOtp = 'verify_forgot_otp';
+  static const getVerifyGuestOtp = 'verify_guest_login_otp';
+  static const getSignUpOtp = 'get_guest_login_otp';
   static const updateForgotPassword = 'update_forgot_password';
   static const changePassword = 'change_password';
   static const getCategory = 'product/category/list';
@@ -23,4 +25,11 @@ class ApiUrl {
   static const getHome = 'product/trend/list';
   static const getSearch = 'product/search';
   static const review = 'review';
+  static const getState = 'get_state';
+  static const getCity = 'get_city';
+  static const getUser = 'user/get';
+  static const updateUser = 'user/update';
+  static const addFavourite = 'favorite';
+  static const getFavourite = 'favorite_list';
+  static const addDefaultAddress = 'address/setDefaultAddress';
 }

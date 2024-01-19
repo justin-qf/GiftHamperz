@@ -10,6 +10,7 @@ import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/Resetpass_controller.dart';
+import 'package:gifthamperz/controller/changePasswordController.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/PrepareScreen/PrepareScreen.dart';
@@ -18,6 +19,7 @@ import '../../../../componant/input/form_inputs.dart';
 import '../../../../componant/toolbar/toolbar.dart';
 import '../../../../configs/colors_constant.dart';
 
+// ignore: must_be_immutable
 class RecoveryScreen extends StatefulWidget {
   RecoveryScreen({
     this.mobile,
@@ -30,7 +32,6 @@ class RecoveryScreen extends StatefulWidget {
 
 class _RecoveryScreenState extends State<RecoveryScreen> {
   var controller = Get.put(ResetpassController());
-
   @override
   void initState() {
     super.initState();
