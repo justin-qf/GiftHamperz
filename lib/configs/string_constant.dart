@@ -21,7 +21,7 @@ class LoginConst {
 }
 
 class APIImageUrl {
-  static const url = 'http://192.168.1.11/qfs_ecommerce/public/storage/';
+  static const url = 'http://192.168.1.9/qfs_ecommerce/public/storage/';
 }
 
 class AddAddressText {
@@ -127,6 +127,14 @@ class Logout {
   static const yes = "Yes";
 }
 
+class Payment {
+  static const title = "Payment";
+  static const heading = "Cancel Payment...!";
+  static const no = "No";
+  static const yes = "Yes";
+  static const ok = "Ok";
+}
+
 class EditScreenConstant {
   static const title = "Edit Profile";
   static const editPic = "Edit Photo";
@@ -173,7 +181,7 @@ class ReviewsScreenConstant {
   static const update = "Update";
   static const hiny = "Write a review";
   static const btnTitle = "Write a Review";
-  static const hint = "Write a Review";
+  static const hint = "Write a Review...";
 }
 
 class FilterScreenConstant {

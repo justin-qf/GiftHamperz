@@ -143,7 +143,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
       textCapitalization: widget.isReferenceField
           ? TextCapitalization.characters
           : TextCapitalization.none,
-      minLines: widget.isAddressField ? 3 : 1,
+      minLines: widget.isAddressField ? 4 : 1,
       maxLines: widget.isAddressField ? 7 : 1,
       textInputAction: widget.isAddressField
           ? TextInputAction.newline

@@ -8,6 +8,7 @@ import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/input/form_inputs.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/models/addressModel.dart';
@@ -458,6 +459,7 @@ class AddAddressController extends GetxController {
       loadingIndicator.hide(context);
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
+        Statusbar().trasparentStatusbarIsNormalScreen();
         if (responseData['status'] == 1) {
           for (int i = 0; i < responseData['data'].length; i++) {
             var models = CityList.fromJson(responseData['data'][i]);
@@ -487,6 +489,7 @@ class AddAddressController extends GetxController {
               callback: () {});
         }
       } else {
+        Statusbar().trasparentStatusbarIsNormalScreen();
         state.value = ScreenState.apiError;
         message.value = APIResponseHandleText.serverError;
         showDialogForScreen(
@@ -494,6 +497,7 @@ class AddAddressController extends GetxController {
             callback: () {});
       }
     } catch (e) {
+      Statusbar().trasparentStatusbarIsNormalScreen();
       logcat("Ecxeption", e);
       loadingIndicator.hide(context);
       showDialogForScreen(

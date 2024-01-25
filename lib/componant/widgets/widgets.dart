@@ -193,6 +193,35 @@ Widget getFooter(isLogin) {
   );
 }
 
+Widget getRichText(title, desc) {
+  return RichText(
+    overflow: TextOverflow.clip,
+    textAlign: TextAlign.start,
+    softWrap: true,
+    textScaleFactor: 1,
+    maxLines: 16,
+    text: TextSpan(
+      text: title,
+      style: TextStyle(
+          overflow: TextOverflow.ellipsis,
+          color: isDarkMode() ? white : black,
+          fontFamily: fontExtraBold,
+          fontSize: 11.sp),
+      children: [
+        TextSpan(
+          text: desc,
+          style: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontFamily: fontRegular,
+              color: black,
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w400),
+        )
+      ],
+    ),
+  );
+}
+
 Widget getHomeLable(String title, Function onCLick) {
   return FadeInRight(
     child: Container(
@@ -386,7 +415,7 @@ Widget getComplaintRow(title, desc) {
 }
 
 Widget getCommonContainer(title, isFromAddCart, icon,
-    {Function? addCartClick, Function? buyNowClick}) {
+    {Function? addCartClick, Function? buyNowClick, bool? isEnable}) {
   return Expanded(
     child: GestureDetector(
       onTap: () {
@@ -394,9 +423,15 @@ Widget getCommonContainer(title, isFromAddCart, icon,
       },
       child: Container(
         decoration: BoxDecoration(
-          color: isFromAddCart == true
-              ? secondaryColor.withOpacity(0.9)
-              : primaryColor,
+          color: isFromAddCart == true ? secondaryColor : white,
+          boxShadow: [
+            BoxShadow(
+              color: grey.withOpacity(0.6),
+              blurRadius: 2.0, // Adjust the blur radius as needed
+              offset:
+                  const Offset(0, -2), // Negative offset to create a top shadow
+            ),
+          ],
           borderRadius: BorderRadius.only(
             topLeft: isFromAddCart == true
                 ? Radius.circular(7.w)
@@ -429,7 +464,7 @@ Widget getCommonContainer(title, isFromAddCart, icon,
 }
 
 Widget getAddToCartBtn(title, icon,
-    {Function? addCartClick, RxBool? isAddToCartClicked}) {
+    {Function? addCartClick, RxBool? isAddToCartClicked, bool? isEnable}) {
   return GestureDetector(
     onTap: () {
       addCartClick!();
@@ -470,11 +505,39 @@ Widget getAddToCartBtn(title, icon,
   );
 }
 
-getGuestUserAlertDialog(BuildContext context) {
-  return showDialog(
+// getGuestUserAlertDialog(BuildContext context, String screenName) {
+//   return showDialog(
+//     context: context,
+//     builder: (BuildContext context) {
+//       return CustomLoginAlertRoundedDialog(
+//           screenName); // Use your custom dialog widget
+//     },
+//   );
+// }
+
+getGuestUserAlertDialog(BuildContext context, String screenName) async {
+  return await showGeneralDialog(
     context: context,
-    builder: (BuildContext context) {
-      return const CustomLoginAlertRoundedDialog(); // Use your custom dialog widget
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: const Duration(milliseconds: 600),
+    pageBuilder: (BuildContext buildContext, Animation<double> animation,
+        Animation<double> secondaryAnimation) {
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: CustomLoginAlertRoundedDialog(screenName),
+      );
+    },
+    transitionBuilder: (BuildContext buildContext, Animation<double> animation,
+        Animation<double> secondaryAnimation, Widget child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 1),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child,
+      );
     },
   );
 }

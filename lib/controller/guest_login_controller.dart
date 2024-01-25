@@ -8,11 +8,17 @@ import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
+import 'package:gifthamperz/controller/AddressController.dart';
+import 'package:gifthamperz/controller/CartController.dart';
+import 'package:gifthamperz/controller/homeController.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
+import 'package:gifthamperz/controller/productDetailController.dart';
+import 'package:gifthamperz/controller/searchController.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/models/validation_model.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/log.dart';
+import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
 
 class GuestLoginController extends GetxController {
@@ -171,7 +177,8 @@ class GuestLoginController extends GetxController {
     }
   }
 
-  void verifyOtpAPI(context, String otp, String mobile) async {
+  void verifyOtpAPI(
+      context, String otp, String mobile, String screenName) async {
     var loadingIndicator = LoadingProgressDialog();
     loadingIndicator.show(context, '');
 
@@ -204,7 +211,34 @@ class GuestLoginController extends GetxController {
           UserPreferences().saveSignInInfo(loginData.user);
           UserPreferences().setToken(loginData.user.token);
           UserPreferences().setIsGuestUser(false);
-          Get.offAll(const BottomNavScreen());
+
+          if (screenName == DashboardText.dashboard) {
+            Get.find<HomeScreenController>().getHome(context);
+          }
+          if (screenName == SearchScreenConstant.title) {
+            Get.find<SearchScreenController>().getGuestLogin();
+          }
+
+          if (screenName == AddAddressText.addressTitle) {
+            Get.find<AddressScreenController>()
+                .getAddressList(context, 0, true);
+          }
+
+          if (screenName == AddAddressText.addressTitle) {
+            Get.find<AddressScreenController>()
+                .getAddressList(context, 0, true);
+            Get.find<AddressScreenController>().getGuestUser();
+          }
+          if (screenName == CartScreenConstant.title) {
+            Get.find<CartScreenController>().initLoginData();
+          }
+
+          if (screenName == ProductDetailScreenConstant.title) {
+            Get.find<ProductDetailScreenController>().getGuestUser();
+          }
+
+          Navigator.of(context).pop();
+          //Get.offAll(const BottomNavScreen());
         } else {
           logcat("STEP-3", 'DONE');
 

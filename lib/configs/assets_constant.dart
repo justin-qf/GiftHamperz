@@ -62,6 +62,7 @@ class Asset {
   static const avaterFourholder = '$assets${pngFolder}avatar_four.jpg';
   static const avaterFiveholder = '$assets${pngFolder}avatar_five.jpg';
   static const cartEmptys = '$assets${pngFolder}cart_empty.jpg';
+  static const homeBanner = '$assets${pngFolder}home_banner.jpg';
 
   //Splash Screen
   static const logo = '$assets${svgFolder}logo.svg';

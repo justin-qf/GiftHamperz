@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
@@ -19,23 +20,21 @@ import 'internet_controller.dart';
 class CartScreenController extends GetxController {
   var currentPage = 0;
 
-  List pageNavigation = [];
-  RxInt currentTreeView = 2.obs;
-
-  RxBool isExpanded = false.obs;
-  RxBool isTreeModeVertical = true.obs;
-
-  RxBool accessToDrawer = false.obs;
   DateTime selectedValue = DateTime.now();
 
   RxString picDate = "".obs;
-  RxList treeList = [].obs;
   RxDouble productCost = 178.38.obs;
   RxDouble deliveryCharge = 5.00.obs;
   RxDouble discount = 10.00.obs;
   RxDouble total = 0.0.obs;
+  RxBool isGuest = false.obs;
 
   final GlobalKey<ScaffoldState> key = GlobalKey();
+
+  initLoginData() async {
+    isGuest.value = await UserPreferences().getGuestUser();
+    update();
+  }
 
   changeIndex(int index) async {
     currentPage = index;

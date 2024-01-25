@@ -6,8 +6,11 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
+import 'package:gifthamperz/views/DeliveryScreen/AddAddressScreen.dart';
+import 'package:gifthamperz/views/DeliveryScreen/AddressScreen.dart';
 import 'package:gifthamperz/views/IntroScreen/intro.dart';
 import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
+import 'package:gifthamperz/views/ReviewsScreen/ReviewsScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../configs/assets_constant.dart';
 
@@ -25,12 +28,12 @@ class _SplashscreenState extends State<Splashscreen> {
     UserPreferences().setGuestUserDialogVisible(false);
     Timer(const Duration(seconds: 3), () async {
       UserData? retrievedObject = await UserPreferences().getSignInInfo();
-      if (retrievedObject != null) {
-        Get.offAll(const BottomNavScreen());
-      } else {
-        Get.offAll(const IntroScreen());
-      }
-      //Get.offAll(const BottomNavScreen());
+      // if (retrievedObject != null) {
+      //   Get.offAll(const BottomNavScreen());
+      // } else {
+      //   Get.offAll(const IntroScreen());
+      // }
+      Get.offAll(const BottomNavScreen());
     });
   }
 

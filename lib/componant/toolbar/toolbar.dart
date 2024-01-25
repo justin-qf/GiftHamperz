@@ -986,7 +986,7 @@ Widget notification(isNotify) {
 }
 
 // ignore: non_constant_identifier_names
-Future<Object?> PopupDialogs(BuildContext context) {
+Future<Object?> PopupDialogs(BuildContext context, bool? isFromPayment) {
   return showGeneralDialog(
       barrierColor: black.withOpacity(0.6),
       transitionBuilder: (context, a1, a2, widget) {
@@ -997,7 +997,7 @@ Future<Object?> PopupDialogs(BuildContext context) {
               opacity: a1.value,
               child: CupertinoAlertDialog(
                 title: Text(
-                  Logout.title,
+                  isFromPayment == true ? Payment.title : Logout.title,
                   style: TextStyle(
                     fontSize: 18,
                     color: isDarkMode() ? white : black,
@@ -1006,7 +1006,7 @@ Future<Object?> PopupDialogs(BuildContext context) {
                   ),
                 ),
                 content: Text(
-                  Logout.heading,
+                  isFromPayment == true ? Payment.heading : Logout.heading,
                   style: TextStyle(
                     fontSize: 13,
                     color: isDarkMode() ? white : black,
@@ -1014,29 +1014,33 @@ Future<Object?> PopupDialogs(BuildContext context) {
                   ),
                 ),
                 actions: [
+                  if (isFromPayment != true)
+                    CupertinoDialogAction(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      isDefaultAction: true,
+                      isDestructiveAction: true,
+                      child: Text(Logout.no,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: isDarkMode() ? white : black,
+                            fontFamily: fontBold,
+                            fontWeight: FontWeight.bold,
+                          )),
+                    ),
+                    
                   CupertinoDialogAction(
                     onPressed: () {
                       Navigator.pop(context);
+                      if (isFromPayment != true) {
+                        UserPreferences().logout();
+                        Get.offAll(const LoginScreen());
+                      }
                     },
                     isDefaultAction: true,
                     isDestructiveAction: true,
-                    child: Text(Logout.no,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: isDarkMode() ? white : black,
-                          fontFamily: fontBold,
-                          fontWeight: FontWeight.bold,
-                        )),
-                  ),
-                  CupertinoDialogAction(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      UserPreferences().logout();
-                      Get.offAll(const LoginScreen());
-                    },
-                    isDefaultAction: true,
-                    isDestructiveAction: true,
-                    child: Text(Logout.yes,
+                    child: Text(isFromPayment == true ? Payment.ok : Logout.yes,
                         style: TextStyle(
                           fontSize: 15,
                           color: isDarkMode() ? white : black,

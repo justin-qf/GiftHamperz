@@ -387,7 +387,7 @@ Future showValidationDialog(
       });
 }
 
-getGuestUserLogin(BuildContext context) async {
+getGuestUserLogin(BuildContext context, String screemName) async {
   return await showGeneralDialog(
     context: context,
     barrierDismissible: true,
@@ -396,9 +396,9 @@ getGuestUserLogin(BuildContext context) async {
     transitionDuration: const Duration(milliseconds: 600),
     pageBuilder: (BuildContext buildContext, Animation<double> animation,
         Animation<double> secondaryAnimation) {
-      return const Align(
+      return Align(
         alignment: Alignment.bottomCenter,
-        child: CustomLoginAlertRoundedDialog(),
+        child: CustomLoginAlertRoundedDialog(screemName),
       );
     },
     transitionBuilder: (BuildContext buildContext, Animation<double> animation,
@@ -416,7 +416,8 @@ getGuestUserLogin(BuildContext context) async {
 
 var controller = Get.put(GuestLoginController());
 
-Future<Future> getLoginBottomSheetDialog(BuildContext parentContext) async {
+Future<Future> getLoginBottomSheetDialog(
+    BuildContext parentContext, String screenName) async {
   controller.numberCtr.text = "";
   controller.isFormInvalidate.value = false;
   controller.isOtpFormInvalidate.value = false;
@@ -583,7 +584,8 @@ Future<Future> getLoginBottomSheetDialog(BuildContext parentContext) async {
                                             context,
                                             controller.otp!.value.toString(),
                                             controller.numberCtr.text
-                                                .toString());
+                                                .toString(),
+                                                screenName);
                                       }
                                     } else {
                                       if (controller.isFormInvalidate.value ==
@@ -685,5 +687,109 @@ Future<Future> getLoginBottomSheetDialog(BuildContext parentContext) async {
             );
           },
         );
+      });
+}
+
+Future<Object?> selectImageFromCameraOrGallery(BuildContext context,
+    {Function? cameraClick, Function? galleryClick}) {
+  return showGeneralDialog(
+      barrierColor: black.withOpacity(0.6),
+      transitionBuilder: (context, a1, a2, widget) {
+        return Transform.scale(
+          scale: a1.value,
+          child: Opacity(
+              opacity: a1.value,
+              child: CupertinoAlertDialog(
+                title: const Text(
+                  'Photo',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: black,
+                    fontFamily: fontBold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                content: const Text(
+                  'Select Photo From',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: black,
+                    fontFamily: fontMedium,
+                  ),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    onPressed: () {
+                      cameraClick!();
+                      Navigator.pop(context);
+                    },
+                    isDefaultAction: true,
+                    isDestructiveAction: true,
+                    child: Text(
+                      'Camera',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: black,
+                          fontFamily: fontRegular,
+                          fontSize: SizerUtil.deviceType == DeviceType.mobile
+                              ? 13.sp
+                              : 11.sp),
+                    ),
+                    // Icon(
+                    //   Icons.camera_alt,
+                    //   size: SizerUtil.deviceType == DeviceType.mobile
+                    //       ? 20.sp
+                    //       : 15.sp,
+                    // ),
+                    //  Text(LocalizationKeys.no.tr,
+                    //     style: const TextStyle(
+                    //       fontSize: 15,
+                    //       color: black,
+                    //       fontFamily: fontBold,
+                    //       fontWeight: FontWeight.bold,
+                    //     )),
+                  ),
+                  CupertinoDialogAction(
+                    onPressed: () {
+                      galleryClick!();
+                      Navigator.pop(context);
+                    },
+                    isDefaultAction: true,
+                    isDestructiveAction: true,
+                    child: Text(
+                      'Gallery',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: black,
+                          fontFamily: fontRegular,
+                          fontSize: SizerUtil.deviceType == DeviceType.mobile
+                              ? 13.sp
+                              : 11.sp),
+                    ),
+                    // Icon(
+                    //   Icons.photo_size_select_actual_outlined,
+                    //   size: SizerUtil.deviceType == DeviceType.mobile
+                    //       ? 20.sp
+                    //       : 15.sp,
+                    // )
+                    // Text(LocalizationKeys.yes.tr,
+                    //     style: const TextStyle(
+                    //       fontSize: 15,
+                    //       color: black,
+                    //       fontFamily: fontBold,
+                    //       fontWeight: FontWeight.bold,
+                    //     )),
+                  ),
+                  // The "No" button
+                ],
+              )),
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 200),
+      barrierDismissible: true,
+      barrierLabel: '',
+      context: context,
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
       });
 }

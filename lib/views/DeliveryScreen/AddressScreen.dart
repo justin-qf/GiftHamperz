@@ -32,6 +32,7 @@ class _AddressScreenState extends State<AddressScreen> {
   @override
   void initState() {
     apiCalls();
+    controller.getGuestUser();
     super.initState();
   }
 
@@ -43,6 +44,7 @@ class _AddressScreenState extends State<AddressScreen> {
   @override
   Widget build(BuildContext context) {
     Statusbar().trasparentStatusbarIsNormalScreen();
+    controller.setBuildContext(context);
     return CustomParentScaffold(
       onWillPop: () async {
         return true;
@@ -267,27 +269,35 @@ class _AddressScreenState extends State<AddressScreen> {
               left: 0,
               right: 0,
               bottom: 3.h,
-              child: setActionButton(context, AddAddressText.add,
+              child: Obx(() {
+                return setActionButton(
+                  context,
+                  AddAddressText.add,
+                  controller.currentIndex.value == -1 ? false : true,
                   onActionClick: () {
-                Get.to(AddAddressScreen(
-                  isFromEdit: false,
-                  itemData: null,
-                ))!
-                    .then((value) {
-                  if (value == true) {
-                    apiCalls();
-                  }
-                  Statusbar().trasparentStatusbarIsNormalScreen();
-                });
-              }, onClick: () async {
-                bool isGuest = await UserPreferences().getGuestUser();
-                if (isGuest == true) {
-                  // ignore: use_build_context_synchronously
-                  getGuestUserAlertDialog(context);
-                } else {
-                  // ignore: use_build_context_synchronously
-                  controller.showCustomDialog(context);
-                }
+                    Get.to(AddAddressScreen(
+                      isFromEdit: false,
+                      itemData: null,
+                    ))!
+                        .then((value) {
+                      if (value == true) {
+                        apiCalls();
+                      }
+                      Statusbar().trasparentStatusbarIsNormalScreen();
+                    });
+                  },
+                  onClick: () async {
+                    //bool isGuest = await UserPreferences().getGuestUser();
+                    if (controller.isGuest.value == true) {
+                      // ignore: use_build_context_synchronously
+                      getGuestUserAlertDialog(
+                          context, AddAddressText.addressTitle);
+                    } else {
+                      //controller.showCustomDialog(context);
+                      controller.openCheckout();
+                    }
+                  },
+                );
               }))
         ]),
       ),

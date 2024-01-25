@@ -11,9 +11,7 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/searchController.dart';
 import 'package:gifthamperz/models/searchModel.dart';
-import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
 import '../../utils/enum.dart';
@@ -27,18 +25,12 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   var controller = Get.put(SearchScreenController());
-  bool? isGuest = true;
   @override
   void initState() {
     controller.isSearch = false;
     controller.getSearchList(context, controller.searchCtr.text.toString());
-    getGuestLogin();
+    controller.getGuestLogin();
     super.initState();
-  }
-
-  void getGuestLogin() async {
-    isGuest = await UserPreferences().getGuestUser();
-    logcat('USER:', isGuest);
   }
 
   @override
@@ -168,7 +160,8 @@ class _SearchScreenState extends State<SearchScreen> {
         crossAxisSpacing: 4,
         itemBuilder: (context, index) {
           SearchDataList data = controller.searchList[index];
-          return controller.getItemListItem(context, data, isGuest);
+          return controller.getItemListItem(
+              context, data, controller.isGuest!.value);
         },
         itemCount: controller.searchList.length,
       );

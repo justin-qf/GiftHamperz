@@ -13,6 +13,7 @@ import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/search_chat_widgets.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
+import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
@@ -72,7 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // Check if the current route is the home screen before showing the alert
         Future.delayed(const Duration(seconds: 2), () {
-          getGuestUserLogin(context);
+          getGuestUserLogin(
+            context,
+            DashboardText.dashboard,
+          );
         });
       });
     }
@@ -309,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
               () {
                 return controller.trendingItemList.isNotEmpty
                     ? SizedBox(
-                        height: 26.h,
+                        height: 25.h,
                         child: ListView.builder(
                             padding: EdgeInsets.only(left: 4.w, right: 2.w),
                             physics: const BouncingScrollPhysics(),
@@ -330,6 +334,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     : Container();
               },
             ),
+            Container(
+              width: SizerUtil.width,
+              height: 15.h,
+              padding: EdgeInsets.all(0.2.h),
+              margin: EdgeInsets.only(left: 5.w, right: 4.w),
+              decoration: BoxDecoration(
+                  color: isDarkMode() ? darkBackgroundColor : white,
+                  boxShadow: const [
+                    BoxShadow(
+                        color: grey,
+                        blurRadius: 1.0,
+                        offset: Offset(0, 3),
+                        spreadRadius: 0.5)
+                  ],
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(2.h),
+                  )),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2.h),
+                  child: Image.asset(
+                    Asset.homeBanner,
+                    fit: BoxFit.cover,
+                  )),
+            ),
+            getDynamicSizedBox(height: 2.h),
             getHomeLable(DashboardText.populerTitle, () {
               Get.to(DetailScreen(
                 title: DashboardText.populerTitle,

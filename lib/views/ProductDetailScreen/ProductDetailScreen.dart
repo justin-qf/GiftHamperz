@@ -22,6 +22,7 @@ import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
+import 'package:gifthamperz/views/DeliveryScreen/AddressScreen.dart';
 import 'package:gifthamperz/views/ReviewsScreen/ReviewsScreen.dart';
 import 'package:marquee/marquee.dart';
 import 'package:sizer/sizer.dart';
@@ -39,7 +40,6 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
   var controller = Get.put(ProductDetailScreenController());
-  bool? isGuest = true;
 
   @override
   void initState() {
@@ -47,14 +47,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         PageController(initialPage: controller.currentPage);
     startAutoScroll();
     loadStoredQuantity();
-    getGuestUser();
+    controller.getGuestUser();
     //controller.loadStoredQuantity(widget.data);
     super.initState();
-  }
-
-  getGuestUser() async {
-    isGuest = await UserPreferences().getGuestUser();
-    setState(() {});
   }
 
   Future<void> loadStoredQuantity() async {
@@ -174,7 +169,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                         ),
                                       )
                                     : Text(
-                                        'Product Detail',
+                                        ProductDetailScreenConstant.title,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: fontRegular,
@@ -299,34 +294,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     ),
                     actions: [
                       Container(
-                        margin: EdgeInsets.only(
-                            right: SizerUtil.deviceType == DeviceType.mobile
-                                ? 2.w
-                                : 3.w),
-                        child: GestureDetector(
-                          onTap: () {
-                            if (isGuest == true) {
-                              getGuestUserAlertDialog(context);
-                            } else {
-                              addFavouriteAPI(
-                                  context,
-                                  controller.networkManager,
-                                  widget.data!.id.toString(),
-                                  '1',
-                                  ProductDetailScreenConstant.title);
-                            }
-                          },
-                          child: Container(
-                              padding: const EdgeInsets.all(10),
-                              child: Icon(
-                                Icons.favorite_rounded,
-                                color: isDarkMode() ? black : black,
-                                size: SizerUtil.deviceType == DeviceType.mobile
-                                    ? 3.5.h
-                                    : 5.h,
-                              )),
-                        ),
-                      ),
+                          margin: EdgeInsets.only(
+                              right: SizerUtil.deviceType == DeviceType.mobile
+                                  ? 2.w
+                                  : 3.w),
+                          child: GetBuilder<ProductDetailScreenController>(
+                            builder: (controller) {
+                              return GestureDetector(
+                                onTap: () {
+                                  if (controller.isGuest!.value == true) {
+                                    getGuestUserAlertDialog(context,
+                                        ProductDetailScreenConstant.title);
+                                  } else {
+                                    addFavouriteAPI(
+                                        context,
+                                        controller.networkManager,
+                                        widget.data!.id.toString(),
+                                        '1',
+                                        ProductDetailScreenConstant.title);
+                                  }
+                                },
+                                child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Icon(
+                                      Icons.favorite_rounded,
+                                      color: isDarkMode() ? black : black,
+                                      size: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 3.5.h
+                                          : 5.h,
+                                    )),
+                              );
+                            },
+                          )),
                     ],
                   ),
                   SliverToBoxAdapter(
@@ -376,28 +376,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                     getDynamicSizedBox(width: 0.5.w),
                                     controller.getCommonText("35 Reviews",
                                         isHint: true),
-                                    const Spacer(),
-                                    Row(
-                                      children: [
-                                        controller.getColorText(
-                                            "Write a Reviews",
-                                            isReviews: true),
-                                        const SizedBox(
-                                          width: 18, // Set the desired width
-                                          height:
-                                              22.0, // Set the desired height
-                                          child: Icon(
-                                            Icons.chevron_right_sharp,
-                                            size: 20,
-                                            color: primaryColor,
-                                          ),
-                                        )
-                                      ],
-                                    )
+                                    // const Spacer(),
+                                    // Row(
+                                    //   children: [
+                                    //     controller.getColorText(
+                                    //         "Write a Reviews",
+                                    //         isReviews: true),
+                                    //     const SizedBox(
+                                    //       width: 18, // Set the desired width
+                                    //       height:
+                                    //           22.0, // Set the desired height
+                                    //       child: Icon(
+                                    //         Icons.chevron_right_sharp,
+                                    //         size: 20,
+                                    //         color: primaryColor,
+                                    //       ),
+                                    //     )
+                                    //   ],
+                                    // )
                                   ],
                                 ),
                               ),
-                              getDynamicSizedBox(height: 1.h),
+                              getDynamicSizedBox(height: 0.5.h),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -562,7 +562,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                   ),
                                 ],
                               ),
-                              getDynamicSizedBox(height: 1.h),
+                              getDynamicSizedBox(height: 0.5.h),
                               controller.getLableText('About',
                                   isMainTitle: false),
                               getDynamicSizedBox(height: 0.5.h),
@@ -612,10 +612,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                               controller.getCommonText(
                                   "- Ship in custom ProFlowers packaging and gift box.",
                                   isHint: true),
-                              getDynamicSizedBox(height: 3.h),
+                              getDynamicSizedBox(height: 1.h),
                               controller.getLableText('You Might Also Like',
                                   isMainTitle: false),
-                              getDynamicSizedBox(height: 2.h),
+                              getDynamicSizedBox(height: 1.h),
                             ],
                           ),
                         ),
@@ -675,14 +675,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       getCommonContainer('Buy Now', false, Icons.shopping_bag,
                           buyNowClick: () {
                         logcat("Buy", 'Click');
-                        if (isGuest == true) {
-                          getGuestUserAlertDialog(context);
+                        if (controller.isGuest!.value == true) {
+                          getGuestUserAlertDialog(
+                              context, ProductDetailScreenConstant.title);
                         } else {
-                          Get.to(const CartScreen())!.then((value) {
+                          Get.to(const AddressScreen())!.then((value) {
                             Statusbar().trasparentStatusbarProfile(true);
                           });
                         }
-                      }),
+                      }, isEnable: controller.isGuest!.value),
                     ],
                   )),
             ],

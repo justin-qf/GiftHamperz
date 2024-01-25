@@ -28,12 +28,18 @@ class ProductDetailScreenController extends GetxController {
   var quantity = 0;
   late Timer timer;
   RxList<Map<String, dynamic>> cartItems = <Map<String, dynamic>>[].obs;
+  RxBool? isGuest = true.obs;
 
   // Future<void> saveCartItems() async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
   //   String cartItemsJson = cartItems.map((item) => item.toString()).join(',');
   //   await prefs.setString('cartItems', cartItemsJson);
   // }
+
+  getGuestUser() async {
+    isGuest!.value = await UserPreferences().getGuestUser();
+    update();
+  }
 
   RxList<SavedItem> staticData = <SavedItem>[
     SavedItem(
@@ -159,6 +165,7 @@ class ProductDetailScreenController extends GetxController {
     );
   }
 
+
   getItemListItem(SavedItem data) {
     return Obx(
       () {
@@ -188,109 +195,117 @@ class ProductDetailScreenController extends GetxController {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(
                     SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
-                child: Padding(
-                  padding: EdgeInsets.only(top: 0.2.h, right: 1.w, left: 1.w),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 15.h,
-                        padding: EdgeInsets.only(top: 0.2.h),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              SizerUtil.deviceType == DeviceType.mobile
-                                  ? 3.5.w
-                                  : 2.5.w),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              SizerUtil.deviceType == DeviceType.mobile
-                                  ? 3.5.w
-                                  : 2.5.w),
-                          child: data.icon,
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 14.h,
+                      //padding: EdgeInsets.only(top: 0.2.h),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            SizerUtil.deviceType == DeviceType.mobile
+                                ? 3.5.w
+                                : 2.5.w),
                       ),
-                      SizedBox(
-                        height: 1.5.h,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            SizerUtil.deviceType == DeviceType.mobile
+                                ? 3.5.w
+                                : 2.5.w),
+                        child: data.icon,
                       ),
-                      getText(
-                        data.name,
-                        TextStyle(
-                            fontFamily: fontSemiBold,
-                            color: isDarkMode() ? black : black,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 12.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      getDynamicSizedBox(
-                        height: 0.5.h,
-                      ),
-                      getText(
-                        '\u20B9${'100'}',
-                        TextStyle(
-                            fontFamily: fontBold,
-                            color: primaryColor,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 10.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
+                    ),
+                    SizedBox(
+                      height: 1.5.h,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 1.w, right: 1.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          RatingBar.builder(
-                            initialRating: 3.5,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 1,
-                            itemSize: 3.5.w,
-                            itemBuilder: (context, _) => const Icon(
-                              Icons.star,
-                              color: Colors.orange,
-                            ),
-                            onRatingUpdate: (rating) {
-                              logcat("RATING", rating);
-                            },
-                          ),
                           getText(
-                            "3.5",
+                            data.name,
                             TextStyle(
                                 fontFamily: fontSemiBold,
-                                color: lableColor,
-                                fontWeight:
-                                    isDarkMode() ? FontWeight.w600 : null,
+                                color: isDarkMode() ? black : black,
                                 fontSize:
                                     SizerUtil.deviceType == DeviceType.mobile
-                                        ? 9.sp
+                                        ? 12.sp
                                         : 7.sp,
                                 height: 1.2),
                           ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              data.isSelected.value = !data.isSelected.value;
-                              update();
-                            },
-                            child: Icon(
-                              data.isSelected.value
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border,
-                              size: 3.h,
-                              color: primaryColor,
-                            ),
-                          )
+                          getDynamicSizedBox(
+                            height: 0.5.h,
+                          ),
+                          getText(
+                            '\u20B9${'100'}',
+                            TextStyle(
+                                fontFamily: fontBold,
+                                color: primaryColor,
+                                fontSize:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 10.sp
+                                        : 7.sp,
+                                height: 1.2),
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              RatingBar.builder(
+                                initialRating: 3.5,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 1,
+                                itemSize: 3.5.w,
+                                itemBuilder: (context, _) => const Icon(
+                                  Icons.star,
+                                  color: Colors.orange,
+                                ),
+                                onRatingUpdate: (rating) {
+                                  logcat("RATING", rating);
+                                },
+                              ),
+                              getText(
+                                "3.5",
+                                TextStyle(
+                                    fontFamily: fontSemiBold,
+                                    color: lableColor,
+                                    fontWeight:
+                                        isDarkMode() ? FontWeight.w600 : null,
+                                    fontSize: SizerUtil.deviceType ==
+                                            DeviceType.mobile
+                                        ? 9.sp
+                                        : 7.sp,
+                                    height: 1.2),
+                              ),
+                              const Spacer(),
+                              GestureDetector(
+                                onTap: () {
+                                  data.isSelected.value =
+                                      !data.isSelected.value;
+                                  update();
+                                },
+                                child: Icon(
+                                  data.isSelected.value
+                                      ? Icons.favorite_rounded
+                                      : Icons.favorite_border,
+                                  size: 3.h,
+                                  color: primaryColor,
+                                ),
+                              )
+                            ],
+                          ),
+                          getDynamicSizedBox(
+                            height: 1.h,
+                          ),
                         ],
                       ),
-                      getDynamicSizedBox(
-                        height: 1.h,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               )),
         );
@@ -316,7 +331,7 @@ class ProductDetailScreenController extends GetxController {
           color: isDarkMode() ? white : black,
           fontFamily: isMainTitle == true ? fontBold : null,
           fontWeight: isMainTitle == true ? FontWeight.w900 : FontWeight.w500,
-          fontSize: isMainTitle == true ? 17.sp : 12.sp,
+          fontSize: isMainTitle == true ? 15.sp : 12.sp,
         ));
   }
 

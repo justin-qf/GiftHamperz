@@ -104,10 +104,47 @@ getMiniButton(Function fun, str, {bool? icon}) {
   );
 }
 
-getSecondaryFormButton(Function fun, str, {isvalidate, bool? isFromDialog}) {
+getSecondaryFormButton(Function fun, str, {isvalidate, bool? isFromDialog,bool? isEnable}) {
   return InkWell(
     onTap: () {
       fun();
+    },
+    child: Container(
+      padding: EdgeInsets.symmetric(
+          vertical: SizerUtil.deviceType == DeviceType.mobile ? 1.7.h : 1.h,
+          horizontal: SizerUtil.deviceType == DeviceType.mobile ? 5.h : 6.h),
+      width: SizerUtil.width,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4.h),
+        color: isvalidate ? lightPrimaryColor : grey,
+        gradient: isvalidate
+            ? const LinearGradient(
+                colors: [secondaryColor, primaryColor],
+                begin: FractionalOffset(0.0, 0.0),
+                end: FractionalOffset(0.8, 0.0),
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp)
+            : null,
+      ),
+      child: Text(
+        str,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: white,
+            fontFamily: fontBold,
+            fontWeight: FontWeight.w900,
+            fontSize: isFromDialog == true ? 12.5.sp : 13.sp),
+      ),
+    ),
+  );
+}
+
+getAddressButton(Function fun, str, {isvalidate, bool? isFromDialog}) {
+  return InkWell(
+    onTap: () {
+      if (isvalidate == true) {
+        fun();
+      }
     },
     child: Container(
       padding: EdgeInsets.symmetric(

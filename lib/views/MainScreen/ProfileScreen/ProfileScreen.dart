@@ -259,7 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: controller.getMenuListItem(
                               title: ProfileConstant.logout,
                               callback: () {
-                                PopupDialogs(context);
+                                PopupDialogs(context, false);
                               },
                               color: profileThreeColor,
                               iconDate: Icons.logout_outlined,

@@ -7,7 +7,7 @@ import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:sizer/sizer.dart';
 
-setActionButton(context, String tag,
+setActionButton(context, String tag, bool? isEnable,
     {Function? onActionClick, Function? onClick}) {
   return Column(
     children: [
@@ -72,9 +72,9 @@ setActionButton(context, String tag,
         ),
         child: FadeInUp(
             from: 50,
-            child: getSecondaryFormButton(() {
+            child: getAddressButton(() {
               onClick!();
-            }, AddAddressText.payment, isvalidate: true)),
+            }, AddAddressText.payment, isvalidate: isEnable)),
       ),
     ],
   );

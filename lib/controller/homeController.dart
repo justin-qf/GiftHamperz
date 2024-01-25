@@ -334,8 +334,7 @@ class HomeScreenController extends GetxController {
               child: Container(
                   width: 35.w,
                   margin: EdgeInsets.only(bottom: 1.h, left: 1.w, right: 2.w),
-                  padding: EdgeInsets.only(
-                      left: 1.2.w, right: 1.2.w, top: 1.2.w, bottom: 1.h),
+                  padding: EdgeInsets.only(bottom: 1.h),
                   decoration: BoxDecoration(
                     border: isDarkMode()
                         ? null
@@ -363,6 +362,17 @@ class HomeScreenController extends GetxController {
                                   SizerUtil.deviceType == DeviceType.mobile
                                       ? 3.5.w
                                       : 2.5.w),
+                              // boxShadow: [
+                              //   BoxShadow(
+                              //     color: isDarkMode()
+                              //         ? grey.withOpacity(0.2)
+                              //         : grey.withOpacity(0.5),
+                              //     spreadRadius: 2,
+                              //     blurRadius:
+                              //         5.0, // Adjust the blur radius as needed
+                              //     offset: const Offset(0, 2),
+                              //   )
+                              // ],
                               border: isDarkMode()
                                   ? Border.all(
                                       color: grey, // Border color
@@ -370,7 +380,7 @@ class HomeScreenController extends GetxController {
                                     )
                                   : Border.all(
                                       color: grey, // Border color
-                                      width: 0.5, // Border width
+                                      width: 0.2, // Border width
                                     ),
                             ),
                             child: ClipRRect(
@@ -418,217 +428,230 @@ class HomeScreenController extends GetxController {
                       SizedBox(
                         height: 0.6.h,
                       ),
-                      getText(
-                        data.name,
-                        TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                            fontFamily: fontSemiBold,
-                            fontWeight: FontWeight.w500,
-                            color: isDarkMode() ? black : black,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 10.sp
-                                : 8.sp,
-                            height: 1.2),
-                      ),
-                      getDynamicSizedBox(
-                        height: 0.5.h,
-                      ),
-                      getText(
-                        '\u20B9${data.sku}',
-                        TextStyle(
-                            fontFamily: fontBold,
-                            color: primaryColor,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 12.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      getDynamicSizedBox(
-                        height: 0.5.h,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          RatingBar.builder(
-                            initialRating: 3.5,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 1,
-                            itemSize: 3.5.w,
-                            itemBuilder: (context, _) => const Icon(
-                              Icons.star,
-                              color: Colors.orange,
+                      Container(
+                        margin: EdgeInsets.only(left: 1.w, right: 1.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            getText(
+                              data.name,
+                              TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontFamily: fontSemiBold,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDarkMode() ? black : black,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 10.sp
+                                          : 8.sp,
+                                  height: 1.2),
                             ),
-                            onRatingUpdate: (rating) {
-                              logcat("RATING", rating);
-                            },
-                          ),
-                          getText(
-                            "3.5",
-                            TextStyle(
-                                fontFamily: fontSemiBold,
-                                color: lableColor,
-                                fontWeight:
-                                    isDarkMode() ? FontWeight.w600 : null,
-                                fontSize:
-                                    SizerUtil.deviceType == DeviceType.mobile
-                                        ? 9.sp
-                                        : 7.sp,
-                                height: 1.2),
-                          ),
-                          const Spacer(),
-                          Obx(
-                            () {
-                              return data.isInCart!.value == false
-                                  ? getAddToCartBtn(
-                                      'Add to Cart', Icons.shopping_cart,
-                                      addCartClick: () async {
-                                      data.isInCart!.value = true;
-                                      // data.quantity!.value = 1;
-                                      incrementDecrementCartItem(
-                                          isFromIcr: true,
-                                          data: data,
-                                          quantity: data.quantity!.value);
-                                      update();
-                                      // if (isGuestUser == true) {
-                                      //   getGuestUserAlertDialog(context);
-                                      // } else {
-                                      //   data.isInCart!.value = true;
-                                      //   data.quantity!.value = 1;
-                                      //   incrementDecrementCartItem(
-                                      //       isFromIcr: true,
-                                      //       data: data,
-                                      //       quantity: data.quantity!.value);
-                                      //   update();
-                                      // List<CommonProductList> cartItems =
-                                      //     await UserPreferences()
-                                      //         .loadCartItems();
-                                      // int existingIndex =
-                                      //     cartItems.indexWhere(
-                                      //   (item) => item.id == data.id,
-                                      // );
-                                      // data.isInCart!.value = true;
-                                      // if (existingIndex != -1) {
-                                      //   logcat("existingIndex", 'InCARTTTTT');
-                                      //   // Product already in the cart, update the quantity
-                                      //   cartItems[existingIndex]
-                                      //       .quantity!
-                                      //       .value += 1;
-                                      //   // Save the updated cart back to preferences
-                                      //   await UserPreferences().addToCart(
-                                      //     data,
-                                      //     cartItems[existingIndex]
-                                      //         .quantity!
-                                      //         .value,
-                                      //   );
-                                      //   // Update your UI if needed
-                                      //   update();
-                                      // } else {
-                                      //   logcat(
-                                      //       "existingIndex", 'ItemNotInCart');
-                                      //   // Product not in the cart, add it with quantity 1
-                                      //   CommonProductList newProduct =
-                                      //       data.copyWith(quantity: 1);
-                                      //   cartItems.add(newProduct);
-                                      //   // Save the updated cart back to preferences
-                                      //   await UserPreferences()
-                                      //       .addToCart(data, 1);
-                                      //   update();
-                                      // }
-                                      // update();
-                                      // getTotalProductInCart();
-                                      // }
-                                      update();
-                                    }, isAddToCartClicked: data.isInCart!)
-                                  : cartIncDecUi(
-                                      qty: data.quantity.toString(),
-                                      increment: () async {
-                                        incrementDecrementCartItemInList(
-                                            isFromIcr: true,
-                                            data: data,
-                                            quantity: data.quantity!.value);
-                                        update();
-                                        // data.quantity!.value++;
-                                        // // Fetch the current cart items from preferences
-                                        // List<CommonProductList> cartItems =
-                                        //     await UserPreferences()
-                                        //         .loadCartItems();
-                                        // // Check if the product is already in the cart
-                                        // int existingIndex =
-                                        //     cartItems.indexWhere(
-                                        //   (item) => item.id == data.id,
-                                        // );
+                            getDynamicSizedBox(
+                              height: 0.5.h,
+                            ),
+                            getText(
+                              '\u20B9${data.sku}',
+                              TextStyle(
+                                  fontFamily: fontBold,
+                                  color: primaryColor,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 12.sp
+                                          : 7.sp,
+                                  height: 1.2),
+                            ),
+                            getDynamicSizedBox(
+                              height: 0.5.h,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                RatingBar.builder(
+                                  initialRating: 3.5,
+                                  minRating: 1,
+                                  direction: Axis.horizontal,
+                                  allowHalfRating: true,
+                                  itemCount: 1,
+                                  itemSize: 3.5.w,
+                                  itemBuilder: (context, _) => const Icon(
+                                    Icons.star,
+                                    color: Colors.orange,
+                                  ),
+                                  onRatingUpdate: (rating) {
+                                    logcat("RATING", rating);
+                                  },
+                                ),
+                                getText(
+                                  "3.5",
+                                  TextStyle(
+                                      fontFamily: fontSemiBold,
+                                      color: lableColor,
+                                      fontWeight:
+                                          isDarkMode() ? FontWeight.w600 : null,
+                                      fontSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 9.sp
+                                          : 7.sp,
+                                      height: 1.2),
+                                ),
+                                const Spacer(),
+                                Obx(
+                                  () {
+                                    return data.isInCart!.value == false
+                                        ? getAddToCartBtn(
+                                            'Add to Cart', Icons.shopping_cart,
+                                            addCartClick: () async {
+                                            data.isInCart!.value = true;
+                                            // data.quantity!.value = 1;
+                                            incrementDecrementCartItem(
+                                                isFromIcr: true,
+                                                data: data,
+                                                quantity: data.quantity!.value);
+                                            update();
+                                            // if (isGuestUser == true) {
+                                            //   getGuestUserAlertDialog(context);
+                                            // } else {
+                                            //   data.isInCart!.value = true;
+                                            //   data.quantity!.value = 1;
+                                            //   incrementDecrementCartItem(
+                                            //       isFromIcr: true,
+                                            //       data: data,
+                                            //       quantity: data.quantity!.value);
+                                            //   update();
+                                            // List<CommonProductList> cartItems =
+                                            //     await UserPreferences()
+                                            //         .loadCartItems();
+                                            // int existingIndex =
+                                            //     cartItems.indexWhere(
+                                            //   (item) => item.id == data.id,
+                                            // );
+                                            // data.isInCart!.value = true;
+                                            // if (existingIndex != -1) {
+                                            //   logcat("existingIndex", 'InCARTTTTT');
+                                            //   // Product already in the cart, update the quantity
+                                            //   cartItems[existingIndex]
+                                            //       .quantity!
+                                            //       .value += 1;
+                                            //   // Save the updated cart back to preferences
+                                            //   await UserPreferences().addToCart(
+                                            //     data,
+                                            //     cartItems[existingIndex]
+                                            //         .quantity!
+                                            //         .value,
+                                            //   );
+                                            //   // Update your UI if needed
+                                            //   update();
+                                            // } else {
+                                            //   logcat(
+                                            //       "existingIndex", 'ItemNotInCart');
+                                            //   // Product not in the cart, add it with quantity 1
+                                            //   CommonProductList newProduct =
+                                            //       data.copyWith(quantity: 1);
+                                            //   cartItems.add(newProduct);
+                                            //   // Save the updated cart back to preferences
+                                            //   await UserPreferences()
+                                            //       .addToCart(data, 1);
+                                            //   update();
+                                            // }
+                                            // update();
+                                            // getTotalProductInCart();
+                                            // }
+                                            update();
+                                          }, isAddToCartClicked: data.isInCart!)
+                                        : cartIncDecUi(
+                                            qty: data.quantity.toString(),
+                                            increment: () async {
+                                              incrementDecrementCartItemInList(
+                                                  isFromIcr: true,
+                                                  data: data,
+                                                  quantity:
+                                                      data.quantity!.value);
+                                              update();
+                                              // data.quantity!.value++;
+                                              // // Fetch the current cart items from preferences
+                                              // List<CommonProductList> cartItems =
+                                              //     await UserPreferences()
+                                              //         .loadCartItems();
+                                              // // Check if the product is already in the cart
+                                              // int existingIndex =
+                                              //     cartItems.indexWhere(
+                                              //   (item) => item.id == data.id,
+                                              // );
 
-                                        // if (existingIndex != -1) {
-                                        //   // Product already in the cart, update the quantity
-                                        //   cartItems[existingIndex]
-                                        //       .quantity!
-                                        //       .value += 1;
-                                        //   // Save the updated cart back to preferences
-                                        //   await UserPreferences().addToCart(
-                                        //     data,
-                                        //     cartItems[existingIndex]
-                                        //         .quantity!
-                                        //         .value,
-                                        //   );
+                                              // if (existingIndex != -1) {
+                                              //   // Product already in the cart, update the quantity
+                                              //   cartItems[existingIndex]
+                                              //       .quantity!
+                                              //       .value += 1;
+                                              //   // Save the updated cart back to preferences
+                                              //   await UserPreferences().addToCart(
+                                              //     data,
+                                              //     cartItems[existingIndex]
+                                              //         .quantity!
+                                              //         .value,
+                                              //   );
 
-                                        //   update();
-                                        // } else {
-                                        //   // Product not in the cart, add it with quantity 1
-                                        //   CommonProductList newProduct =
-                                        //       data.copyWith(quantity: 1);
-                                        //   cartItems.add(newProduct);
+                                              //   update();
+                                              // } else {
+                                              //   // Product not in the cart, add it with quantity 1
+                                              //   CommonProductList newProduct =
+                                              //       data.copyWith(quantity: 1);
+                                              //   cartItems.add(newProduct);
 
-                                        //   // Save the updated cart back to preferences
-                                        //   await UserPreferences()
-                                        //       .addToCart(data, 1);
-                                        //   update();
-                                        // }
-                                      },
-                                      decrement: () async {
-                                        incrementDecrementCartItemInList(
-                                            isFromIcr: false,
-                                            data: data,
-                                            quantity: data.quantity!.value);
-                                        update();
-                                        // // Fetch the current cart items from preferences
-                                        // List<CommonProductList> cartItems =
-                                        //     await UserPreferences()
-                                        //         .loadCartItems();
-                                        // // Check if the product is already in the cart
-                                        // int existingIndex =
-                                        //     cartItems.indexWhere(
-                                        //   (item) => item.id == data.id,
-                                        // );
-                                        // if (data.quantity!.value > 0) {
-                                        //   data.quantity!.value--;
-                                        //   if (existingIndex != -1) {
-                                        //     // Product already in the cart, decrement the quantity
-                                        //     await UserPreferences().addToCart(
-                                        //       data,
-                                        //       -1, // Pass a negative quantity for decrement
-                                        //     );
-                                        //   } else {
-                                        //     // Product not in the cart, add it with quantity 1
-                                        //     CommonProductList newProduct =
-                                        //         data.copyWith(quantity: 1);
-                                        //     cartItems.add(newProduct);
+                                              //   // Save the updated cart back to preferences
+                                              //   await UserPreferences()
+                                              //       .addToCart(data, 1);
+                                              //   update();
+                                              // }
+                                            },
+                                            decrement: () async {
+                                              incrementDecrementCartItemInList(
+                                                  isFromIcr: false,
+                                                  data: data,
+                                                  quantity:
+                                                      data.quantity!.value);
+                                              update();
+                                              // // Fetch the current cart items from preferences
+                                              // List<CommonProductList> cartItems =
+                                              //     await UserPreferences()
+                                              //         .loadCartItems();
+                                              // // Check if the product is already in the cart
+                                              // int existingIndex =
+                                              //     cartItems.indexWhere(
+                                              //   (item) => item.id == data.id,
+                                              // );
+                                              // if (data.quantity!.value > 0) {
+                                              //   data.quantity!.value--;
+                                              //   if (existingIndex != -1) {
+                                              //     // Product already in the cart, decrement the quantity
+                                              //     await UserPreferences().addToCart(
+                                              //       data,
+                                              //       -1, // Pass a negative quantity for decrement
+                                              //     );
+                                              //   } else {
+                                              //     // Product not in the cart, add it with quantity 1
+                                              //     CommonProductList newProduct =
+                                              //         data.copyWith(quantity: 1);
+                                              //     cartItems.add(newProduct);
 
-                                        //     // Save the updated cart back to preferences
-                                        //     await UserPreferences()
-                                        //         .addToCart(data, 1);
-                                        //   }
-                                        // } else {
-                                        //   data.isInCart!.value = false;
-                                        // }
-                                        // Update your UI
-                                      });
-                            },
-                          ),
-                        ],
+                                              //     // Save the updated cart back to preferences
+                                              //     await UserPreferences()
+                                              //         .addToCart(data, 1);
+                                              //   }
+                                              // } else {
+                                              //   data.isInCart!.value = false;
+                                              // }
+                                              // Update your UI
+                                            });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
+
                       //getDynamicSizedBox(height: 1.h),
                       // getAddToCartBtn('Add to Cart', Icons.shopping_cart,
                       //     addCartClick: () {
@@ -678,14 +701,16 @@ class HomeScreenController extends GetxController {
               child: Container(
                   width: 48.w,
                   margin: EdgeInsets.only(bottom: 1.h, left: 1.w, right: 2.w),
-                  padding: EdgeInsets.only(
-                      left: 1.2.w, right: 1.2.w, top: 1.2.w, bottom: 1.h),
+                  padding: EdgeInsets.only(bottom: 1.h),
                   decoration: BoxDecoration(
                     border: isDarkMode()
-                        ? null
+                        ? Border.all(
+                            color: grey, // Border color
+                            width: 1, // Border width
+                          )
                         : Border.all(
                             color: grey, // Border color
-                            width: 0.5, // Border width
+                            width: 0.2, // Border width
                           ),
                     color: isDarkMode() ? tileColour : white,
                     borderRadius: BorderRadius.circular(
@@ -735,7 +760,7 @@ class HomeScreenController extends GetxController {
                                 errorWidget: (context, url, error) =>
                                     Image.asset(
                                   Asset.productPlaceholder,
-                                  height: 14.h,
+                                  height: 12.h,
                                   fit: BoxFit.contain,
                                 ),
                               ),
@@ -762,74 +787,87 @@ class HomeScreenController extends GetxController {
                       SizedBox(
                         height: 1.0.h,
                       ),
-                      getText(
-                        data.name,
-                        TextStyle(
-                            fontFamily: fontSemiBold,
-                            fontWeight: FontWeight.w500,
-                            color: isDarkMode() ? black : black,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 12.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      getDynamicSizedBox(
-                        height: 0.5.h,
-                      ),
-                      getText(
-                        '${data.sku}\u20B9',
-                        TextStyle(
-                            fontFamily: fontBold,
-                            color: primaryColor,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 12.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          RatingBar.builder(
-                            initialRating: 3.5,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 1,
-                            itemSize: 3.5.w,
-                            itemBuilder: (context, _) => const Icon(
-                              Icons.star,
-                              color: Colors.orange,
+                      Container(
+                        margin: EdgeInsets.only(left: 1.w, right: 1.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            getText(
+                              data.name,
+                              TextStyle(
+                                  fontFamily: fontSemiBold,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDarkMode() ? black : black,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 12.sp
+                                          : 7.sp,
+                                  height: 1.2),
                             ),
-                            onRatingUpdate: (rating) {
-                              logcat("RATING", rating);
-                            },
-                          ),
-                          getText(
-                            "3.5",
-                            TextStyle(
-                                fontFamily: fontSemiBold,
-                                color: lableColor,
-                                fontWeight:
-                                    isDarkMode() ? FontWeight.w600 : null,
-                                fontSize:
-                                    SizerUtil.deviceType == DeviceType.mobile
-                                        ? 9.sp
-                                        : 7.sp,
-                                height: 1.2),
-                          ),
-                          const Spacer(),
-                          getAddToCartBtn('Add to Cart', Icons.shopping_cart,
-                              addCartClick: () {
-                            if (isGuestUser == true) {
-                              getGuestUserAlertDialog(context);
-                            } else {
-                              Get.to(const CartScreen())!.then((value) {
-                                Statusbar().trasparentStatusbarProfile(true);
-                              });
-                            }
-                          })
-                        ],
+                            getDynamicSizedBox(
+                              height: 0.5.h,
+                            ),
+                            getText(
+                              '\u20B9${data.sku}',
+                              TextStyle(
+                                  fontFamily: fontBold,
+                                  color: primaryColor,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 12.sp
+                                          : 7.sp,
+                                  height: 1.2),
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RatingBar.builder(
+                                  initialRating: 3.5,
+                                  minRating: 1,
+                                  direction: Axis.horizontal,
+                                  allowHalfRating: true,
+                                  itemCount: 1,
+                                  itemSize: 3.5.w,
+                                  itemBuilder: (context, _) => const Icon(
+                                    Icons.star,
+                                    color: Colors.orange,
+                                  ),
+                                  onRatingUpdate: (rating) {
+                                    logcat("RATING", rating);
+                                  },
+                                ),
+                                getText(
+                                  "3.5",
+                                  TextStyle(
+                                      fontFamily: fontSemiBold,
+                                      color: lableColor,
+                                      fontWeight:
+                                          isDarkMode() ? FontWeight.w600 : null,
+                                      fontSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 9.sp
+                                          : 7.sp,
+                                      height: 1.2),
+                                ),
+                                const Spacer(),
+                                getAddToCartBtn(
+                                    'Add to Cart', Icons.shopping_cart,
+                                    addCartClick: () {
+                                  if (isGuestUser == true) {
+                                    getGuestUserAlertDialog(
+                                        context, DashboardText.dashboard);
+                                  } else {
+                                    Get.to(const CartScreen())!.then((value) {
+                                      Statusbar()
+                                          .trasparentStatusbarProfile(true);
+                                    });
+                                  }
+                                })
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   )),

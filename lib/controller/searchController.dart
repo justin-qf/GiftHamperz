@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
-import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
@@ -19,6 +18,7 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/models/searchModel.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
@@ -43,11 +43,19 @@ class SearchScreenController extends GetxController {
   late TextEditingController searchCtr;
   bool isSearch = false;
   RxList<SavedItem> filterList = <SavedItem>[].obs;
+  RxBool? isGuest = true.obs;
 
   @override
   void onInit() {
     searchCtr = TextEditingController();
+    getGuestLogin();
     super.onInit();
+  }
+
+  void getGuestLogin() async {
+    isGuest!.value = await UserPreferences().getGuestUser();
+    update();
+    logcat('USER:', isGuest!.value);
   }
 
   final RxString searchQuery = ''.obs; // For storing the search query
@@ -248,15 +256,17 @@ class SearchScreenController extends GetxController {
             child: Container(
               width: double.infinity,
               margin: EdgeInsets.only(bottom: 0.5.h, left: 1.w, right: 2.w),
-              padding: EdgeInsets.only(left: 1.2.w, right: 1.2.w, top: 1.2.w),
               decoration: BoxDecoration(
                 border: isDarkMode()
-                    ? null
+                    ? Border.all(
+                        color: grey, // Border color
+                        width: 1, // Border width
+                      )
                     : Border.all(
                         color: grey, // Border color
-                        width: 0.5, // Border width
+                        width: 0.2, // Border width
                       ),
-                color: isDarkMode() ? itemDarkBackgroundColor : white,
+                color: isDarkMode() ? tileColour : white,
                 borderRadius: BorderRadius.circular(
                     SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
               ),
@@ -288,7 +298,7 @@ class SearchScreenController extends GetxController {
                                   : 2.5.w),
                           child: CachedNetworkImage(
                             fit: BoxFit.cover,
-                            height: 15.h,
+                            height: 12.h,
                             imageUrl: APIImageUrl.url + data.images,
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(
@@ -296,7 +306,7 @@ class SearchScreenController extends GetxController {
                             ),
                             errorWidget: (context, url, error) => Image.asset(
                               Asset.productPlaceholder,
-                              height: 9.h,
+                              height: 12.h,
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -323,81 +333,100 @@ class SearchScreenController extends GetxController {
                   SizedBox(
                     height: 1.h,
                   ),
-                  getText(
-                    data.name,
-                    TextStyle(
-                        fontFamily: fontSemiBold,
-                        overflow: TextOverflow.ellipsis,
-                        fontWeight: FontWeight.w500,
-                        color: isDarkMode() ? black : black,
-                        fontSize: SizerUtil.deviceType == DeviceType.mobile
-                            ? 10.sp
-                            : 7.sp,
-                        height: 1.2),
-                  ),
-                  getDynamicSizedBox(
-                    height: 0.5.h,
-                  ),
-                  getText(
-                    '${data.sku}\u20B9',
-                    TextStyle(
-                        fontFamily: fontBold,
-                        color: primaryColor,
-                        fontSize: SizerUtil.deviceType == DeviceType.mobile
-                            ? 10.sp
-                            : 7.sp,
-                        height: 1.2),
-                  ),
-                  getDynamicSizedBox(
-                    height: 0.5.h,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RatingBar.builder(
-                        initialRating: 3.5,
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        itemCount: 1,
-                        itemSize: 3.5.w,
-                        // itemPadding:
-                        //     const EdgeInsets.symmetric(horizontal: 5.0),
-                        itemBuilder: (context, _) => const Icon(
-                          Icons.star,
-                          color: Colors.orange,
+                  Container(
+                    margin: EdgeInsets.only(left: 1.w, right: 1.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        getText(
+                          data.name,
+                          TextStyle(
+                              fontFamily: fontSemiBold,
+                              overflow: TextOverflow.ellipsis,
+                              fontWeight: FontWeight.w500,
+                              color: isDarkMode() ? black : black,
+                              fontSize:
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 10.sp
+                                      : 7.sp,
+                              height: 1.2),
                         ),
-                        onRatingUpdate: (rating) {
-                          logcat("RATING", rating);
-                        },
-                      ),
-                      getText(
-                        "3.2",
-                        TextStyle(
-                            fontFamily: fontSemiBold,
-                            color: lableColor,
-                            fontWeight: isDarkMode() ? FontWeight.w900 : null,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 8.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      const Spacer(),
-                      getAddToCartBtn('Add to Cart', Icons.shopping_cart,
-                          addCartClick: () {
-                        if (isGuestUser == true) {
-                          getGuestUserAlertDialog(context);
-                        } else {
-                          Get.to(const CartScreen())!.then((value) {
-                            Statusbar().trasparentStatusbarProfile(true);
-                          });
-                        }
-                      })
-                    ],
-                  ),
-                  getDynamicSizedBox(
-                    height: 1.h,
+                        getDynamicSizedBox(
+                          height: 0.5.h,
+                        ),
+                        getText(
+                          '\u20B9${data.sku}',
+                          TextStyle(
+                              fontFamily: fontBold,
+                              color: primaryColor,
+                              fontSize:
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 12.sp
+                                      : 7.sp,
+                              height: 1.2),
+                        ),
+                        getDynamicSizedBox(
+                          height: 0.5.h,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            RatingBar.builder(
+                              initialRating: 3.5,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 1,
+                              itemSize: 3.5.w,
+                              // itemPadding:
+                              //     const EdgeInsets.symmetric(horizontal: 5.0),
+                              itemBuilder: (context, _) => const Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                              ),
+                              onRatingUpdate: (rating) {
+                                logcat("RATING", rating);
+                              },
+                            ),
+                            getText(
+                              "3.2",
+                              TextStyle(
+                                  fontFamily: fontSemiBold,
+                                  color: lableColor,
+                                  fontWeight:
+                                      isDarkMode() ? FontWeight.w900 : null,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 8.sp
+                                          : 7.sp,
+                                  height: 1.2),
+                            ),
+                            const Spacer(),
+                            Obx(
+                              () {
+                                return getAddToCartBtn(
+                                    'Add to Cart', Icons.shopping_cart,
+                                    addCartClick: () {
+                                  if (isGuest!.value == true) {
+                                    getGuestUserAlertDialog(
+                                        context, SearchScreenConstant.title);
+                                  } else {
+                                    Get.to(const CartScreen())!.then((value) {
+                                      Statusbar()
+                                          .trasparentStatusbarProfile(true);
+                                    });
+                                  }
+                                }, isEnable: isGuest!.value);
+                              },
+                            )
+                          ],
+                        ),
+                        getDynamicSizedBox(
+                          height: 1.h,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -413,7 +442,7 @@ class SearchScreenController extends GetxController {
       padding: EdgeInsets.only(left: 0.5.w, right: 0.5.w),
       child: Text(
         title,
-        maxLines: 3,
+        maxLines: 2,
         style: style,
       ),
     );
