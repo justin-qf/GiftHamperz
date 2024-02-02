@@ -12,20 +12,30 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/edit_controller.dart';
+import 'package:gifthamperz/models/UserModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
-
+  EditProfileScreen(this.loginData, {super.key});
+  UserDetailData? loginData;
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   var controller = Get.put(EditProfileController());
+
+  @override
+  void initState() {
+    controller.initDataSet(widget.loginData);
+    setState(() {});
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Statusbar().trasparentStatusbarIsNormalScreen();
@@ -45,7 +55,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             getForgetToolbar(EditScreenConstant.title, showBackButton: true,
                 callback: () {
-              Get.back();
+              Get.back(result: false);
             }),
             Expanded(
               child: SingleChildScrollView(

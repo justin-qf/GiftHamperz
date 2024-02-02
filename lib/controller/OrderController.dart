@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
+import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
@@ -36,39 +37,6 @@ class OrderScreenController extends GetxController {
   late TabController tabController;
   var currentPage = 0;
 
-  RxList<OrderItem> staticData = <OrderItem>[
-    OrderItem(
-        title: "Order #0012",
-        status: "On its day",
-        orderDate: "4/4/2023",
-        price: "\$128.69"),
-    OrderItem(
-        title: "Order #0013",
-        status: "Canceled",
-        orderDate: "5/4/2023",
-        price: "\$128.69"),
-    OrderItem(
-        title: "Order #0014",
-        status: "Delivered",
-        orderDate: "6/4/2023",
-        price: "\$128.69"),
-    OrderItem(
-        title: "Order #0015",
-        status: "Delivered",
-        orderDate: "7/4/2023",
-        price: "\$128.69"),
-    OrderItem(
-        title: "Order #0016",
-        status: "Delivered",
-        orderDate: "8/4/2023",
-        price: "\$128.69"),
-    OrderItem(
-        title: "Order #0017",
-        status: "Delivered",
-        orderDate: "9/4/2023",
-        price: "\$128.69"),
-  ].obs;
-
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
@@ -89,10 +57,18 @@ class OrderScreenController extends GetxController {
   RxList orderList = [].obs;
   RxString nextPageURL = "".obs;
 
-  void getOrderList(context, currentPage, bool hideloading) async {
+  void getOrderList(
+    context,
+    currentPage,
+    bool hideloading, {
+    bool? isRefress,
+  }) async {
+    var loadingIndicator = LoadingProgressDialog();
+
     if (hideloading == true) {
       state.value = ScreenState.apiLoading;
     } else {
+      loadingIndicator.show(context, '');
       isLoading.value = true;
       update();
     }
@@ -106,28 +82,42 @@ class OrderScreenController extends GetxController {
         });
         return;
       }
-      //var pageURL = ApiUrl.getAddress + currentPage.toString();
-      var pageURL = ApiUrl.getOrderList;
+      var pageURL = '${ApiUrl.getOrderList}?page=$currentPage';
+      //var pageURL = ApiUrl.getOrderList;
 
       logcat("URL", pageURL.toString());
-      var response = await Repository.post({
-        "city_id": 25,
-      }, pageURL, allowHeader: true);
-
+      var response = await Repository.post({}, pageURL, allowHeader: true);
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       // loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
+          var responseData = OrderModel.fromJson(data);
           state.value = ScreenState.apiSuccess;
           message.value = '';
           isLoading.value = false;
           update();
-          var responseData = OrderModel.fromJson(data);
-          orderList.clear();
-          orderList.addAll(responseData.data.data);
-          nextPageURL.value = responseData.data.nextPageUrl.toString();
-          logcat("NextPageURL", nextPageURL.value.toString());
-          // currentPage++;
+          if (responseData.data.data.isNotEmpty) {
+            orderList.addAll(responseData.data.data);
+            orderList.refresh();
+          }
+          if (responseData.data.nextPageUrl != 'null' &&
+              responseData.data.nextPageUrl != null) {
+            nextPageURL.value = responseData.data.nextPageUrl.toString();
+            update();
+          } else {
+            nextPageURL.value = "";
+            update();
+          }
+          if (isRefress == true) {
+            return;
+          } else {
+            currentPage++;
+          }
           update();
         } else {
           isLoading.value = false;
@@ -152,7 +142,7 @@ class OrderScreenController extends GetxController {
     }
   }
 
-  getOrderListItem(BuildContext context, OrderData data, int index) {
+  Widget getOrderListItem(BuildContext context, OrderData data, int index) {
     return FadeInUp(
       child: GestureDetector(
         onTap: () {
@@ -173,14 +163,6 @@ class OrderScreenController extends GetxController {
                 : null,
             color: isDarkMode() ? itemDarkBackgroundColor : white,
             borderRadius: const BorderRadius.all(Radius.circular(10)),
-            // boxShadow: [
-            //   BoxShadow(
-            //       color: isDarkMode() ? transparent : grey.withOpacity(0.1),
-            //       spreadRadius: 2,
-            //       blurRadius: 6,
-            //       offset: const Offset(0.3, 0.3)),
-            // ],
-
             boxShadow: [
               BoxShadow(
                   color: grey.withOpacity(0.5),
@@ -195,24 +177,22 @@ class OrderScreenController extends GetxController {
                 margin: EdgeInsets.only(
                   right: 3.w,
                 ),
+                padding: const EdgeInsets.all(0.5),
                 decoration: BoxDecoration(
                   border: isDarkMode()
-                      ? null
+                      ? Border.all(
+                          color: isDarkMode() ? grey : grey, // Border color
+                          width: 0.2, // Border width
+                        )
                       : Border.all(
                           color: grey, // Border color
-                          width: 0.5, // Border width
+                          width: 0.6, // Border width
                         ),
                   color: isDarkMode() ? itemDarkBackgroundColor : white,
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: isDarkMode()
-                            ? grey.withOpacity(0.2)
-                            : grey.withOpacity(0.1),
-                        spreadRadius: 2,
-                        blurRadius: 6,
-                        offset: const Offset(0.3, 0.3)),
-                  ],
+                  borderRadius: BorderRadius.circular(
+                      SizerUtil.deviceType == DeviceType.mobile
+                          ? 3.5.w
+                          : 2.5.w),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(
@@ -221,15 +201,16 @@ class OrderScreenController extends GetxController {
                           : 2.5.w),
                   child: CachedNetworkImage(
                     fit: BoxFit.cover,
-                    height: 14.h,
-                    width: 14.h,
-                    imageUrl: APIImageUrl.url + data.orderDetails[0].images,
+                    height: 12.h,
+                    width: 12.h,
+                    imageUrl: APIImageUrl.url +
+                        data.orderDetails[0].images[0].toString(),
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(color: primaryColor),
                     ),
                     errorWidget: (context, url, error) => Image.asset(
-                      Asset.placeholder,
-                      height: 9.h,
+                      Asset.productPlaceholder,
+                      height: 12.h,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -245,18 +226,18 @@ class OrderScreenController extends GetxController {
                         Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: const BoxDecoration(
-                              color: primaryColor, shape: BoxShape.circle),
+                              color: Colors.green, shape: BoxShape.circle),
                         ),
                         getDynamicSizedBox(width: 1.w),
                         Text(
                           'Delivered',
                           style: TextStyle(
-                              fontSize:
-                                  SizerUtil.deviceType == DeviceType.mobile
-                                      ? 10.sp
-                                      : 6.sp,
-                              fontFamily: fontSemiBold,
-                              color: primaryColor),
+                            fontSize: SizerUtil.deviceType == DeviceType.mobile
+                                ? 10.sp
+                                : 6.sp,
+                            fontFamily: fontSemiBold,
+                            color: Colors.green,
+                          ),
                         ),
                       ],
                     ),
@@ -282,59 +263,38 @@ class OrderScreenController extends GetxController {
                           fontWeight: isDarkMode() ? FontWeight.w600 : null,
                           color: isDarkMode() ? grey : lableColor),
                     ),
-                    // getDynamicSizedBox(height: 0.5.h),
-                    // Text(
-                    //   ('Date Of Delivery: ${getFormateDate(data.dateOfDelivery.toString())}'),
-                    //   style: TextStyle(
-                    //       fontSize: SizerUtil.deviceType == DeviceType.mobile
-                    //           ? 10.sp
-                    //           : 6.sp,
-                    //       fontFamily: fontRegular,
-                    //       fontWeight: isDarkMode() ? FontWeight.w900 : null,
-                    //       color: isDarkMode()
-                    //           ? itemTextBackgroundColor
-                    //           : lableColor),
-                    // ),
                     getDynamicSizedBox(height: 0.5.h),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              ('\u{20B9}${data.totalAmount.toString()}'),
-                              style: TextStyle(
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
-                                          ? 11.sp
-                                          : 6.sp,
-                                  fontFamily: fontExtraBold,
-                                  color: isDarkMode() ? black : black),
-                            ),
-                            RatingBar.builder(
-                              initialRating: 3.5,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemSize: 4.w,
-                              itemBuilder: (context, _) => const Icon(
-                                Icons.star,
-                                color: Colors.orange,
-                              ),
-                              onRatingUpdate: (rating) {
-                                logcat("RATING", rating);
-                              },
-                            ),
-                          ],
+                        Text(
+                          ('\u{20B9}${formatPrice(double.parse(data.totalAmount.toString()))}'),
+                          style: TextStyle(
+                              fontSize:
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 12.sp
+                                      : 10.sp,
+                              fontFamily: fontExtraBold,
+                              color: isDarkMode() ? black : black),
                         ),
                         const Spacer(),
-                        getOrderButton(() {
-                          Get.to(OrderDetailScreen(
-                            data: data,
-                          ));
-                        })
+                        Text(
+                          ('View Details'),
+                          style: TextStyle(
+                              fontSize:
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 10.sp
+                                      : 8.sp,
+                              decoration: TextDecoration.underline,
+                              fontFamily: fontExtraBold,
+                              color: isDarkMode() ? black : black),
+                        ),
+                        // getOrderButton(() {
+                        //   Get.to(OrderDetailScreen(
+                        //     data: data,
+                        //   ));
+                        // })
                       ],
                     ),
                   ],

@@ -14,16 +14,14 @@ import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
-import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/BannerModel.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
-import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/CategoryScreen/SubCategoryScreen.dart';
 import 'package:gifthamperz/views/ProductDetailScreen/ProductDetailScreen.dart';
 import 'package:marquee/marquee.dart';
@@ -48,6 +46,16 @@ class HomeScreenController extends GetxController {
   late TextEditingController searchCtr;
   bool isSearch = false;
   RxInt totalItemsCount = 0.obs;
+  RxBool isShowMoreLoading = false.obs;
+  // Use a Map to store the quantity for each product ID
+  final Map<String, int> productQuantities = <String, int>{};
+
+  // Method to update the quantity for a product
+  void updateQuantity(String productId, int quantity) {
+    productQuantities[productId] = quantity;
+    logcat("ItemISIInCART:::", productQuantities[productId].toString());
+    update(); // Notify listeners
+  }
 
   @override
   void onInit() {
@@ -206,7 +214,7 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  getCategoryListItem(CategoryData item) {
+  getCategoryListItem(CategoryList item) {
     return FadeInUp(
         child: GestureDetector(
             onTap: () {
@@ -304,7 +312,6 @@ class HomeScreenController extends GetxController {
     totalItemsCount.value = cartItems.length;
     logcat("cartItems", totalItemsCount.value.toString());
     update();
-    update();
   }
 
   getListItem(BuildContext context, CommonProductList data,
@@ -362,17 +369,6 @@ class HomeScreenController extends GetxController {
                                   SizerUtil.deviceType == DeviceType.mobile
                                       ? 3.5.w
                                       : 2.5.w),
-                              // boxShadow: [
-                              //   BoxShadow(
-                              //     color: isDarkMode()
-                              //         ? grey.withOpacity(0.2)
-                              //         : grey.withOpacity(0.5),
-                              //     spreadRadius: 2,
-                              //     blurRadius:
-                              //         5.0, // Adjust the blur radius as needed
-                              //     offset: const Offset(0, 2),
-                              //   )
-                              // ],
                               border: isDarkMode()
                                   ? Border.all(
                                       color: grey, // Border color
@@ -391,7 +387,7 @@ class HomeScreenController extends GetxController {
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
                                 height: 12.h,
-                                imageUrl: APIImageUrl.url + data.images,
+                                imageUrl: APIImageUrl.url + data.images[0],
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
                                       color: primaryColor),
@@ -449,31 +445,28 @@ class HomeScreenController extends GetxController {
                             getDynamicSizedBox(
                               height: 0.5.h,
                             ),
-                            getText(
-                              '\u20B9${data.sku}',
-                              TextStyle(
-                                  fontFamily: fontBold,
-                                  color: primaryColor,
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
+                            Row(
+                              children: [
+                                getText(
+                                  '\u20B9${data.sku}',
+                                  TextStyle(
+                                      fontFamily: fontBold,
+                                      color: primaryColor,
+                                      fontSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
                                           ? 12.sp
                                           : 7.sp,
-                                  height: 1.2),
-                            ),
-                            getDynamicSizedBox(
-                              height: 0.5.h,
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
+                                      height: 1.2),
+                                ),
+                                const Spacer(),
                                 RatingBar.builder(
-                                  initialRating: 3.5,
+                                  initialRating: data.averageRating ?? 0.0,
                                   minRating: 1,
                                   direction: Axis.horizontal,
                                   allowHalfRating: true,
                                   itemCount: 1,
                                   itemSize: 3.5.w,
+                                  unratedColor: Colors.orange,
                                   itemBuilder: (context, _) => const Icon(
                                     Icons.star,
                                     color: Colors.orange,
@@ -483,7 +476,9 @@ class HomeScreenController extends GetxController {
                                   },
                                 ),
                                 getText(
-                                  "3.5",
+                                  data.averageRating != null
+                                      ? data.averageRating.toString()
+                                      : '0.0',
                                   TextStyle(
                                       fontFamily: fontSemiBold,
                                       color: lableColor,
@@ -495,163 +490,127 @@ class HomeScreenController extends GetxController {
                                           : 7.sp,
                                       height: 1.2),
                                 ),
-                                const Spacer(),
-                                Obx(
-                                  () {
-                                    return data.isInCart!.value == false
-                                        ? getAddToCartBtn(
-                                            'Add to Cart', Icons.shopping_cart,
-                                            addCartClick: () async {
-                                            data.isInCart!.value = true;
-                                            // data.quantity!.value = 1;
-                                            incrementDecrementCartItem(
-                                                isFromIcr: true,
-                                                data: data,
-                                                quantity: data.quantity!.value);
-                                            update();
-                                            // if (isGuestUser == true) {
-                                            //   getGuestUserAlertDialog(context);
-                                            // } else {
-                                            //   data.isInCart!.value = true;
-                                            //   data.quantity!.value = 1;
-                                            //   incrementDecrementCartItem(
-                                            //       isFromIcr: true,
-                                            //       data: data,
-                                            //       quantity: data.quantity!.value);
-                                            //   update();
-                                            // List<CommonProductList> cartItems =
-                                            //     await UserPreferences()
-                                            //         .loadCartItems();
-                                            // int existingIndex =
-                                            //     cartItems.indexWhere(
-                                            //   (item) => item.id == data.id,
-                                            // );
-                                            // data.isInCart!.value = true;
-                                            // if (existingIndex != -1) {
-                                            //   logcat("existingIndex", 'InCARTTTTT');
-                                            //   // Product already in the cart, update the quantity
-                                            //   cartItems[existingIndex]
-                                            //       .quantity!
-                                            //       .value += 1;
-                                            //   // Save the updated cart back to preferences
-                                            //   await UserPreferences().addToCart(
-                                            //     data,
-                                            //     cartItems[existingIndex]
-                                            //         .quantity!
-                                            //         .value,
-                                            //   );
-                                            //   // Update your UI if needed
-                                            //   update();
-                                            // } else {
-                                            //   logcat(
-                                            //       "existingIndex", 'ItemNotInCart');
-                                            //   // Product not in the cart, add it with quantity 1
-                                            //   CommonProductList newProduct =
-                                            //       data.copyWith(quantity: 1);
-                                            //   cartItems.add(newProduct);
-                                            //   // Save the updated cart back to preferences
-                                            //   await UserPreferences()
-                                            //       .addToCart(data, 1);
-                                            //   update();
-                                            // }
-                                            // update();
-                                            // getTotalProductInCart();
-                                            // }
-                                            update();
-                                          }, isAddToCartClicked: data.isInCart!)
-                                        : cartIncDecUi(
-                                            qty: data.quantity.toString(),
-                                            increment: () async {
-                                              incrementDecrementCartItemInList(
-                                                  isFromIcr: true,
-                                                  data: data,
-                                                  quantity:
-                                                      data.quantity!.value);
-                                              update();
-                                              // data.quantity!.value++;
-                                              // // Fetch the current cart items from preferences
-                                              // List<CommonProductList> cartItems =
-                                              //     await UserPreferences()
-                                              //         .loadCartItems();
-                                              // // Check if the product is already in the cart
-                                              // int existingIndex =
-                                              //     cartItems.indexWhere(
-                                              //   (item) => item.id == data.id,
-                                              // );
-
-                                              // if (existingIndex != -1) {
-                                              //   // Product already in the cart, update the quantity
-                                              //   cartItems[existingIndex]
-                                              //       .quantity!
-                                              //       .value += 1;
-                                              //   // Save the updated cart back to preferences
-                                              //   await UserPreferences().addToCart(
-                                              //     data,
-                                              //     cartItems[existingIndex]
-                                              //         .quantity!
-                                              //         .value,
-                                              //   );
-
-                                              //   update();
-                                              // } else {
-                                              //   // Product not in the cart, add it with quantity 1
-                                              //   CommonProductList newProduct =
-                                              //       data.copyWith(quantity: 1);
-                                              //   cartItems.add(newProduct);
-
-                                              //   // Save the updated cart back to preferences
-                                              //   await UserPreferences()
-                                              //       .addToCart(data, 1);
-                                              //   update();
-                                              // }
-                                            },
-                                            decrement: () async {
-                                              incrementDecrementCartItemInList(
-                                                  isFromIcr: false,
-                                                  data: data,
-                                                  quantity:
-                                                      data.quantity!.value);
-                                              update();
-                                              // // Fetch the current cart items from preferences
-                                              // List<CommonProductList> cartItems =
-                                              //     await UserPreferences()
-                                              //         .loadCartItems();
-                                              // // Check if the product is already in the cart
-                                              // int existingIndex =
-                                              //     cartItems.indexWhere(
-                                              //   (item) => item.id == data.id,
-                                              // );
-                                              // if (data.quantity!.value > 0) {
-                                              //   data.quantity!.value--;
-                                              //   if (existingIndex != -1) {
-                                              //     // Product already in the cart, decrement the quantity
-                                              //     await UserPreferences().addToCart(
-                                              //       data,
-                                              //       -1, // Pass a negative quantity for decrement
-                                              //     );
-                                              //   } else {
-                                              //     // Product not in the cart, add it with quantity 1
-                                              //     CommonProductList newProduct =
-                                              //         data.copyWith(quantity: 1);
-                                              //     cartItems.add(newProduct);
-
-                                              //     // Save the updated cart back to preferences
-                                              //     await UserPreferences()
-                                              //         .addToCart(data, 1);
-                                              //   }
-                                              // } else {
-                                              //   data.isInCart!.value = false;
-                                              // }
-                                              // Update your UI
-                                            });
-                                  },
-                                ),
                               ],
+                            ),
+                            getDynamicSizedBox(
+                              height: 0.5.h,
+                            ),
+                            // Row(
+                            //   crossAxisAlignment: CrossAxisAlignment.center,
+                            //   mainAxisAlignment: MainAxisAlignment.start,
+                            //   children: [
+                            //     RatingBar.builder(
+                            //       initialRating: 3.5,
+                            //       minRating: 1,
+                            //       direction: Axis.horizontal,
+                            //       allowHalfRating: true,
+                            //       itemCount: 1,
+                            //       itemSize: 3.5.w,
+                            //       itemBuilder: (context, _) => const Icon(
+                            //         Icons.star,
+                            //         color: Colors.orange,
+                            //       ),
+                            //       onRatingUpdate: (rating) {
+                            //         logcat("RATING", rating);
+                            //       },
+                            //     ),
+                            //     getText(
+                            //       "3.5",
+                            //       TextStyle(
+                            //           fontFamily: fontSemiBold,
+                            //           color: lableColor,
+                            //           fontWeight:
+                            //               isDarkMode() ? FontWeight.w600 : null,
+                            //           fontSize: SizerUtil.deviceType ==
+                            //                   DeviceType.mobile
+                            //               ? 9.sp
+                            //               : 7.sp,
+                            //           height: 1.2),
+                            //     ),
+                            //     const Spacer(),
+                            //     // Obx(
+                            //     //   () {
+                            //     //     return data.isInCart!.value == false
+                            //     //         ? getAddToCartBtn(
+                            //     //             'Add to Cart', Icons.shopping_cart,
+                            //     //             addCartClick: () async {
+                            //     //             data.isInCart!.value = true;
+                            //     //             // data.quantity!.value = 1;
+                            //     //             incrementDecrementCartItem(
+                            //     //                 isFromIcr: true,
+                            //     //                 data: data,
+                            //     //                 itemList: popularItemList,
+                            //     //                 quantity: data.quantity!.value);
+
+                            //     //             update();
+                            //     //           }, isAddToCartClicked: data.isInCart!)
+                            //     //         : cartIncDecUi(
+                            //     //             qty: data.quantity.toString(),
+                            //     //             increment: () async {
+                            //     //               incrementDecrementCartItemInList(
+                            //     //                   isFromIcr: true,
+                            //     //                   data: data,
+                            //     //                   itemList: popularItemList,
+                            //     //                   quantity:
+                            //     //                       data.quantity!.value);
+
+                            //     //               update();
+                            //     //             },
+                            //     //             decrement: () async {
+                            //     //               incrementDecrementCartItemInList(
+                            //     //                   isFromIcr: false,
+                            //     //                   data: data,
+                            //     //                   itemList: popularItemList,
+                            //     //                   quantity:
+                            //     //                       data.quantity!.value);
+                            //     //               update();
+                            //     //             });
+                            //     //   },
+                            //     // ),
+                            //   ],
+                            // ),
+                            getDynamicSizedBox(height: 0.3.h),
+                            Obx(
+                              () {
+                                return data.isInCart!.value == false
+                                    ? getAddToCartBtn(
+                                        'Add to Cart', Icons.shopping_cart,
+                                        addCartClick: () async {
+                                        data.isInCart!.value = true;
+                                        // data.quantity!.value = 1;
+                                        incrementDecrementCartItem(
+                                            isFromIcr: true,
+                                            data: data,
+                                            itemList: popularItemList,
+                                            quantity: data.quantity!.value);
+
+                                        update();
+                                      }, isAddToCartClicked: data.isInCart!)
+                                    : homeCartIncDecUi(
+                                        qty: data.quantity.toString(),
+                                        increment: () async {
+                                          incrementDecrementCartItemInList(
+                                              isFromIcr: true,
+                                              data: data,
+                                              itemList: popularItemList,
+                                              quantity: data.quantity!.value);
+
+                                          update();
+                                        },
+                                        isFromPopular: false,
+                                        decrement: () async {
+                                          incrementDecrementCartItemInList(
+                                              isFromIcr: false,
+                                              data: data,
+                                              itemList: popularItemList,
+                                              quantity: data.quantity!.value);
+                                          update();
+                                        });
+                              },
                             ),
                           ],
                         ),
                       ),
-
                       //getDynamicSizedBox(height: 1.h),
                       // getAddToCartBtn('Add to Cart', Icons.shopping_cart,
                       //     addCartClick: () {
@@ -704,13 +663,10 @@ class HomeScreenController extends GetxController {
                   padding: EdgeInsets.only(bottom: 1.h),
                   decoration: BoxDecoration(
                     border: isDarkMode()
-                        ? Border.all(
-                            color: grey, // Border color
-                            width: 1, // Border width
-                          )
+                        ? null
                         : Border.all(
                             color: grey, // Border color
-                            width: 0.2, // Border width
+                            width: 0.5, // Border width
                           ),
                     color: isDarkMode() ? tileColour : white,
                     borderRadius: BorderRadius.circular(
@@ -752,7 +708,7 @@ class HomeScreenController extends GetxController {
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
                                 height: 12.h,
-                                imageUrl: APIImageUrl.url + data.images,
+                                imageUrl: APIImageUrl.url + data.images[0],
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
                                       color: primaryColor),
@@ -807,28 +763,28 @@ class HomeScreenController extends GetxController {
                             getDynamicSizedBox(
                               height: 0.5.h,
                             ),
-                            getText(
-                              '\u20B9${data.sku}',
-                              TextStyle(
-                                  fontFamily: fontBold,
-                                  color: primaryColor,
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
+                            Row(
+                              children: [
+                                getText(
+                                  '\u20B9${data.sku}',
+                                  TextStyle(
+                                      fontFamily: fontBold,
+                                      color: primaryColor,
+                                      fontSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
                                           ? 12.sp
                                           : 7.sp,
-                                  height: 1.2),
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
+                                      height: 1.2),
+                                ),
+                                const Spacer(),
                                 RatingBar.builder(
-                                  initialRating: 3.5,
+                                  initialRating: data.averageRating ?? 0.0,
                                   minRating: 1,
                                   direction: Axis.horizontal,
                                   allowHalfRating: true,
                                   itemCount: 1,
                                   itemSize: 3.5.w,
+                                  unratedColor: Colors.orange,
                                   itemBuilder: (context, _) => const Icon(
                                     Icons.star,
                                     color: Colors.orange,
@@ -838,7 +794,9 @@ class HomeScreenController extends GetxController {
                                   },
                                 ),
                                 getText(
-                                  "3.5",
+                                  data.averageRating != null
+                                      ? data.averageRating.toString()
+                                      : '0.0',
                                   TextStyle(
                                       fontFamily: fontSemiBold,
                                       color: lableColor,
@@ -850,22 +808,130 @@ class HomeScreenController extends GetxController {
                                           : 7.sp,
                                       height: 1.2),
                                 ),
-                                const Spacer(),
-                                getAddToCartBtn(
-                                    'Add to Cart', Icons.shopping_cart,
-                                    addCartClick: () {
-                                  if (isGuestUser == true) {
-                                    getGuestUserAlertDialog(
-                                        context, DashboardText.dashboard);
-                                  } else {
-                                    Get.to(const CartScreen())!.then((value) {
-                                      Statusbar()
-                                          .trasparentStatusbarProfile(true);
-                                    });
-                                  }
-                                })
                               ],
                             ),
+                            getDynamicSizedBox(height: 0.5.h),
+                            Obx(
+                              () {
+                                return data.isInCart!.value == false
+                                    ? getAddToCartBtn(
+                                        'Add to Cart', Icons.shopping_cart,
+                                        addCartClick: () async {
+                                        data.isInCart!.value = true;
+                                        // data.quantity!.value = 1;
+                                        incrementDecrementCartItem(
+                                            isFromIcr: true,
+                                            data: data,
+                                            itemList: trendingItemList,
+                                            quantity: data.quantity!.value);
+                                        update();
+                                      }, isAddToCartClicked: data.isInCart!)
+                                    : homeCartIncDecUi(
+                                        qty: data.quantity.toString(),
+                                        increment: () async {
+                                          incrementDecrementCartItemInList(
+                                              isFromIcr: true,
+                                              data: data,
+                                              itemList: trendingItemList,
+                                              quantity: data.quantity!.value);
+                                          update();
+                                        },
+                                        isFromPopular: true,
+                                        decrement: () async {
+                                          incrementDecrementCartItemInList(
+                                              isFromIcr: false,
+                                              data: data,
+                                              itemList: trendingItemList,
+                                              quantity: data.quantity!.value);
+                                          update();
+                                        });
+                              },
+                            ),
+                            // Row(
+                            //   crossAxisAlignment: CrossAxisAlignment.center,
+                            //   mainAxisAlignment: MainAxisAlignment.center,
+                            //   children: [
+                            //     RatingBar.builder(
+                            //       initialRating: 3.5,
+                            //       minRating: 1,
+                            //       direction: Axis.horizontal,
+                            //       allowHalfRating: true,
+                            //       itemCount: 1,
+                            //       itemSize: 3.5.w,
+                            //       itemBuilder: (context, _) => const Icon(
+                            //         Icons.star,
+                            //         color: Colors.orange,
+                            //       ),
+                            //       onRatingUpdate: (rating) {
+                            //         logcat("RATING", rating);
+                            //       },
+                            //     ),
+                            //     getText(
+                            //       "3.5",
+                            //       TextStyle(
+                            //           fontFamily: fontSemiBold,
+                            //           color: lableColor,
+                            //           fontWeight:
+                            //               isDarkMode() ? FontWeight.w600 : null,
+                            //           fontSize: SizerUtil.deviceType ==
+                            //                   DeviceType.mobile
+                            //               ? 9.sp
+                            //               : 7.sp,
+                            //           height: 1.2),
+                            //     ),
+                            //     const Spacer(),
+                            //     // getAddToCartBtn(
+                            //     //     'Add to Cart', Icons.shopping_cart,
+                            //     //     addCartClick: () {
+                            //     //   if (isGuestUser == true) {
+                            //     //     getGuestUserAlertDialog(
+                            //     //         context, DashboardText.dashboard);
+                            //     //   } else {
+                            //     //     Get.to(const CartScreen())!.then((value) {
+                            //     //       Statusbar()
+                            //     //           .trasparentStatusbarProfile(true);
+                            //     //     });
+                            //     //   }
+                            //     // })
+                            //     Obx(
+                            //       () {
+                            //         return data.isInCart!.value == false
+                            //             ? getAddToCartBtn(
+                            //                 'Add to Cart', Icons.shopping_cart,
+                            //                 addCartClick: () async {
+                            //                 data.isInCart!.value = true;
+                            //                 // data.quantity!.value = 1;
+                            //                 incrementDecrementCartItem(
+                            //                     isFromIcr: true,
+                            //                     data: data,
+                            //                     itemList: trendingItemList,
+                            //                     quantity: data.quantity!.value);
+                            //                 update();
+                            //               }, isAddToCartClicked: data.isInCart!)
+                            //             : cartIncDecUi(
+                            //                 qty: data.quantity.toString(),
+                            //                 increment: () async {
+                            //                   incrementDecrementCartItemInList(
+                            //                       isFromIcr: true,
+                            //                       data: data,
+                            //                       itemList: trendingItemList,
+                            //                       quantity:
+                            //                           data.quantity!.value);
+                            //                   update();
+                            //                 },
+                            //                 decrement: () async {
+                            //                   incrementDecrementCartItemInList(
+                            //                       isFromIcr: false,
+                            //                       data: data,
+                            //                       itemList: trendingItemList,
+                            //                       quantity:
+                            //                           data.quantity!.value);
+                            //                   update();
+                            //                 });
+                            //       },
+                            //     ),
+                            //   ],
+                            // ),
                           ],
                         ),
                       ),
@@ -878,7 +944,7 @@ class HomeScreenController extends GetxController {
     );
   }
 
-  RxList categoryList = [].obs;
+  // RxList categoryList = [].obs;
   void getCategoryList(context) async {
     state.value = ScreenState.apiLoading;
     try {
@@ -927,7 +993,8 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  RxList bannerList = [].obs;
+  //RxList bannerList = [].obs;
+
   void getBannerList(context) async {
     state.value = ScreenState.apiLoading;
     try {
@@ -974,9 +1041,16 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  RxList trendingItemList = [].obs;
+  // RxList trendingItemList = [].obs;
   RxList topItemList = [].obs;
-  RxList popularItemList = [].obs;
+  RxList bannerList = [].obs;
+  //RxList popularItemList = [].obs;
+
+  RxList<CommonProductList> popularItemList = <CommonProductList>[].obs;
+  RxList<CommonProductList> trendingItemList = <CommonProductList>[].obs;
+
+  RxList categoryList = [].obs;
+
   void getHome(context) async {
     state.value = ScreenState.apiLoading;
     try {
@@ -1000,11 +1074,23 @@ class HomeScreenController extends GetxController {
           trendingItemList.clear();
           topItemList.clear();
           popularItemList.clear();
+          bannerList.clear();
+          categoryList.clear();
 
           if (homeData.data.trendList.isNotEmpty) {
             trendingItemList.addAll(homeData.data.trendList);
             update();
           }
+
+          if (homeData.data.categoryList.isNotEmpty) {
+            categoryList.addAll(homeData.data.categoryList);
+            update();
+          }
+          if (homeData.data.bannerList.isNotEmpty) {
+            bannerList.addAll(homeData.data.bannerList);
+            update();
+          }
+
           List<CommonProductList> cartItems =
               await UserPreferences().loadCartItems();
 
@@ -1027,6 +1113,18 @@ class HomeScreenController extends GetxController {
           if (homeData.data.popularList.isNotEmpty) {
             popularItemList.addAll(homeData.data.popularList);
             update();
+          }
+
+          for (CommonProductList item in homeData.data.popularList) {
+            int existingIndex =
+                cartItems.indexWhere((cartItem) => cartItem.id == item.id);
+            if (existingIndex != -1) {
+              item.isInCart!.value = true;
+              item.quantity!.value = cartItems[existingIndex].quantity!.value;
+            } else {
+              item.isInCart!.value = false;
+              item.quantity!.value = 0;
+            }
           }
         } else {
           message.value = responseData['message'];

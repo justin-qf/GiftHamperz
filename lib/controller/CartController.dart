@@ -1,101 +1,39 @@
+import 'dart:ffi';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
-import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
+import '../models/UpdateDashboardModel.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class CartScreenController extends GetxController {
-  var currentPage = 0;
-
   DateTime selectedValue = DateTime.now();
-
-  RxString picDate = "".obs;
-  RxDouble productCost = 178.38.obs;
-  RxDouble deliveryCharge = 5.00.obs;
-  RxDouble discount = 10.00.obs;
-  RxDouble total = 0.0.obs;
   RxBool isGuest = false.obs;
-
-  final GlobalKey<ScaffoldState> key = GlobalKey();
+  RxString totalProductList = ''.obs;
+  Rx<ScreenState> state = ScreenState.apiLoading.obs;
+  RxString message = "".obs;
+  final InternetController etworkManager = Get.find<InternetController>();
 
   initLoginData() async {
     isGuest.value = await UserPreferences().getGuestUser();
     update();
   }
 
-  changeIndex(int index) async {
-    currentPage = index;
-    update();
-  }
-
-  getTotal() {
-    total.value = (productCost.value + deliveryCharge.value) - discount.value;
-    logcat("Difference", total.value.toString());
-  }
-
-  void updateDate(date) {
-    picDate.value = date;
-    update();
-  }
-
-  Rx<ScreenState> state = ScreenState.apiLoading.obs;
-  RxString message = "".obs;
-  final InternetController etworkManager = Get.find<InternetController>();
-
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
     }
-  }
-
-  RxList<CartItem> cartItems = <CartItem>[
-    CartItem(
-        title: "Unicorn Roses - 12 Long Stemmed Tie Dyned Roses",
-        status: "Deluxe",
-        orderDate: "1",
-        icone: 'assets/pngs/home_three.jpg',
-        initialQuantity: 1,
-        price: 128.69),
-    CartItem(
-        title: "12 Handmade Easter Chocolate Brownie Pops",
-        status: "Canceled",
-        orderDate: "1",
-        icone: 'assets/pngs/home_one.jpg',
-        initialQuantity: 1,
-        price: 49.69),
-    CartItem(
-        title: "12 Handmade Easter Chocolate Brownie Pops",
-        status: "Canceled",
-        orderDate: "1",
-        icone: 'assets/pngs/home_one.jpg',
-        initialQuantity: 1,
-        price: 49.69),
-    CartItem(
-        title: "12 Handmade Easter Chocolate Brownie Pops",
-        status: "Canceled",
-        orderDate: "1",
-        icone: 'assets/pngs/home_one.jpg',
-        initialQuantity: 1,
-        price: 49.69),
-  ].obs;
-
-  void removeItemFromCart(CartItem item) {
-    cartItems.remove(item);
-    update();
   }
 
   Widget getLableText(text, {isMainTitle}) {
@@ -160,7 +98,7 @@ class CartScreenController extends GetxController {
                               fit: BoxFit.cover,
                               height: 13.h,
                               width: 30.w,
-                              imageUrl: APIImageUrl.url + data.images,
+                              imageUrl: APIImageUrl.url + data.images[0],
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
                                     color: primaryColor),
@@ -352,7 +290,7 @@ class CartScreenController extends GetxController {
                   )
                 : TextStyle(
                     fontFamily: fontBold,
-                    color: isDarkMode() ? lableColor : black,
+                    color: isDarkMode() ? white : black,
                     fontWeight: FontWeight.w900,
                     fontSize: SizerUtil.deviceType == DeviceType.mobile
                         ? 14.sp
@@ -373,7 +311,7 @@ class CartScreenController extends GetxController {
                   )
                 : TextStyle(
                     fontFamily: fontBold,
-                    color: primaryColor,
+                    color: isDarkMode() ? white : primaryColor,
                     fontWeight: FontWeight.w800,
                     fontSize: SizerUtil.deviceType == DeviceType.mobile
                         ? 14.sp
@@ -399,4 +337,70 @@ class CartScreenController extends GetxController {
   //   total = products.fold<double>(0, (p, c) => p + c.price! * c.quantity!);
   //   update();
   // }
+
+  RxDouble productPrice = 0.0.obs;
+  RxDouble deliveryPrice = 0.0.obs;
+  RxDouble discountPrice = 0.0.obs;
+  RxDouble finalProductPrice = 0.0.obs;
+  RxInt totalQuantity = 0.obs;
+
+  // double calculateFinalPrice(List<CommonProductList> data) {
+  //   finalProductPrice.value = 0.0;
+  //   totalQuantity.value = 0;
+
+  //   for (int i = 0; i < data.length; i++) {
+  //     CommonProductList item = data[i];
+  //     productPrice.value = item.price.toDouble();
+  //     deliveryPrice.value = item.shippingCharge.toDouble();
+  //     discountPrice.value = item.discount.toDouble();
+
+  //     finalProductPrice.value += (item.quantity!.value *
+  //         (productPrice.value - discountPrice.value + deliveryPrice.value));
+  //     totalQuantity.value += item.quantity!.value;
+
+  //     logcat("ITEMS_NAME", item.brandName);
+  //   }
+
+  //   update();
+  //   return finalProductPrice.value > 0 ? finalProductPrice.value : 0;
+  // }
+
+  double calculateFinalPrice(List<CommonProductList> cartItems) {
+    finalProductPrice.value = 0.0;
+    double totalProductPrice = 0.0;
+    double totalDeliveryPrice = 0.0;
+    double totalDiscountPrice = 0.0;
+
+    for (CommonProductList item in cartItems) {
+      double itemPrice = item.quantity!.value.toDouble() * item.price;
+      totalProductPrice += itemPrice;
+
+      // Accumulate delivery and discount prices for each item
+      totalDeliveryPrice += item.shippingCharge.toDouble();
+      totalDiscountPrice += item.discount.toDouble();
+
+      // Calculate total item price
+      double totalItemPrice = itemPrice - item.discount;
+
+      // Add shipping charge to the total item cost
+      double totalCostForItem = totalItemPrice + item.shippingCharge;
+
+      // Add the total cost of the item to the grand total
+      finalProductPrice.value += totalCostForItem;
+      update();
+    }
+
+    // You might want to update these values if needed
+    productPrice.value = totalProductPrice;
+    deliveryPrice.value = totalDeliveryPrice;
+    discountPrice.value = totalDiscountPrice;
+
+    // Ensure the grand total is not negative
+    if (finalProductPrice.value < 0) {
+      finalProductPrice.value = 0.0;
+    }
+
+    update();
+    return finalProductPrice.value;
+  }
 }

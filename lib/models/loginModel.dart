@@ -43,6 +43,7 @@ class UserData {
   DateTime? dateOfBirth;
   String gender;
   dynamic profilePic;
+  String isGuestLogin;
   int isActive;
   int isBlock;
   int isRegister;
@@ -66,6 +67,7 @@ class UserData {
     required this.dateOfBirth,
     required this.gender,
     required this.profilePic,
+    required this.isGuestLogin,
     required this.isActive,
     required this.isBlock,
     required this.isRegister,
@@ -93,6 +95,7 @@ class UserData {
                 : null,
         gender: json["gender"] ?? '',
         profilePic: json["profile_pic"],
+        isGuestLogin: json["is_guest_login"] ?? '',
         isActive: json["is_active"],
         isBlock: json["is_block"],
         isRegister: json["is_register"],
@@ -119,6 +122,7 @@ class UserData {
             : null,
         "gender": gender,
         "profile_pic": profilePic,
+        "is_guest_login": isGuestLogin,
         "is_active": isActive,
         "is_block": isBlock,
         "is_register": isRegister,

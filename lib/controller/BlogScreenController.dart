@@ -279,7 +279,7 @@ class BlogScreenController extends GetxController {
                                           : 6.sp,
                                   fontFamily: fontBold,
                                   fontWeight: FontWeight.w700,
-                                  color: isDarkMode() ? white : black,
+                                  color: isDarkMode() ? black : black,
                                 ),
                               ),
                             ),
@@ -295,8 +295,9 @@ class BlogScreenController extends GetxController {
                               callback: (val) {
                                 logcat("ONTAP", val.toString());
                               },
-                              colorClickableText: Colors
-                                  .blue, // Customize link color if desired
+                              colorClickableText: isDarkMode()
+                                  ? black
+                                  : primaryColor, // Customize link color if desired
                               trimMode: TrimMode.Line,
                               trimCollapsedText:
                                   '...Show more', // Add your custom "Show More" text
@@ -308,14 +309,12 @@ class BlogScreenController extends GetxController {
                                 overflow: TextOverflow.ellipsis,
                                 fontSize:
                                     SizerUtil.deviceType == DeviceType.mobile
-                                        ? 12.sp
-                                        : 6.sp,
+                                        ? 11.sp
+                                        : 10.sp,
                                 fontFamily: fontRegular,
                                 fontWeight:
                                     isDarkMode() ? FontWeight.w900 : null,
-                                color: isDarkMode()
-                                    ? itemTextBackgroundColor
-                                    : lableColor,
+                                color: isDarkMode() ? grey : lableColor,
                               ),
                               lessStyle: TextStyle(
                                 fontFamily: fontMedium,

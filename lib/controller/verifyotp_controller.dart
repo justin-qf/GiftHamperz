@@ -199,7 +199,7 @@ class OtpController extends GetxController {
     }
   }
 
-  void getSignUpOtpApi(context, String otp, String mobile) async {
+  void getLoginOtpApi(context, String otp, String mobile) async {
     var loadingIndicator = LoadingProgressDialog();
     loadingIndicator.show(context, '');
 
@@ -216,7 +216,7 @@ class OtpController extends GetxController {
       var response = await Repository.post({
         "mobile_no": mobile,
         "otp": otpController.text,
-      }, ApiUrl.getVerifyGuestOtp);
+      }, ApiUrl.verifyLoginOtp);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       logcat("RESPONSE", jsonEncode(data));
@@ -226,6 +226,13 @@ class OtpController extends GetxController {
           UserPreferences().saveSignInInfo(loginData.user);
           UserPreferences().setToken(loginData.user.token);
           UserPreferences().setIsGuestUser(false);
+          if (loginData.user.isGuestLogin == "false") {
+            logcat("isGuestLogin-1", loginData.user.isGuestLogin.toString());
+            UserPreferences().setIsGuestUserFromApi(false);
+          } else {
+            logcat("isGuestLogin-2", loginData.user.isGuestLogin.toString());
+            UserPreferences().setIsGuestUserFromApi(true);
+          }
           Get.offAll(const BottomNavScreen());
         } else {
           showDialogForScreen(
@@ -311,7 +318,7 @@ class OtpController extends GetxController {
 
       var response = await Repository.post({
         "mobile_no": number,
-      }, ApiUrl.getSignUpOtp, allowHeader: false);
+      }, ApiUrl.login, allowHeader: false);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {

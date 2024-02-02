@@ -11,16 +11,26 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/AddressController.dart';
 import 'package:gifthamperz/models/addressModel.dart';
-import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
+import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/DeliveryScreen/AddAddressScreen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/enum.dart';
 
+// ignore: must_be_immutable
 class AddressScreen extends StatefulWidget {
-  const AddressScreen({super.key});
+  AddressScreen(
+      {this.shipinCharge,
+      this.totaAmount,
+      this.discount,
+      this.isFromBuyNow,
+      this.id,
+      super.key});
+  String? shipinCharge, totaAmount, discount;
+  bool? isFromBuyNow;
+  int? id;
 
   @override
   State<AddressScreen> createState() => _AddressScreenState();
@@ -33,12 +43,20 @@ class _AddressScreenState extends State<AddressScreen> {
   void initState() {
     apiCalls();
     controller.getGuestUser();
+
     super.initState();
   }
 
   void apiCalls() async {
     // ignore: use_build_context_synchronously
     controller.getAddressList(context, 0, true);
+    controller.initData(
+        widget.shipinCharge!, widget.totaAmount!, widget.discount!);
+
+    logcat("shipinCharge", widget.shipinCharge.toString());
+    logcat("totaAmount", widget.totaAmount.toString());
+    logcat("discount", widget.discount.toString());
+    setState(() {});
   }
 
   @override
@@ -74,6 +92,7 @@ class _AddressScreenState extends State<AddressScreen> {
                           );
                         },
                         child: CustomScrollView(
+                          physics: const BouncingScrollPhysics(),
                           slivers: [
                             SliverToBoxAdapter(
                               child: Obx(() {
@@ -287,6 +306,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     });
                   },
                   onClick: () async {
+                    //controller.getReviewBottomSheetDialog(context);
                     //bool isGuest = await UserPreferences().getGuestUser();
                     if (controller.isGuest.value == true) {
                       // ignore: use_build_context_synchronously
@@ -294,7 +314,9 @@ class _AddressScreenState extends State<AddressScreen> {
                           context, AddAddressText.addressTitle);
                     } else {
                       //controller.showCustomDialog(context);
-                      controller.openCheckout();
+                      controller.getBuyNowProductListWithCalculation(
+                          context, widget.id, widget.isFromBuyNow);
+                      //controller.openCheckout();
                     }
                   },
                 );
@@ -309,7 +331,7 @@ class _AddressScreenState extends State<AddressScreen> {
     if (controller.state == ScreenState.apiSuccess &&
         controller.addressList.isNotEmpty) {
       return ListView.builder(
-        padding: EdgeInsets.only(bottom: 2.h),
+        padding: EdgeInsets.only(bottom: 20.h),
         physics: const BouncingScrollPhysics(),
         itemCount: controller.addressList.length,
         clipBehavior: Clip.antiAlias,
@@ -320,22 +342,7 @@ class _AddressScreenState extends State<AddressScreen> {
         },
       );
     } else {
-      return Container(
-        height: SizerUtil.height,
-        width: SizerUtil.width,
-        padding: EdgeInsets.only(bottom: 20.h),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              Common.datanotfound,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-            ),
-          ],
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 

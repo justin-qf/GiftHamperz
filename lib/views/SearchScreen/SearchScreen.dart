@@ -5,11 +5,13 @@ import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/search_chat_widgets.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/searchController.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/searchModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -38,6 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
     Statusbar().trasparentStatusbarIsNormalScreen();
     return CustomParentScaffold(
       onWillPop: () async {
+        Get.back(result: true);
         return false;
       },
       onTap: () {
@@ -51,7 +54,7 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             getForgetToolbar(SearchScreenConstant.title,
                 isList: true, showBackButton: true, callback: () {
-              Get.back();
+              Get.back(result: true);
             }),
             Column(children: [
               getDynamicSizedBox(height: 5.h),
@@ -159,26 +162,14 @@ class _SearchScreenState extends State<SearchScreen> {
         mainAxisSpacing: 10,
         crossAxisSpacing: 4,
         itemBuilder: (context, index) {
-          SearchDataList data = controller.searchList[index];
+          CommonProductList data = controller.searchList[index];
           return controller.getItemListItem(
               context, data, controller.isGuest!.value);
         },
         itemCount: controller.searchList.length,
       );
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
-              Common.datanotfound,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-            ),
-          ),
-        ],
-      );
+      return noDataFoundWidget();
     }
   }
 

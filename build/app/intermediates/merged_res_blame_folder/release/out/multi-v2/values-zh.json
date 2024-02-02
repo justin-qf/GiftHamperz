@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.app.gifthamperz.app-mergeReleaseResources-28:/values-zh/values-zh.xml",
+            "outputFile": "com.app.gifthamperz.app-mergeReleaseResources-31:/values-zh/values-zh.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Hp\\.gradle\\caches\\transforms-3\\504f4fc810ee788bc10969b55b446e05\\transformed\\jetified-ucrop-2.2.8\\res\\values-zh\\values-zh.xml",

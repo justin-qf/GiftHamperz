@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
@@ -18,6 +19,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../utils/enum.dart';
 
+// ignore: must_be_immutable
 class SubCategoryScreen extends StatefulWidget {
   SubCategoryScreen({super.key, required this.categoryId});
   String? categoryId;
@@ -81,20 +83,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
         controller.subCategoryList.isNotEmpty) {
       return getListViewItem();
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 5.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -214,7 +203,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
           ),
         ),
       );
-    } else if (controller.isLoading == false &&
+    } else if (controller.isLoading.value == false &&
         controller.innerSubCategoryList.isNotEmpty) {
       return MasonryGridView.count(
         physics: const BouncingScrollPhysics(),

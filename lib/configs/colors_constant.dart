@@ -21,6 +21,8 @@ const Color fourthTile = Color.fromARGB(255, 101, 185, 155);
 const Color black = Colors.black;
 const Color white = Colors.white;
 const Color grey = Colors.grey;
+
+const Color darkGrey = Color(0XFFf7f7f7);
 const Color lightGrey = Color(0XFF666666);
 const Color bottomMenuColor = Color(0XFFFFFBF4);
 const Color bottomNavBackground = Color(0XFFDBA342);

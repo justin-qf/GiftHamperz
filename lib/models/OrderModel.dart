@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:gifthamperz/models/ProductModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
+
 OrderModel orderModelFromJson(String str) =>
     OrderModel.fromJson(json.decode(str));
 
@@ -173,11 +176,11 @@ class OrderData {
         billingAddressId: json["billing_address_id"],
         shippingAddressId: json["shipping_address_id"],
         totalAmount: json["total_amount"],
-        promocodeId: json["promocode_id"],
+        promocodeId: json["promocode_id"] ?? 0,
         discount: json["discount"],
         dateOfDelivery:
             DateTime.parse(json["date_of_delivery"].toString() ?? ''),
-        timeOfDelivery: json["time_of_delivery"],
+        timeOfDelivery: json["time_of_delivery"] ?? '',
         shipingCharge: json["shiping_charge"],
         isPackingSeperetly: json["is_packing_seperetly"],
         gstNumber: json["gst_number"],
@@ -258,8 +261,8 @@ class OrderDetail {
   int innerSubcategoryId;
   int brandId;
   int sku;
-  String images;
-  String thumbnailUrl;
+  List<String> images;
+  List<String> thumbnailUrl;
   int isActive;
   String tags;
   int price;
@@ -267,17 +270,17 @@ class OrderDetail {
   String discountUnit;
   int instockQty;
   String description;
-  int minQty;
+  dynamic minQty;
   int isFreeShipping;
   int isReturnPolicy;
   int returnPolicyDays;
   int shippingCharge;
-  String? shippingChargeUnit;
+  String shippingChargeUnit;
   int isFeatured;
   int isTrending;
   int isHotDeals;
-  int? tax;
-  String? taxUnit;
+  dynamic tax;
+  dynamic taxUnit;
   int isVariations;
   String productCategoryName;
   String productCategoryThumbnailUrl;
@@ -337,49 +340,52 @@ class OrderDetail {
   factory OrderDetail.fromJson(Map<String, dynamic> json) => OrderDetail(
         id: json["id"],
         orderId: json["order_id"],
-        qty: json["qty"],
-        rate: json["rate"],
-        totalAmount: json["total_amount"],
+        qty: json["qty"] ?? '',
+        rate: json["rate"] ?? '',
+        totalAmount: json["total_amount"] ?? '',
         dateOfDelivery: json["date_of_delivery"],
         timeOfDelivery: json["time_of_delivery"],
         productId: json["product_id"],
-        name: json["name"],
+        name: json["name"] ?? '',
         categoryId: json["category_id"],
         subcategoryId: json["subcategory_id"],
         innerSubcategoryId: json["inner_subcategory_id"],
         brandId: json["brand_id"],
         sku: json["sku"],
-        images: json["images"],
-        thumbnailUrl: json["thumbnail_url"],
+        images: List<String>.from(json["images"].map((x) => x) ?? ''),
+        thumbnailUrl:
+            List<String>.from(json["thumbnail_url"].map((x) => x) ?? ''),
         isActive: json["is_active"],
-        tags: json["tags"],
+        tags: json["tags"] ?? '',
         price: json["price"],
         discount: json["discount"],
-        discountUnit: json["discount_unit"],
+        discountUnit: json["discount_unit"] ?? '',
         instockQty: json["instock_qty"],
-        description: json["description"],
+        description: json["description"] ?? '',
         minQty: json["min_qty"],
         isFreeShipping: json["is_free_shipping"],
         isReturnPolicy: json["is_return_policy"],
         returnPolicyDays: json["return_policy_days"],
         shippingCharge: json["shipping_charge"],
-        shippingChargeUnit: json["shipping_charge_unit"],
+        shippingChargeUnit: json["shipping_charge_unit"] ?? '',
         isFeatured: json["is_featured"],
         isTrending: json["is_trending"],
         isHotDeals: json["is_hot_deals"],
         tax: json["tax"],
         taxUnit: json["tax_unit"],
         isVariations: json["is_variations"],
-        productCategoryName: json["product_category_name"],
-        productCategoryThumbnailUrl: json["product_category_thumbnail_url"],
-        productSubCategoryName: json["product_sub_category_name"],
+        productCategoryName: json["product_category_name"] ?? '',
+        productCategoryThumbnailUrl:
+            json["product_category_thumbnail_url"] ?? '',
+        productSubCategoryName: json["product_sub_category_name"] ?? '',
         productSubCategoryThumbnailUrl:
-            json["product_sub_category_thumbnail_url"],
-        productInnerSubCategoryName: json["product_inner_sub_category_name"],
+            json["product_sub_category_thumbnail_url"] ?? '',
+        productInnerSubCategoryName:
+            json["product_inner_sub_category_name"] ?? '',
         productInnerSubCategoryThumbnailUrl:
-            json["product_inner_sub_category_thumbnail_url"],
-        brandName: json["brand_name"],
-        brandThumbnailUrl: json["brand_thumbnail_url"],
+            json["product_inner_sub_category_thumbnail_url"] ?? '',
+        brandName: json["brand_name"] ?? '',
+        brandThumbnailUrl: json["brand_thumbnail_url"] ?? '',
       );
 
   Map<String, dynamic> toJson() => {
@@ -397,8 +403,8 @@ class OrderDetail {
         "inner_subcategory_id": innerSubcategoryId,
         "brand_id": brandId,
         "sku": sku,
-        "images": images,
-        "thumbnail_url": thumbnailUrl,
+        "images": List<dynamic>.from(images.map((x) => x)),
+        "thumbnail_url": List<dynamic>.from(thumbnailUrl.map((x) => x)),
         "is_active": isActive,
         "tags": tags,
         "price": price,

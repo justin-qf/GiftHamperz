@@ -5,12 +5,13 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/productController.dart';
-import 'package:gifthamperz/models/ProductModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -151,19 +152,7 @@ class _ProductScreenState extends State<ProductScreen>
         controller.brandList.isNotEmpty) {
       return getListViewItem();
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
-              Common.datanotfound,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-            ),
-          ),
-        ],
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -270,18 +259,20 @@ class _ProductScreenState extends State<ProductScreen>
       );
     } else if (controller.isLoading == false &&
         controller.productList.isNotEmpty) {
-      return ListView.builder(
-        padding: EdgeInsets.only(bottom: 2.h),
+      return MasonryGridView.count(
         physics: const BouncingScrollPhysics(),
-        itemCount: controller.productList.length,
-        clipBehavior: Clip.antiAlias,
+        padding: EdgeInsets.only(bottom: 5.h, left: 1.5.w, right: 1.5.w),
+        crossAxisCount: SizerUtil.deviceType == DeviceType.mobile ? 2 : 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 4,
         shrinkWrap: true,
         itemBuilder: (context, index) {
-          ProductListData model = controller.productList[index];
+          CommonProductList model = controller.productList[index];
           logcat("IMAGE_URL", APIImageUrl.url + model.images.toString());
           return controller.getListItem(context, model, widget.categoryId,
               widget.subcategoryId, widget.innerSubcategoryId);
         },
+        itemCount: controller.productList.length,
       );
     } else {
       return SizedBox(

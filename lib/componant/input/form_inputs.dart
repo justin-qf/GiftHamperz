@@ -37,6 +37,7 @@ Widget getReactiveFormField(
     bool isAddress = false,
     bool isSearch = false,
     bool isReview = false,
+    final bool? isWhite,
     String? fromObsecureText,
     String? index,
     bool isReference = false}) {
@@ -54,7 +55,7 @@ Widget getReactiveFormField(
                     : 5.5.w
                 : isSearch == true
                     ? 0.2.w
-                    : 7.5.w,
+                    : 6.0.w,
             vertical: 0.90.h),
     child: CustomFormField(
       index: index,
@@ -85,6 +86,7 @@ Widget getReactiveFormField(
       isFromAddStory: isFromAddStory,
       isEnable: isEnable,
       isReadOnly: isReadOnly,
+      isWhite: isWhite,
     ),
   );
 }

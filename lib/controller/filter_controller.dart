@@ -49,6 +49,26 @@ class FilterController extends GetxController {
     ColorsList(title: 'Whites', color: white, isSelected: false),
   ].obs;
 
+  RxList<ReviewsList> color = [
+    ReviewsList(title: 'Blue', isSelected: false),
+    ReviewsList(title: 'Red', isSelected: false),
+    ReviewsList(title: 'Pink', isSelected: false),
+    ReviewsList(title: 'Yellow', isSelected: false),
+    ReviewsList(title: 'Green', isSelected: false),
+    ReviewsList(title: 'Purple', isSelected: false),
+    ReviewsList(title: 'Orange', isSelected: false),
+    ReviewsList(title: 'White', isSelected: false),
+    ReviewsList(title: 'Black', isSelected: false),
+    ReviewsList(title: 'Grey', isSelected: false),
+  ].obs;
+
+  RxList<ReviewsList> review = [
+    ReviewsList(title: '1.0 & above', isSelected: false),
+    ReviewsList(title: '2.0 & above', isSelected: false),
+    ReviewsList(title: '3.0 & above', isSelected: false),
+    ReviewsList(title: '4.0 & above', isSelected: false),
+  ].obs;
+
   getBlackOverlayGradient() {
     return Container(
       decoration: BoxDecoration(
@@ -92,6 +112,33 @@ class FilterController extends GetxController {
   }
 
   RxBool isChecked = false.obs;
+
+  getReviewCheckBox(ReviewsList colorsList) {
+    return Theme(
+      data: ThemeData(
+          checkboxTheme: CheckboxThemeData(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)))),
+      child: CheckboxListTile(
+        controlAffinity: ListTileControlAffinity.leading,
+        activeColor: isDarkMode() ? white : black,
+        checkColor: isDarkMode() ? black : white,
+        //visualDensity: const VisualDensity(horizontal: -1, vertical: -1),
+        contentPadding: const EdgeInsets.only(top: 0.5, bottom: 0.5),
+        value: colorsList.isSelected.value,
+        onChanged: (bool? value) {
+          colorsList.isSelected.value = value!;
+        },
+        title: Text(
+          colorsList.title,
+          style: TextStyle(
+              color: isDarkMode() ? white : black,
+              fontFamily: fontBold,
+              fontWeight: FontWeight.w400),
+        ),
+      ),
+    );
+  }
 
   getRoundShapCheckBox(FlowerType flowersList) {
     return FadeInUp(

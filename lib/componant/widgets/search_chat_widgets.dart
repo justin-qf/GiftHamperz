@@ -68,12 +68,12 @@ setSearchBar(context, controller, String tag,
                       .applyFilter(controller.text.toString(), true);
                 }
               },
-              style: styleTextFormFieldText(isWhite: false),
+              style: styleTextFormFieldText(isWhite: true),
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.search,
-                  color: isDarkMode() ? primaryColor : black,
+                  color: isDarkMode() ? black : black,
                   size: SizerUtil.deviceType == DeviceType.mobile ? 20 : 25,
                 ),
                 labelStyle: styleTextForFieldHint(),
@@ -85,7 +85,7 @@ setSearchBar(context, controller, String tag,
                     padding: EdgeInsets.only(right: 1.w),
                     child: Icon(
                       Icons.cancel,
-                      color: isDarkMode() ? primaryColor : black,
+                      color: isDarkMode() ? black : black,
                       size: SizerUtil.deviceType == DeviceType.mobile ? 20 : 25,
                     ),
                   ),
@@ -117,7 +117,7 @@ setSearchBar(context, controller, String tag,
                       SearchConstant.cancle,
                       style: TextStyle(
                         fontFamily: fontRegular,
-                        color: isDarkMode() ? primaryColor : black,
+                        color: isDarkMode() ? white : black,
                         fontSize: 12.sp,
                       ),
                     ),

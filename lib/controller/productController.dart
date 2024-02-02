@@ -18,6 +18,7 @@ import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/models/ProductModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/brandModel.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
@@ -141,9 +142,9 @@ class ProductScreenController extends GetxController {
         "brand_id": brandId
       });
       var response = await Repository.post({
-        "category_id": "4",
-        "subcategory_id": "3",
-        "inner_subcategory_id": "5",
+        "category_id": categoryId,
+        "subcategory_id": subcategoryId,
+        "inner_subcategory_id": innerSubcategoryId,
         "brand_id": brandId
       }, ApiUrl.getProductList, allowHeader: false);
       // loadingIndicator.hide(context);
@@ -189,7 +190,7 @@ class ProductScreenController extends GetxController {
 
   getListItem(
     BuildContext context,
-    ProductListData data,
+    CommonProductList data,
     categoryId,
     subcategoryId,
     innerSubcategoryId,
@@ -203,7 +204,11 @@ class ProductScreenController extends GetxController {
             FadeInUp(
               child: GestureDetector(
                 onTap: () {
-                  Get.to(ProductDetailScreen('Trending'));
+                  logcat('Treanding', 'DONE');
+                  Get.to(ProductDetailScreen(
+                    'Trending',
+                    data: data,
+                  ));
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(
@@ -211,9 +216,8 @@ class ProductScreenController extends GetxController {
                   child: Container(
                       width: 45.w,
                       margin:
-                          EdgeInsets.only(bottom: 0.5.h, left: 1.w, right: 2.w),
-                      padding: EdgeInsets.only(
-                          left: 1.2.w, right: 1.2.w, top: 1.2.w, bottom: 1.h),
+                          EdgeInsets.only(bottom: 1.h, left: 1.w, right: 2.w),
+                      padding: EdgeInsets.only(bottom: 1.h),
                       decoration: BoxDecoration(
                         border: isDarkMode()
                             ? null
@@ -221,17 +225,12 @@ class ProductScreenController extends GetxController {
                                 color: grey, // Border color
                                 width: 0.5, // Border width
                               ),
-                        color: isDarkMode() ? itemDarkBackgroundColor : white,
+                        //color: isDarkMode() ? itemDarkBackgroundColor : white,
+                        color: isDarkMode() ? tileColour : white,
                         borderRadius: BorderRadius.circular(
                             SizerUtil.deviceType == DeviceType.mobile
                                 ? 4.w
                                 : 2.2.w),
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //       color: black.withOpacity(0.1),
-                        //       blurRadius: 10.0,
-                        //       offset: const Offset(0, 5))
-                        // ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,12 +239,32 @@ class ProductScreenController extends GetxController {
                           Stack(
                             children: [
                               Container(
-                                width: double.infinity,
+                                width: SizerUtil.width,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(
                                       SizerUtil.deviceType == DeviceType.mobile
                                           ? 3.5.w
                                           : 2.5.w),
+                                  // boxShadow: [
+                                  //   BoxShadow(
+                                  //     color: isDarkMode()
+                                  //         ? grey.withOpacity(0.2)
+                                  //         : grey.withOpacity(0.5),
+                                  //     spreadRadius: 2,
+                                  //     blurRadius:
+                                  //         5.0, // Adjust the blur radius as needed
+                                  //     offset: const Offset(0, 2),
+                                  //   )
+                                  // ],
+                                  border: isDarkMode()
+                                      ? Border.all(
+                                          color: grey, // Border color
+                                          width: 1, // Border width
+                                        )
+                                      : Border.all(
+                                          color: grey, // Border color
+                                          width: 0.2, // Border width
+                                        ),
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(
@@ -254,112 +273,162 @@ class ProductScreenController extends GetxController {
                                           : 2.5.w),
                                   child: CachedNetworkImage(
                                     fit: BoxFit.cover,
-                                    height: 10.h,
-                                    imageUrl: APIImageUrl.url +
-                                        data.images.toString(),
+                                    height: 12.h,
+                                    imageUrl: APIImageUrl.url + data.images[0],
                                     placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator(
                                           color: primaryColor),
                                     ),
                                     errorWidget: (context, url, error) =>
                                         Image.asset(
-                                      Asset.placeholder,
+                                      Asset.productPlaceholder,
                                       height: 9.h,
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                right: 3.w,
-                                top: 1.0.h,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // data.isSelected.value =
-                                    //     !data.isSelected.value;
-                                    update();
-                                  },
-                                  child: Icon(
-                                    // data.isSelected.value
-                                    //     ? Icons.favorite_rounded
-                                    //     : Icons.favorite_border,
-                                    Icons.favorite_rounded,
-                                    size: 3.h,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                              )
+                              // Positioned(
+                              //   right: 3.w,
+                              //   top: 1.0.h,
+                              //   child: GestureDetector(
+                              //     onTap: () {
+                              //       // data.isSelected.value =
+                              //       //     !data.isSelected.value;
+                              //       addFavouriteAPI(
+                              //           context, item.id.toString(), "1");
+                              //       //update();
+                              //     },
+                              //     child: Icon(
+                              //       Icons.favorite_border,
+                              //       size: 3.h,
+                              //       color: primaryColor,
+                              //     ),
+                              //   ),
+                              // )
                             ],
                           ),
                           SizedBox(
-                            height: 1.0.h,
+                            height: 0.6.h,
                           ),
-                          getText(
-                            data.name,
-                            TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontFamily: fontSemiBold,
-                                fontWeight: FontWeight.w500,
-                                color: isDarkMode() ? white : black,
-                                fontSize:
-                                    SizerUtil.deviceType == DeviceType.mobile
-                                        ? 12.sp
-                                        : 7.sp,
-                                height: 1.2),
-                          ),
-                          // getDynamicSizedBox(
-                          //   height: 0.5.h,
-                          // ),
-                          // getText(
-                          //   "${data.price} \u20B9",
-                          //   TextStyle(
-                          //       fontFamily: fontBold,
-                          //       color: primaryColor,
-                          //       fontSize:
-                          //           SizerUtil.deviceType == DeviceType.mobile
-                          //               ? 10.sp
-                          //               : 7.sp,
-                          //       height: 1.2),
-                          // ),
-                          getDynamicSizedBox(
-                            height: 0.5.h,
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: RatingBar.builder(
-                                  initialRating: 3.5,
-                                  minRating: 1,
-                                  direction: Axis.horizontal,
-                                  allowHalfRating: true,
-                                  itemCount: 5,
-                                  itemSize: 3.5.w,
-                                  itemBuilder: (context, _) => const Icon(
-                                    Icons.star,
-                                    color: Colors.orange,
-                                  ),
-                                  onRatingUpdate: (rating) {
-                                    logcat("RATING", rating);
-                                  },
+                          Container(
+                            margin: EdgeInsets.only(left: 1.w, right: 1.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                getText(
+                                  data.name,
+                                  TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontFamily: fontSemiBold,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDarkMode() ? black : black,
+                                      fontSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 10.sp
+                                          : 8.sp,
+                                      height: 1.2),
                                 ),
-                              ),
-                              getText(
-                                "35 Reviews",
-                                TextStyle(
-                                    fontFamily: fontSemiBold,
-                                    color: lableColor,
-                                    fontWeight:
-                                        isDarkMode() ? FontWeight.w600 : null,
-                                    fontSize: SizerUtil.deviceType ==
-                                            DeviceType.mobile
-                                        ? 9.sp
-                                        : 7.sp,
-                                    height: 1.2),
-                              ),
-                            ],
+                                getDynamicSizedBox(
+                                  height: 0.5.h,
+                                ),
+                                getText(
+                                  '\u20B9${data.price}',
+                                  TextStyle(
+                                      fontFamily: fontBold,
+                                      color: primaryColor,
+                                      fontSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 12.sp
+                                          : 7.sp,
+                                      height: 1.2),
+                                ),
+                                getDynamicSizedBox(
+                                  height: 0.5.h,
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    RatingBar.builder(
+                                      initialRating: 3.5,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 1,
+                                      itemSize: 3.5.w,
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.orange,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        logcat("RATING", rating);
+                                      },
+                                    ),
+                                    getText(
+                                      "3.5",
+                                      TextStyle(
+                                          fontFamily: fontSemiBold,
+                                          color: lableColor,
+                                          fontWeight: isDarkMode()
+                                              ? FontWeight.w600
+                                              : null,
+                                          fontSize: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 9.sp
+                                              : 7.sp,
+                                          height: 1.2),
+                                    ),
+                                    //const Spacer(),
+                                    // Obx(
+                                    //   () {
+                                    //     return data.isInCart!.value == false
+                                    //         ? getAddToCartBtn('Add to Cart',
+                                    //             Icons.shopping_cart,
+                                    //             addCartClick: () async {
+                                    //             data.isInCart!.value = true;
+                                    //             // data.quantity!.value = 1;
+                                    //             incrementDecrementCartItem(
+                                    //                 isFromIcr: true,
+                                    //                 data: data,
+                                    //                 quantity:
+                                    //                     data.quantity!.value);
+                                    //             update();
+                                    //           },
+                                    //             isAddToCartClicked:
+                                    //                 data.isInCart!)
+                                    //         : cartIncDecUi(
+                                    //             qty: data.quantity.toString(),
+                                    //             increment: () async {
+                                    //               incrementDecrementCartItemInList(
+                                    //                   isFromIcr: true,
+                                    //                   data: data,
+                                    //                   quantity:
+                                    //                       data.quantity!.value);
+                                    //               update();
+                                    //             },
+                                    //             decrement: () async {
+                                    //               incrementDecrementCartItemInList(
+                                    //                   isFromIcr: false,
+                                    //                   data: data,
+                                    //                   quantity:
+                                    //                       data.quantity!.value);
+                                    //               update();
+                                    //             });
+                                    //   },
+                                    // ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
+                          //getDynamicSizedBox(height: 1.h),
+                          // getAddToCartBtn('Add to Cart', Icons.shopping_cart,
+                          //     addCartClick: () {
+                          //   Get.to(const CartScreen())!.then((value) {
+                          //     Statusbar().trasparentStatusbarProfile(true);
+                          //   });
+                          // })
                         ],
                       )),
                 ),
@@ -389,7 +458,7 @@ class ProductScreenController extends GetxController {
       padding: EdgeInsets.only(left: 0.5.w, right: 0.5.w),
       child: Text(
         title,
-        maxLines: 3,
+        maxLines: 2,
         style: style,
       ),
     );

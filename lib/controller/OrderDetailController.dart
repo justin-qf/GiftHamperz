@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
-import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
@@ -14,7 +13,6 @@ import 'package:gifthamperz/models/OrderModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
-import 'package:gifthamperz/views/ProductDetailScreen/ProductDetailScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
@@ -31,36 +29,34 @@ class OrderDetailScreenController extends GetxController {
   late TabController tabController;
   var currentPage = 0;
   RxList orderDetailList = [].obs;
-  RxString totalAmount = "".obs;
+  RxString finalProductCost = "".obs;
 
   setOrderTotalAmount(OrderData? data) {
     //totalAmount.value = data!.totalAmount + data.shipingCharge + data.discount;
     // Convert string variables to double
     try {
-      double totalAmountValue = double.tryParse(data!.totalAmount) ?? 0.0;
-      double shippingChargeValue = double.tryParse(data.shipingCharge) ?? 0.0;
-      double discountValue = double.tryParse(data.discount) ?? 0.0;
-      double result = totalAmountValue + discountValue + shippingChargeValue;
-      totalAmount.value = result.toString();
+      // double totalAmountValue = double.tryParse(data!.totalAmount) ?? 0.0;
+      // double shippingChargeValue = double.tryParse(data.shipingCharge) ?? 0.0;
+      // double discountValue = double.tryParse(data.discount) ?? 0.0;
+      // double result = totalAmountValue + discountValue + shippingChargeValue;
+      // productCost.value = result.toString();
+      // for (OrderDetail item in data.orderDetails) {
+      //   double itemPrice = double.parse(item.qty) * item.price;
+      //   productCost.value += itemPrice.toString();
+      //   update();
+      // }
+      double productCost = 0.0; // Initialize productCost as a double
+      for (OrderDetail item in data!.orderDetails) {
+        double itemPrice = double.parse(item.qty) * item.price;
+        productCost += itemPrice; // Accumulate the numeric value
+        update();
+      }
+      // Format productCost to have two decimal places
+      finalProductCost.value = productCost.toStringAsFixed(2);
     } catch (e) {
       logcat("ERROR", e.toString());
     }
   }
-
-  RxList<OrderItem> orderList = <OrderItem>[
-    OrderItem(
-        title: "Unicorn Roses - 12 Long Stemmed Tie Dyned Roses",
-        status: "Deluxe",
-        orderDate: "1",
-        icone: Asset.itemFour,
-        price: "\$128.69"),
-    OrderItem(
-        title: "12 Handmade Easter Chocolate Brownie Pops",
-        status: "Canceled",
-        orderDate: "1",
-        icone: Asset.itemTwo,
-        price: "\$49.69"),
-  ].obs;
 
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
@@ -149,8 +145,8 @@ class OrderDetailScreenController extends GetxController {
                     )
                   : TextStyle(
                       //fontFamily: fontBold,
-                      color: isDarkMode() ? lableColor : black,
-                      fontWeight: FontWeight.w600,
+                      color: isDarkMode() ? white : black,
+                      fontWeight: FontWeight.w800,
                       fontSize: SizerUtil.deviceType == DeviceType.mobile
                           ? 12.sp
                           : 13.sp,
@@ -170,7 +166,7 @@ class OrderDetailScreenController extends GetxController {
                     )
                   : TextStyle(
                       //fontFamily: fontBold,
-                      color: primaryColor,
+                      color: isDarkMode() ? white : primaryColor,
                       fontWeight: FontWeight.w800,
                       fontSize: SizerUtil.deviceType == DeviceType.mobile
                           ? 10.sp
@@ -213,44 +209,44 @@ class OrderDetailScreenController extends GetxController {
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FadeInDown(
                 child: Container(
                   //width: 30.w,
+                  padding: const EdgeInsets.all(0.5),
                   decoration: BoxDecoration(
                     border: isDarkMode()
-                        ? null
+                        ? Border.all(
+                            color: isDarkMode() ? grey : grey, // Border color
+                            width: 0.2, // Border width
+                          )
                         : Border.all(
                             color: grey, // Border color
                             width: 0.6, // Border width
                           ),
-                    color: isDarkMode() ? tileColour : white,
-                    // boxShadow: const [
-                    //   BoxShadow(
-                    //       color: grey,
-                    //       blurRadius: 3.0,
-                    //       offset: Offset(0, 3),
-                    //       spreadRadius: 0.5)
-                    // ],
+                    color: isDarkMode() ? black : white,
                     borderRadius: BorderRadius.circular(
                         SizerUtil.deviceType == DeviceType.mobile
                             ? 3.w
                             : 2.2.w),
                   ),
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    borderRadius: BorderRadius.circular(
+                        SizerUtil.deviceType == DeviceType.mobile
+                            ? 3.w
+                            : 2.2.w),
                     child: CachedNetworkImage(
                       fit: BoxFit.cover,
-                      imageUrl: APIImageUrl.url + data.images,
-                      height: 13.h,
-                      width: 13.h,
+                      imageUrl: APIImageUrl.url + data.images[0].toString(),
+                      height: 12.h,
+                      width: 12.h,
                       placeholder: (context, url) => const Center(
                         child: CircularProgressIndicator(color: primaryColor),
                       ),
                       errorWidget: (context, url, error) => Image.asset(
                         Asset.productPlaceholder,
-                        height: 15.h,
+                        height: 12.h,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -261,7 +257,7 @@ class OrderDetailScreenController extends GetxController {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       data.name,
@@ -303,31 +299,31 @@ class OrderDetailScreenController extends GetxController {
                     getDynamicSizedBox(height: 0.5.h),
                     RichText(
                       overflow: TextOverflow.clip,
-                      textAlign: TextAlign.start,
+                      textAlign: TextAlign.center,
                       softWrap: true,
                       textScaleFactor: 1,
                       text: TextSpan(
-                        text: 'Quantity:',
+                        text: 'Quantity : ',
                         style: TextStyle(
-                          color: lableColor,
-                          fontWeight: FontWeight.w500,
+                          color: isDarkMode() ? black : lableColor,
+                          fontWeight: FontWeight.w800,
                           fontSize: 11.sp,
                         ),
                         children: [
                           TextSpan(
-                            text: data.minQty.toString(),
+                            text: data.qty.toString(),
                             style: TextStyle(
-                              color: isDarkMode() ? lableColor : black,
+                              color: isDarkMode() ? black : black,
                               fontFamily: fontBold,
                               fontSize: 13.sp,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
                     ),
                     getDynamicSizedBox(height: 1.h),
-                    //  getDivider(),
+                    //getDivider(),
                   ],
                 ),
               ),
@@ -383,7 +379,8 @@ class OrderDetailScreenController extends GetxController {
                           child: CachedNetworkImage(
                             fit: BoxFit.cover,
                             height: 15.h,
-                            imageUrl: APIImageUrl.url + data.images,
+                            imageUrl:
+                                APIImageUrl.url + data.images[0].toString(),
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(
                                   color: primaryColor),

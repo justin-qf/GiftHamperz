@@ -8,7 +8,7 @@ import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
-import 'package:gifthamperz/models/favouriteModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -16,7 +16,7 @@ import 'package:gifthamperz/utils/log.dart';
 void addFavouriteAPI(context, InternetController networkManager,
     String productId, String type, String screenName,
     {bool? isFromList,
-    FavouriteList? item,
+    CommonProductList? item,
     RxList? favouriteFilterList}) async {
   var loadingIndicator = LoadingProgressDialog();
   loadingIndicator.show(context, '');
@@ -47,8 +47,8 @@ void addFavouriteAPI(context, InternetController networkManager,
     if (response.statusCode == 200) {
       if (data['status'] == 1) {
         if (isFromList != null && isFromList == true) {
-          for (FavouriteList mo in favouriteFilterList!) {
-            if (productId == mo.id.toString()) {
+          for (CommonProductList mo in favouriteFilterList!) {
+            if (productId == mo.productId.toString()) {
               favouriteFilterList.remove(mo);
             }
             break;

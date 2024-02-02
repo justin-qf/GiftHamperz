@@ -39,6 +39,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         context, widget.isFromEdit!, widget.itemData);
     //controller.getCityList(context, '');
     getCity(context);
+    controller.getGuestUser();
     super.initState();
   }
 
@@ -89,6 +90,59 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   children: [
                     SizedBox(
                       height: 1.0.h,
+                    ),
+                    Obx(
+                      () {
+                        return controller.isGuest.value == true
+                            ? Column(
+                                children: [
+                                  getLable(AddAddressText.userName),
+                                  FadeInDown(
+                                    child: AnimatedSize(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      child: Obx(() {
+                                        return getReactiveFormField(
+                                            node: controller.userNameNode,
+                                            controller: controller.userNameCtr,
+                                            hintLabel:
+                                                AddAddressText.userNameHint,
+                                            onChanged: (val) {
+                                              controller.validateName(val);
+                                            },
+                                            obscuretext: false,
+                                            inputType: TextInputType.name,
+                                            errorText: controller
+                                                .userNameModel.value.error);
+                                      }),
+                                    ),
+                                  ),
+                                  getLable(AddAddressText.emailAddress),
+                                  FadeInDown(
+                                    child: AnimatedSize(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      child: Obx(() {
+                                        return getReactiveFormField(
+                                            node: controller.emailIdNode,
+                                            controller: controller.emailIdCtr,
+                                            hintLabel: AddAddressText
+                                                .emailAddresValidsHint,
+                                            onChanged: (val) {
+                                              controller.validateEmail(val);
+                                            },
+                                            obscuretext: false,
+                                            inputType:
+                                                TextInputType.emailAddress,
+                                            errorText: controller
+                                                .emailIdModel.value.error);
+                                      }),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Container();
+                      },
                     ),
                     getLable(AddAddressText.deliveryName),
                     FadeInDown(

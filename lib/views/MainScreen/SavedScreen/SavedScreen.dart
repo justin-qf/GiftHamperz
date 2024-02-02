@@ -5,12 +5,13 @@ import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/search_chat_widgets.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/savedController.dart';
-import 'package:gifthamperz/models/favouriteModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
@@ -67,7 +68,7 @@ class _SavedScreenState extends State<SavedScreen>
             Column(
               children: [
                 getDynamicSizedBox(
-                    height: controller.isSearch == true ? 4.h : 5.h),
+                    height: controller.isSearch == true ? 4.5.h : 5.h),
                 if (controller.isSearch == true)
                   setSearchBar(context, controller.searchCtr, 'saved',
                       onCancleClick: () {
@@ -91,33 +92,28 @@ class _SavedScreenState extends State<SavedScreen>
                     controller.isSearch = true;
                     setState(() {});
                   }),
-                getDynamicSizedBox(
-                    height:
-                        controller.favouriteFilterList.isNotEmpty ? 2.h : 0.0),
+
                 Expanded(
                   child: isGuest != true
-                      ? Container(
-                          margin: EdgeInsets.only(left: 2.w, right: 2.w),
-                          child: Stack(children: [
-                            Obx(() {
-                              switch (controller.state.value) {
-                                case ScreenState.apiLoading:
-                                case ScreenState.noNetwork:
-                                case ScreenState.noDataFound:
-                                case ScreenState.apiError:
-                                  return SizedBox(
-                                    height: SizerUtil.height / 1.5,
-                                    child:
-                                        apiOtherStates(controller.state.value),
-                                  );
-                                case ScreenState.apiSuccess:
-                                  return apiSuccess(controller.state.value);
-                                default:
-                                  Container();
-                              }
-                              return Container();
-                            }),
-                          ]))
+                      ? Stack(children: [
+                          Obx(() {
+                            switch (controller.state.value) {
+                              case ScreenState.apiLoading:
+                              case ScreenState.noNetwork:
+                              case ScreenState.noDataFound:
+                              case ScreenState.apiError:
+                                return SizedBox(
+                                  height: SizerUtil.height / 1.5,
+                                  child: apiOtherStates(controller.state.value),
+                                );
+                              case ScreenState.apiSuccess:
+                                return apiSuccess(controller.state.value);
+                              default:
+                                Container();
+                            }
+                            return Container();
+                          }),
+                        ])
                       : Container(
                           margin: EdgeInsets.only(bottom: 15.h),
                           child: Center(
@@ -199,30 +195,21 @@ class _SavedScreenState extends State<SavedScreen>
         controller.favouriteFilterList.isNotEmpty) {
       return MasonryGridView.count(
         physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.only(bottom: 13.h),
+        padding: EdgeInsets.only(
+            bottom: 13.h,
+            left: 3.w,
+            top: controller.favouriteFilterList.isNotEmpty ? 2.h : 0.0),
         crossAxisCount: SizerUtil.deviceType == DeviceType.mobile ? 2 : 3,
         mainAxisSpacing: 10,
         crossAxisSpacing: 4,
         itemBuilder: (context, index) {
-          FavouriteList data = controller.favouriteFilterList[index];
+          CommonProductList data = controller.favouriteFilterList[index];
           return controller.getItemListItem(context, data);
         },
         itemCount: controller.favouriteFilterList.length,
       );
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
-              Common.datanotfound,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-            ),
-          ),
-        ],
-      );
+      return noDataFoundWidget();
     }
   }
 

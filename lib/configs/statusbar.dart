@@ -35,4 +35,11 @@ class Statusbar {
       statusBarColor: transparent,
     ));
   }
+
+  void trasparentStatusbarScreen() {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        statusBarColor: black,
+        statusBarBrightness: Brightness.dark));
+  }
 }

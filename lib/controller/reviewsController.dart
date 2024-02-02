@@ -9,6 +9,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
+import 'package:gifthamperz/componant/dialogs/ImageScreen.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/input/form_inputs.dart';
@@ -19,71 +20,29 @@ import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
+import 'package:gifthamperz/models/ReviewModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/models/validation_model.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/FilterScreen/FIlterScreen.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 
 class ReviewsScreenController extends GetxController {
-  List pageNavigation = [];
-  RxInt currentTreeView = 2.obs;
-  RxBool isLiked = true.obs;
-  RxBool isTreeModeVertical = true.obs;
-  RxBool accessToDrawer = false.obs;
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
   final InternetController networkManager = Get.find<InternetController>();
-  RxList treeList = [].obs;
-  var pageController = PageController();
   var currentPage = 0;
-  late Timer timer;
   bool isReviewvisible = false;
   late TextEditingController commentctr;
   double userRating = 3.5;
-  RxList<ReviewsList> reviewList = <ReviewsList>[
-    ReviewsList(
-        title: "Ashwini Prajapati",
-        desc: 'OMG those lights!',
-        likeCount: "2",
-        hours: '2 hours ago',
-        placeHolder: Asset.avaterOneholder,
-        isSelected: false),
-    ReviewsList(
-        title: "Sachin Lakhara",
-        desc: 'Love it! i want to join now!',
-        likeCount: "10",
-        hours: '5 hours ago',
-        placeHolder: Asset.avaterTwoholder,
-        isSelected: true),
-    ReviewsList(
-        title: "Dhabudi Patel",
-        desc: 'Awesome!!!',
-        likeCount: "20",
-        hours: '3 hours ago',
-        placeHolder: Asset.avaterThreeholder,
-        isSelected: true),
-    ReviewsList(
-        title: "Yuvraj babariya",
-        desc: 'Gajab,Ek Number,Kach jevu!!!',
-        likeCount: "30",
-        hours: '1 hours ago',
-        placeHolder: Asset.avaterFourholder,
-        isSelected: false),
-    ReviewsList(
-        title: "Bhoomi Makwana",
-        desc: 'Delighfull..!!',
-        likeCount: "30",
-        hours: '1 hours ago',
-        placeHolder: Asset.avaterFiveholder,
-        isSelected: false),
-  ].obs;
   late FocusNode commentNode;
   var commentModel = ValidationModel(null, null, isValidate: false).obs;
   RxBool isFormInvalidate = false.obs;
@@ -375,210 +334,444 @@ class ReviewsScreenController extends GetxController {
     );
   }
 
-  getListItem(ReviewsList data) {
-    return Obx(
-      () {
-        return FadeInUp(
-          child: Wrap(
-            children: [
-              Stack(
-                children: [
-                  Container(
-                      width: SizerUtil.width,
-                      margin: EdgeInsets.only(
-                          top: 3.h, left: 3.w, right: 3.w, bottom: 2.0.h),
-                      padding: EdgeInsets.all(2.w),
-                      decoration: BoxDecoration(
-                        //color: grey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(1.7.h),
-                        border: isDarkMode()
-                            ? Border.all(
-                                color: grey, // Border color
-                                width: 0.5, // Border width
-                              )
-                            : Border.all(
-                                color: grey, // Border color
-                                width: 0.5, // Border width
-                              ),
-                      ),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              SizerUtil.deviceType == DeviceType.mobile
-                                  ? 4.w
-                                  : 2.2.w),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 1.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    // FadeInDown(
-                                    //   child: ClipRRect(
-                                    //     borderRadius: const BorderRadius.all(
-                                    //         Radius.circular(50)),
-                                    //     child: Image.asset(
-                                    //       data.placeHolder,
-                                    //       height: 7.h,
-                                    //       width: 7.h,
-                                    //       fit: BoxFit.cover,
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    getDynamicSizedBox(width: 20.w),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(data.title,
-                                                  textAlign: TextAlign.start,
-                                                  style: TextStyle(
-                                                    fontFamily: fontMedium,
-                                                    fontWeight: FontWeight.w900,
-                                                    fontSize: 15.sp,
-                                                  )),
-                                              const Spacer(),
-                                              Text(data.likeCount,
-                                                  textAlign: TextAlign.start,
-                                                  style: TextStyle(
-                                                    fontFamily: fontBold,
-                                                    fontSize: 12.sp,
-                                                  )),
-                                              getDynamicSizedBox(width: 0.6.w),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  data.isSelected.value =
-                                                      !data.isSelected.value;
-                                                  update();
-                                                },
-                                                child: Icon(
-                                                  data.isSelected.value
-                                                      ? Icons.favorite_rounded
-                                                      : Icons.favorite_border,
-                                                  size: 3.h,
-                                                  color: primaryColor,
-                                                ),
-                                              ),
-                                              getDynamicSizedBox(width: 0.6.w),
-                                            ],
-                                          ),
-                                          getDynamicSizedBox(height: 0.6.h),
-                                          //getDynamicSizedBox(height: 1.0.h),
-                                          // getDivider()
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                RatingBar.builder(
-                                  initialRating: 3.5,
-                                  minRating: 1,
-                                  direction: Axis.horizontal,
-                                  allowHalfRating: true,
-                                  itemCount: 5,
-                                  itemSize: 3.5.w,
-                                  // itemPadding:
-                                  //     const EdgeInsets.symmetric(horizontal: 5.0),
-                                  itemBuilder: (context, _) => const Icon(
-                                    Icons.star,
-                                    color: Colors.orange,
-                                  ),
-                                  onRatingUpdate: (rating) {
-                                    logcat("RATING", rating);
-                                  },
-                                ),
-                                getDynamicSizedBox(height: 0.6.h),
-                                SizedBox(
-                                  width: 53.w,
-                                  child: Text(data.desc,
-                                      maxLines: 3,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        color: lableColor,
-                                        fontFamily: fontBold,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 12.sp,
-                                      )),
-                                ),
-                                getDynamicSizedBox(height: 0.6.h),
-                                Row(
-                                  children: [
-                                    Text(data.hours,
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                          color: lableColor,
-                                          fontFamily: fontBold,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 11.sp,
-                                        )),
-                                    getDynamicSizedBox(width: 3.w),
-                                    Text('1 Reply',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                          color: lableColor,
-                                          fontFamily: fontBold,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12.sp,
-                                        )),
-                                    getDynamicSizedBox(width: 3.w),
-                                    Text('Reply',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                          color: lableColor,
-                                          fontFamily: fontBold,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 11.sp,
-                                        )),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ))),
-                  Positioned(
-                    left: 9.w,
-                    child: FadeInDown(
-                      child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(50)),
-                        child: CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          height: 7.h,
-                          imageUrl: APIImageUrl.url,
-                          placeholder: (context, url) => const Center(
-                            child:
-                                CircularProgressIndicator(color: primaryColor),
-                          ),
-                          errorWidget: (context, url, error) => Image.asset(
-                            data.placeHolder,
-                            height: 7.h,
-                            width: 7.h,
+  getListItem(BuildContext context, ReviewData data, int index) {
+    DateTime dateTime = DateTime.parse(data.createdAt);
+    String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
+    var name;
+    if (data.firstName != null) {
+      name = data.firstName;
+    } else {
+      name = "User Name";
+    }
+
+    return FadeInUp(
+      child: Wrap(
+        children: [
+          Container(
+            width: SizerUtil.width,
+            margin: EdgeInsets.only(bottom: 1.5.h, right: 3.w, left: 3.w),
+            padding:
+                EdgeInsets.only(left: 2.w, right: 2.w, top: 0.5.h, bottom: 1.h),
+            decoration: BoxDecoration(
+              //color: grey.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(1.7.h),
+              border: isDarkMode()
+                  ? Border.all(
+                      color: grey, // Border color
+                      width: 0.5, // Border width
+                    )
+                  : Border.all(
+                      color: grey, // Border color
+                      width: 0.5, // Border width
+                    ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    FadeInDown(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 0.2.h, left: 2.5.w),
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
+                          child: CachedNetworkImage(
                             fit: BoxFit.cover,
+                            height: 7.h,
+                            imageUrl:
+                                APIImageUrl.url + data.profilePic.toString(),
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(
+                                  color: primaryColor),
+                            ),
+                            errorWidget: (context, url, error) => Image.asset(
+                              Asset.userholder,
+                              height: 7.h,
+                              width: 7.h,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    getDynamicSizedBox(width: 3.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 62.w,
+                            child: Text(name,
+                                maxLines: 2,
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontFamily: fontMedium,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16.sp,
+                                )),
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              RatingBar.builder(
+                                initialRating: double.parse(data.review),
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemSize: 4.w,
+                                itemBuilder: (context, _) => const Icon(
+                                  Icons.star,
+                                  color: Colors.orange,
+                                ),
+                                onRatingUpdate: (rating) {
+                                  logcat("RATING", rating);
+                                },
+                              ),
+                              getDynamicSizedBox(width: 0.6.w),
+                              Text(data.review,
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                    fontFamily: fontBold,
+                                    fontSize: 12.sp,
+                                  )),
+                              const Spacer(),
+                              Text("[$formattedDate]",
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                    fontFamily: fontBold,
+                                    fontSize: 12.sp,
+                                  )),
+                            ],
+                          ),
+                          //getDynamicSizedBox(height: 1.0.h),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                        SizerUtil.deviceType == DeviceType.mobile
+                            ? 4.w
+                            : 2.2.w),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          getDynamicSizedBox(height: 0.5.h),
+                          getDivider(),
+                          getDynamicSizedBox(height: 0.8.h),
+                          Text(data.comment.toString(),
+                              maxLines: 5,
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                overflow: TextOverflow.ellipsis,
+                                color: isDarkMode() ? white : black,
+                                fontFamily: fontBold,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12.sp,
+                              )),
+                          getDynamicSizedBox(height: 1.h),
+                          SizedBox(
+                            width: SizerUtil.width,
+                            height: 9.h,
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: data.images.length,
+                              clipBehavior: Clip.antiAlias,
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: false,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    // Handle image tap
+                                    Get.to(FullScreenImage(
+                                      imageUrl:
+                                          APIImageUrl.url + data.images[index],
+                                      title: 'Review Image',
+                                    ))!
+                                        .then((value) => {
+                                              Statusbar()
+                                                  .trasparentStatusbarIsNormalScreen()
+                                            });
+                                  },
+                                  child: Container(
+                                    height: 6.h,
+                                    width: 9.h,
+                                    margin: EdgeInsets.only(right: 2.w),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: isDarkMode()
+                                          ? Border.all(
+                                              color: grey, // Border color
+                                              width: 0.5, // Border width
+                                            )
+                                          : Border.all(
+                                              color: grey, // Border color
+                                              width: 0.5, // Border width
+                                            ),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(10)),
+                                      child: CachedNetworkImage(
+                                        fit: BoxFit.cover,
+                                        height: 9.h,
+                                        imageUrl: APIImageUrl.url +
+                                            data.images[index],
+                                        placeholder: (context, url) => SizedBox(
+                                          height: 9.h,
+                                          child: const Center(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: CircularProgressIndicator(
+                                                  color: primaryColor),
+                                            ),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Image.asset(
+                                          Asset.productPlaceholder,
+                                          height: 9.h,
+                                          width: 9.h,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          // getDynamicSizedBox(height: 0.6.h),
+                        ],
+                      ),
+                    )),
+              ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
- 
+  getListItems(BuildContext context, ReviewData data, int index) {
+    var name;
+    if (data.firstName != null) {
+      name = data.firstName;
+    } else {
+      name = "Justin Mahida";
+    }
+
+    return FadeInUp(
+      child: Wrap(
+        children: [
+          Stack(
+            children: [
+              Container(
+                  width: SizerUtil.width,
+                  margin: EdgeInsets.only(
+                      top: 3.h, left: 3.w, right: 3.w, bottom: 2.0.h),
+                  padding: EdgeInsets.all(2.w),
+                  decoration: BoxDecoration(
+                    //color: grey.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(1.7.h),
+                    border: isDarkMode()
+                        ? Border.all(
+                            color: grey, // Border color
+                            width: 0.5, // Border width
+                          )
+                        : Border.all(
+                            color: grey, // Border color
+                            width: 0.5, // Border width
+                          ),
+                  ),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                          SizerUtil.deviceType == DeviceType.mobile
+                              ? 4.w
+                              : 2.2.w),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 1.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                getDynamicSizedBox(width: 20.w),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(name,
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                fontFamily: fontMedium,
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 15.sp,
+                                              )),
+                                          const Spacer(),
+                                          Text(data.review,
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                fontFamily: fontBold,
+                                                fontSize: 12.sp,
+                                              )),
+                                          getDynamicSizedBox(width: 0.6.w),
+                                        ],
+                                      ),
+                                      getDynamicSizedBox(height: 0.6.h),
+                                      //getDynamicSizedBox(height: 1.0.h),
+                                      // getDivider()
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                            RatingBar.builder(
+                              initialRating: 3.5,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 5,
+                              itemSize: 3.5.w,
+                              // itemPadding:
+                              //     const EdgeInsets.symmetric(horizontal: 5.0),
+                              itemBuilder: (context, _) => const Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                              ),
+                              onRatingUpdate: (rating) {
+                                logcat("RATING", rating);
+                              },
+                            ),
+                            getDynamicSizedBox(height: 0.6.h),
+                            SizedBox(
+                              width: 53.w,
+                              child: Text(data.comment.toString(),
+                                  maxLines: 3,
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    color: lableColor,
+                                    fontFamily: fontBold,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12.sp,
+                                  )),
+                            ),
+                            getDynamicSizedBox(height: 0.6.h),
+                          ],
+                        ),
+                      ))),
+              Positioned(
+                left: 9.w,
+                child: FadeInDown(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
+                    child: CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      height: 7.h,
+                      imageUrl: APIImageUrl.url,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(color: primaryColor),
+                      ),
+                      errorWidget: (context, url, error) => Image.asset(
+                        Asset.productPlaceholder,
+                        height: 7.h,
+                        width: 7.h,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  RxList reviewList = [].obs;
+  RxString nextPageURL = "".obs;
+  RxBool isLoading = false.obs;
+  RxString fomatedDate = "".obs;
+
+  void getReviewList(context, currentPage, bool hideloading) async {
+    if (hideloading == true) {
+      state.value = ScreenState.apiLoading;
+    } else {
+      isLoading.value = true;
+      update();
+    }
+
+    try {
+      if (networkManager.connectionType == 0) {
+        showDialogForScreen(
+            context, OrderScreenConstant.title, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+      //var pageURL = ApiUrl.getAddress + currentPage.toString();
+      var pageURL = ApiUrl.listReview;
+      logcat("URL", pageURL.toString());
+      var response = await Repository.get({}, pageURL, allowHeader: false);
+      Statusbar().trasparentStatusbarIsNormalScreen();
+      // loadingIndicator.hide(context);
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (data['status'] == 1) {
+          state.value = ScreenState.apiSuccess;
+          message.value = '';
+          isLoading.value = false;
+          update();
+          var responseData = ReviewModel.fromJson(data);
+          // reviewList.clear();
+          reviewList.addAll(responseData.data.data);
+          nextPageURL.value = responseData.data.nextPageUrl.toString();
+          // currentPage++;
+          update();
+        } else {
+          isLoading.value = false;
+          message.value = data['message'];
+          state.value = ScreenState.apiError;
+          showDialogForScreen(
+              context, AddAddressText.addressTitle, data['message'].toString(),
+              callback: () {});
+        }
+      } else {
+        state.value = ScreenState.apiError;
+        isLoading.value = false;
+        message.value = APIResponseHandleText.serverError;
+        showDialogForScreen(
+            context, AddAddressText.addressTitle, data['message'].toString(),
+            callback: () {});
+      }
+    } catch (e) {
+      isLoading.value = false;
+      state.value = ScreenState.apiError;
+      message.value = ServerError.servererror;
+    }
+  }
 }

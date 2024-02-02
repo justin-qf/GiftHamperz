@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
@@ -136,20 +137,7 @@ class _BlocgScreenState extends State<BlocgScreen>
         controller.blogTypeList.isNotEmpty) {
       return getListViewItem();
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 5.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -248,7 +236,7 @@ class _BlocgScreenState extends State<BlocgScreen>
               ),
             ),
           ));
-    } else if (controller.isLoading == false &&
+    } else if (controller.isLoading.value == false &&
         controller.blogList.isNotEmpty) {
       return ListView.builder(
         padding: EdgeInsets.only(bottom: 2.h),

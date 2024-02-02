@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
+
 FavouriteModel favouriteModelFromJson(String str) =>
     FavouriteModel.fromJson(json.decode(str));
 
@@ -12,7 +14,7 @@ String favouriteModelToJson(FavouriteModel data) => json.encode(data.toJson());
 class FavouriteModel {
   int status;
   String message;
-  List<FavouriteList> data;
+  List<CommonProductList> data;
 
   FavouriteModel({
     required this.status,
@@ -23,8 +25,8 @@ class FavouriteModel {
   factory FavouriteModel.fromJson(Map<String, dynamic> json) => FavouriteModel(
         status: json["status"],
         message: json["message"],
-        data: List<FavouriteList>.from(
-            json["data"].map((x) => FavouriteList.fromJson(x))),
+        data: List<CommonProductList>.from(
+            json["data"].map((x) => CommonProductList.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {

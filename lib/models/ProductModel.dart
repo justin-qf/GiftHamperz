@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
+
 ProductModel productModelFromJson(String str) =>
     ProductModel.fromJson(json.decode(str));
 
@@ -35,7 +37,7 @@ class ProductModel {
 
 class Data {
   int currentPage;
-  List<ProductListData> data;
+  List<CommonProductList> data;
   String firstPageUrl;
   String from;
   int lastPage;
@@ -66,8 +68,8 @@ class Data {
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         currentPage: json["current_page"],
-        data: List<ProductListData>.from(
-            json["data"].map((x) => ProductListData.fromJson(x))),
+        data: List<CommonProductList>.from(
+            json["data"].map((x) => CommonProductList.fromJson(x))),
         firstPageUrl: json["first_page_url"] ?? '',
         from: json["from"].toString() ?? '',
         lastPage: json["last_page"],
@@ -106,8 +108,8 @@ class ProductListData {
   // int innerSubcategoryId;
   // int brandId;
   // int sku;
-  String images;
-  // String thumbnailUrl;
+  List<String> images;
+  List<String> thumbnailUrl;
   // int isActive;
   // String tags;
   int price;
@@ -145,7 +147,7 @@ class ProductListData {
     // required this.brandId,
     // required this.sku,
     required this.images,
-    // required this.thumbnailUrl,
+    required this.thumbnailUrl,
     // required this.isActive,
     // required this.tags,
     required this.price,
@@ -184,7 +186,9 @@ class ProductListData {
         // innerSubcategoryId: json["inner_subcategory_id"],
         // brandId: json["brand_id"],
         // sku: json["sku"],
-        images: json["images"] ?? '',
+        images: List<String>.from(json["images"].map((x) => x) ?? ''),
+        thumbnailUrl:
+            List<String>.from(json["thumbnail_url"].map((x) => x) ?? ''),
         // thumbnailUrl: json["thumbnail_url"] ?? '',
         // isActive: json["is_active"],
         // tags: json["tags"] ?? '',
@@ -227,8 +231,8 @@ class ProductListData {
         // "inner_subcategory_id": innerSubcategoryId,
         // "brand_id": brandId,
         // "sku": sku,
-        "images": images,
-        // "thumbnail_url": thumbnailUrl,
+        "images": List<dynamic>.from(images.map((x) => x)),
+        "thumbnail_url": List<dynamic>.from(thumbnailUrl.map((x) => x)),
         // "is_active": isActive,
         // "tags": tags,
         "price": price,

@@ -14,6 +14,7 @@ import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/models/addressModel.dart';
 import 'package:gifthamperz/models/cityModel.dart';
 import 'package:gifthamperz/models/validation_model.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
@@ -27,7 +28,9 @@ class AddAddressController extends GetxController {
       streetctr,
       cityctr,
       landMarkctr,
-      pincodectr;
+      pincodectr,
+      userNameCtr,
+      emailIdCtr;
 
   late FocusNode deliverynamenode,
       deliveryaddressnode,
@@ -35,7 +38,9 @@ class AddAddressController extends GetxController {
       streetnode,
       citynode,
       landMarknode,
-      pinCodenode;
+      pinCodenode,
+      userNameNode,
+      emailIdNode;
   var deliveryModel = ValidationModel(null, null, isValidate: false).obs;
   var deliveryaddressModel = ValidationModel(null, null, isValidate: false).obs;
   var addressLineModel = ValidationModel(null, null, isValidate: false).obs;
@@ -43,6 +48,8 @@ class AddAddressController extends GetxController {
   var cityModel = ValidationModel(null, null, isValidate: false).obs;
   var landMarkModel = ValidationModel(null, null, isValidate: false).obs;
   var pinCodeModel = ValidationModel(null, null, isValidate: false).obs;
+  var userNameModel = ValidationModel(null, null, isValidate: false).obs;
+  var emailIdModel = ValidationModel(null, null, isValidate: false).obs;
 
   late TextEditingController searchCityctr;
   late FocusNode searchCityNode;
@@ -60,7 +67,7 @@ class AddAddressController extends GetxController {
   String? selectCity;
   RxString isActive = "1".obs;
   RxString cityId = "".obs;
-
+  RxBool isGuest = false.obs;
   List<TextEditingController> controllers = [];
 
   final List<String> city = [
@@ -73,6 +80,8 @@ class AddAddressController extends GetxController {
   @override
   void onInit() {
     pinCodenode = FocusNode();
+    userNameNode = FocusNode();
+    emailIdNode = FocusNode();
     landMarknode = FocusNode();
     deliverynamenode = FocusNode();
     deliveryaddressnode = FocusNode();
@@ -88,7 +97,14 @@ class AddAddressController extends GetxController {
     landMarkctr = TextEditingController();
     pincodectr = TextEditingController();
     searchCityctr = TextEditingController();
+    userNameCtr = TextEditingController();
+    emailIdCtr = TextEditingController();
     super.onInit();
+  }
+
+  getGuestUser() async {
+    isGuest.value = await UserPreferences().getGuestUserFromApi();
+    update();
   }
 
   setDataInFormFields(
@@ -139,6 +155,37 @@ class AddAddressController extends GetxController {
 
   RxList imageObjectList = [].obs;
   RxString loginImgPath = "".obs;
+
+  void validateName(String? val) {
+    userNameModel.update((model) {
+      if (val != null && val.isEmpty) {
+        model!.error = AddAddressText.userNameHint;
+        model.isValidate = false;
+      } else {
+        model!.error = null;
+        model.isValidate = true;
+      }
+    });
+
+    enablButton();
+  }
+
+  void validateEmail(String? val) {
+    emailIdModel.update((model) {
+      if (val != null && val.toString().trim().isEmpty) {
+        model!.error = AddAddressText.emailAddressHint;
+        model.isValidate = false;
+      } else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(emailIdCtr.text.trim())) {
+        model!.error = AddAddressText.emailAddresValidsHint;
+        model.isValidate = false;
+      } else {
+        model!.error = null;
+        model.isValidate = true;
+      }
+    });
+
+    enablButton();
+  }
 
   void validateDeliveryName(String? val) {
     deliveryModel.update((model) {
@@ -232,18 +279,38 @@ class AddAddressController extends GetxController {
   }
 
   void enablButton() {
-    if (deliveryModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (addressLineModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (streetModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (landMarkModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (pinCodeModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
+    if (isGuest.value == true) {
+      if (userNameModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (emailIdModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (deliveryModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (addressLineModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (streetModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (landMarkModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (pinCodeModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else {
+        isFormInvalidate.value = true;
+      }
     } else {
-      isFormInvalidate.value = true;
+      if (deliveryModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (addressLineModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (streetModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (landMarkModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (pinCodeModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else {
+        isFormInvalidate.value = true;
+      }
     }
   }
 
@@ -276,6 +343,8 @@ class AddAddressController extends GetxController {
         "pincode": pincodectr.text.toString().trim(),
         "is_office": apiPassingAddressType.value.toString().trim(),
         "is_active": isActive.value.toString().trim(),
+        "user_name": userNameCtr.toString().trim(),
+        "email_id": emailIdCtr.text.toString().trim(),
       });
 
       var response = await Repository.post({
@@ -285,6 +354,8 @@ class AddAddressController extends GetxController {
         "pincode": pincodectr.text.toString().trim(),
         "is_office": apiPassingAddressType.value.toString().trim(),
         "is_active": isActive.value.toString().trim(),
+        "user_name": userNameCtr.toString().trim() ?? '',
+        "email_id": emailIdCtr.text.toString().trim() ?? '',
       }, ApiUrl.addAddress, allowHeader: true);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);

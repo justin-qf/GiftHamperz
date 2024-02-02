@@ -13,6 +13,7 @@ import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
+import 'package:gifthamperz/models/UserModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:gifthamperz/models/validation_model.dart';
@@ -74,7 +75,7 @@ class EditProfileController extends GetxController {
     userNamectr = TextEditingController();
     dobCtr = TextEditingController();
     gederCtr = TextEditingController();
-    initDataSet();
+
     super.onInit();
   }
 
@@ -94,14 +95,24 @@ class EditProfileController extends GetxController {
     'Others',
   ].obs;
 
-  initDataSet() async {
+  initDataSet(UserDetailData? loginData) async {
     getUserData = await UserPreferences().getSignInInfo();
-    userNamectr.text = "${getUserData!.firstName} ${getUserData!.lastName}";
-    emailCtr.text = getUserData!.emailId.toString();
-    dobCtr.text = DateFormat(Date.dateFormat)
-        .format(DateTime.parse(getUserData!.dateOfBirth.toString().trim()));
-    selectGender.value = getUserData!.gender.capitalize.toString();
-    profilePic.value = APIImageUrl.url + getUserData!.profilePic.toString();
+    if (loginData != null) {
+      userNamectr.text = loginData.userName!;
+      emailCtr.text = loginData.emailId.toString();
+      dobCtr.text = DateFormat(Date.dateFormat)
+          .format(DateTime.parse(loginData.dateOfBirth.toString().trim()));
+      selectGender.value = loginData.gender!.capitalize.toString();
+      profilePic.value = APIImageUrl.url + loginData.profilePic.toString();
+    } else {
+      userNamectr.text = "${getUserData!.firstName} ${getUserData!.lastName}";
+      emailCtr.text = getUserData!.emailId.toString();
+      dobCtr.text = DateFormat(Date.dateFormat)
+          .format(DateTime.parse(getUserData!.dateOfBirth.toString().trim()));
+      selectGender.value = getUserData!.gender.capitalize.toString();
+      profilePic.value = APIImageUrl.url + getUserData!.profilePic.toString();
+    }
+
     update();
   }
 
@@ -231,9 +242,9 @@ class EditProfileController extends GetxController {
               borderRadius: BorderRadius.circular(50.0),
               child: avatarFile.value == null && profilePic.value.isNotEmpty
                   ? CachedNetworkImage(
-                      fit: BoxFit.fitWidth,
+                      fit: BoxFit.cover,
                       // height: 15.h,
-                      // width: 30.w,
+                      width: 30.w,
                       imageUrl: profilePic.value,
                       placeholder: (context, url) => Padding(
                             padding: EdgeInsets.all(2.w),
@@ -244,11 +255,12 @@ class EditProfileController extends GetxController {
                           ),
                       imageBuilder: (context, imageProvider) => Image.network(
                             profilePic.value,
-                            fit: BoxFit.fitWidth,
+                            fit: BoxFit.cover,
                             //height: 2.h,
                           ),
                       errorWidget: (context, url, error) => SvgPicture.asset(
                             Asset.avatafr,
+                            fit: BoxFit.cover,
                             // ignore: deprecated_member_use
                             color: isDarkMode() ? lableColor : white,
                             height: 8.0.h,
@@ -256,6 +268,7 @@ class EditProfileController extends GetxController {
                           ))
                   : avatarFile.value == null
                       ? SvgPicture.asset(
+                          fit: BoxFit.cover,
                           Asset.avatafr,
                           height: 8.0.h,
                           width: 8.0.h,
@@ -266,11 +279,12 @@ class EditProfileController extends GetxController {
                           avatarFile.value!,
                           height: 13.h,
                           width: 13.h,
+                          fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return SvgPicture.asset(
                               Asset.profileimg,
-                              height: 10.h,
-                              width: 10.h,
+                              height: 13.h,
+                              width: 13.h,
                             );
                           },
                         ),
@@ -424,8 +438,10 @@ class EditProfileController extends GetxController {
       if (response.statusCode == 200) {
         if (json['status'] == 1) {
           showDialogForScreen(
-              context, EditScreenConstant.title, json['message'], callback: () {
-            Get.back();
+              context,
+              EditScreenConstant.title,
+              json['message'], callback: () {
+            Get.back(result: true);
           });
         } else {
           showDialogForScreen(

@@ -66,19 +66,9 @@ class ColorsList {
 class ReviewsList {
   // ignore: prefer_typing_uninitialized_variables
   String title;
-  String desc;
-  String hours;
-  String likeCount;
-  String placeHolder;
   RxBool isSelected;
 
-  ReviewsList(
-      {required this.title,
-      required this.desc,
-      required this.likeCount,
-      required this.hours,
-      required this.placeHolder,
-      bool isSelected = false})
+  ReviewsList({required this.title, bool isSelected = false})
       : isSelected = isSelected.obs;
 }
 

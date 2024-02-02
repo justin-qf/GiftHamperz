@@ -7,7 +7,6 @@ import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:pinput/pinput.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sizer/sizer.dart';
@@ -174,7 +173,7 @@ Widget getFooter(isLogin) {
           ? LoginConst.dontHaveAccount
           : SignupConstant.haveAnAccount,
       style: TextStyle(
-          color: isDarkMode() ? primaryColor : lableColor,
+          color: isDarkMode() ? grey : lableColor,
           fontWeight: FontWeight.w500,
           fontSize: 11.sp),
       children: [
@@ -184,7 +183,7 @@ Widget getFooter(isLogin) {
               : " ${LoginConst.signIn}",
           style: TextStyle(
               fontFamily: fontBold,
-              color: primaryColor,
+              color: isDarkMode() ? white : primaryColor,
               fontSize: 13.sp,
               fontWeight: FontWeight.w800),
         )
@@ -204,7 +203,7 @@ Widget getRichText(title, desc) {
       text: title,
       style: TextStyle(
           overflow: TextOverflow.ellipsis,
-          color: isDarkMode() ? white : black,
+          color: isDarkMode() ? black : black,
           fontFamily: fontExtraBold,
           fontSize: 11.sp),
       children: [
@@ -213,7 +212,7 @@ Widget getRichText(title, desc) {
           style: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontFamily: fontRegular,
-              color: black,
+              color: isDarkMode() ? black : black,
               fontSize: 10.sp,
               fontWeight: FontWeight.w400),
         )
@@ -266,7 +265,7 @@ Widget getHomeLable(String title, Function onCLick) {
 Widget getLable(String title, {bool? isFromFilter}) {
   return FadeInDown(
     child: Container(
-      margin: EdgeInsets.only(left: 8.w),
+      margin: EdgeInsets.only(left: 5.w),
       width: SizerUtil.width,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +332,7 @@ Widget getPriceLable(String startPrice, String endPrice) {
               fontSize: 13.sp,
             )),
         getDynamicSizedBox(width: 1.w),
-        Text("\$$startPrice",
+        Text("\u20B9$startPrice",
             style: TextStyle(
               color: primaryColor,
               fontFamily: fontBold,
@@ -347,7 +346,7 @@ Widget getPriceLable(String startPrice, String endPrice) {
               fontWeight: FontWeight.w500,
               fontSize: 12.sp,
             )),
-        Text("\$$endPrice",
+        Text("\u20B9$endPrice",
             style: TextStyle(
               color: primaryColor,
               fontFamily: fontBold,
@@ -446,12 +445,15 @@ Widget getCommonContainer(title, isFromAddCart, icon,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon),
+              Icon(
+                icon,
+                color: isDarkMode() ? black : black,
+              ),
               getDynamicSizedBox(width: 2.w),
               Text(
                 title,
                 style: TextStyle(
-                  color: isDarkMode() ? white : black,
+                  color: isDarkMode() ? black : black,
                   fontFamily: fontBold,
                   fontWeight: FontWeight.w700,
                   fontSize: 12.5.sp,
@@ -478,8 +480,9 @@ Widget getAddToCartBtn(title, icon,
           Radius.circular(7.w),
         ),
       ),
+      margin: EdgeInsets.only(left: 0.2.w, right: 0.2.w),
       padding:
-          EdgeInsets.only(top: 0.5.h, bottom: 0.5.h, left: 1.5.w, right: 1.5.w),
+          EdgeInsets.only(top: 0.6.h, bottom: 0.6.h, left: 1.5.w, right: 1.5.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -487,16 +490,16 @@ Widget getAddToCartBtn(title, icon,
           Icon(
             icon,
             size: 1.5.h,
-            color: isDarkMode() ? lightGrey : black,
+            color: isDarkMode() ? black : black,
           ),
           getDynamicSizedBox(width: 0.5.w),
           Text(
             title,
             style: TextStyle(
-              color: isDarkMode() ? lightGrey : black,
+              color: isDarkMode() ? black : black,
               fontFamily: fontBold,
               fontWeight: FontWeight.w700,
-              fontSize: 8.sp,
+              fontSize: 10.sp,
             ),
           ),
         ],
@@ -554,7 +557,7 @@ getPinTheme() {
     decoration: BoxDecoration(
       color: isDarkMode() ? white : const Color.fromRGBO(222, 231, 240, .57),
       borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Colors.transparent),
+      border: Border.all(color: isDarkMode() ? black : transparent),
     ),
   );
 }
@@ -622,7 +625,7 @@ Widget cartIncDecUi({String? qty, Function? increment, Function? decrement}) {
     padding:
         EdgeInsets.only(left: 2.5.w, right: 2.5.w, top: 0.3.h, bottom: 0.3.h),
     decoration: BoxDecoration(
-        color: isDarkMode() ? darkBackgroundColor : white,
+        color: isDarkMode() ? darkBackgroundColor : darkGrey,
         boxShadow: [
           BoxShadow(
               color: grey.withOpacity(0.2),
@@ -634,6 +637,8 @@ Widget cartIncDecUi({String? qty, Function? increment, Function? decrement}) {
           Radius.circular(5.h),
         )),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         GestureDetector(
           onTap: () async {
@@ -670,6 +675,100 @@ Widget cartIncDecUi({String? qty, Function? increment, Function? decrement}) {
           ),
         ),
       ],
+    ),
+  );
+}
+
+Widget homeCartIncDecUi(
+    {String? qty,
+    Function? increment,
+    Function? decrement,
+    bool? isFromPopular}) {
+  return Center(
+    child: Container(
+      margin: EdgeInsets.only(
+          left: isFromPopular == true ? 5.w : 2.w,
+          right: isFromPopular == true ? 5.w : 2.w),
+      padding: EdgeInsets.only(
+          left: isFromPopular == true ? 2.w : 1.5.w,
+          right: isFromPopular == true ? 2.w : 1.5.w,
+          top: 0.5.h,
+          bottom: 0.5.h),
+      decoration: BoxDecoration(
+          color: isDarkMode() ? darkBackgroundColor : darkGrey,
+          boxShadow: [
+            BoxShadow(
+                color: grey.withOpacity(0.2),
+                blurRadius: 1.0,
+                offset: const Offset(0, 1),
+                spreadRadius: 1.0)
+          ],
+          borderRadius: BorderRadius.all(
+            Radius.circular(5.h),
+          )),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () async {
+              decrement!();
+            },
+            child: Icon(
+              Icons.remove,
+              size: 2.h,
+              color: isDarkMode() ? white : black,
+            ),
+          ),
+          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 2.w),
+          getVerticalDivider(),
+          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 2.w),
+          Text(
+            qty.toString(),
+            style: TextStyle(
+              color: isDarkMode() ? white : black,
+              fontWeight: FontWeight.w600,
+              fontSize:
+                  SizerUtil.deviceType == DeviceType.mobile ? 12.sp : 13.sp,
+            ),
+          ),
+          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 2.w),
+          getVerticalDivider(),
+          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 2.w),
+          GestureDetector(
+            onTap: () async {
+              increment!();
+            },
+            child: Icon(
+              Icons.add,
+              size: 2.h,
+              color: isDarkMode() ? white : black,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget noDataFoundWidget() {
+  return SizedBox(
+    height: SizerUtil.height / 1.2,
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            Common.datanotfound,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontFamily: fontMedium,
+                fontSize: 12.sp,
+                color: isDarkMode() ? white : black),
+          ),
+        ],
+      ),
     ),
   );
 }

@@ -16,6 +16,7 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/models/searchModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
@@ -149,37 +150,44 @@ class SearchScreenController extends GetxController {
         });
         return;
       }
-
       var response = await Repository.get({},
           "${ApiUrl.getSearch}?search_product=${searchText.isNotEmpty ? searchText : ""}",
           allowHeader: true);
-
       logcat("SEARCH_RESPONSE::", response.body);
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        state.value = ScreenState.apiSuccess;
-        message.value = '';
-        var searchData = SearchModel.fromJson(responseData);
-        searchList.clear();
-        if (searchData.data.isNotEmpty) {
-          searchList.addAll(searchData.data);
-          update();
+        if (responseData['status'] == 1) {
+          state.value = ScreenState.apiSuccess;
+          message.value = '';
+          var searchData = SearchModel.fromJson(responseData);
+          searchList.clear();
+          if (searchData.data.isNotEmpty) {
+            searchList.addAll(searchData.data);
+            update();
+          } else {
+            state.value = ScreenState.noDataFound;
+          }
+
+          List<CommonProductList> cartItems =
+              await UserPreferences().loadCartItems();
+
+          for (CommonProductList item in searchData.data) {
+            int existingIndex =
+                cartItems.indexWhere((cartItem) => cartItem.id == item.id);
+            if (existingIndex != -1) {
+              item.isInCart!.value = true;
+              item.quantity!.value = cartItems[existingIndex].quantity!.value;
+            } else {
+              item.isInCart!.value = false;
+              item.quantity!.value = 0;
+            }
+          }
+        } else {
+          message.value = responseData['message'];
+          showDialogForScreen(
+              context, SearchScreenConstant.title, responseData['message'],
+              callback: () {});
         }
-        // if (responseData['status'] == 1) {
-        //   state.value = ScreenState.apiSuccess;
-        //   message.value = '';
-        //   var searchData = SearchModel.fromJson(responseData);
-        //   searchList.clear();
-        //   if (searchData.data.isNotEmpty) {
-        //     searchList.addAll(searchData.data);
-        //     update();
-        //   }
-        // } else {
-        //   message.value = responseData['message'];
-        //   showDialogForScreen(
-        //       context, SearchScreenConstant.title, responseData['message'],
-        //       callback: () {});
-        // }
       } else {
         state.value = ScreenState.apiError;
         message.value = APIResponseHandleText.serverError;
@@ -246,7 +254,7 @@ class SearchScreenController extends GetxController {
   }
 
   getItemListItem(
-      BuildContext context, SearchDataList data, bool? isGuestUser) {
+      BuildContext context, CommonProductList data, bool? isGuestUser) {
     return FadeInUp(
       child: Wrap(
         children: [
@@ -298,8 +306,8 @@ class SearchScreenController extends GetxController {
                                   : 2.5.w),
                           child: CachedNetworkImage(
                             fit: BoxFit.cover,
-                            height: 12.h,
-                            imageUrl: APIImageUrl.url + data.images,
+                            //height: 12.h,
+                            imageUrl: APIImageUrl.url + data.images[0],
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(
                                   color: primaryColor),
@@ -354,33 +362,28 @@ class SearchScreenController extends GetxController {
                         getDynamicSizedBox(
                           height: 0.5.h,
                         ),
-                        getText(
-                          '\u20B9${data.sku}',
-                          TextStyle(
-                              fontFamily: fontBold,
-                              color: primaryColor,
-                              fontSize:
-                                  SizerUtil.deviceType == DeviceType.mobile
-                                      ? 12.sp
-                                      : 7.sp,
-                              height: 1.2),
-                        ),
-                        getDynamicSizedBox(
-                          height: 0.5.h,
-                        ),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            getText(
+                              '\u20B9${data.sku}',
+                              TextStyle(
+                                  fontFamily: fontBold,
+                                  color: primaryColor,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 12.sp
+                                          : 7.sp,
+                                  height: 1.2),
+                            ),
+                            const Spacer(),
                             RatingBar.builder(
-                              initialRating: 3.5,
+                              initialRating: data.averageRating ?? 0.0,
                               minRating: 1,
                               direction: Axis.horizontal,
                               allowHalfRating: true,
                               itemCount: 1,
                               itemSize: 3.5.w,
-                              // itemPadding:
-                              //     const EdgeInsets.symmetric(horizontal: 5.0),
+                              unratedColor: Colors.orange,
                               itemBuilder: (context, _) => const Icon(
                                 Icons.star,
                                 color: Colors.orange,
@@ -390,38 +393,136 @@ class SearchScreenController extends GetxController {
                               },
                             ),
                             getText(
-                              "3.2",
+                              data.averageRating != null
+                                  ? data.averageRating.toString()
+                                  : '0.0',
                               TextStyle(
                                   fontFamily: fontSemiBold,
                                   color: lableColor,
                                   fontWeight:
-                                      isDarkMode() ? FontWeight.w900 : null,
+                                      isDarkMode() ? FontWeight.w600 : null,
                                   fontSize:
                                       SizerUtil.deviceType == DeviceType.mobile
-                                          ? 8.sp
+                                          ? 9.sp
                                           : 7.sp,
                                   height: 1.2),
                             ),
-                            const Spacer(),
-                            Obx(
-                              () {
-                                return getAddToCartBtn(
-                                    'Add to Cart', Icons.shopping_cart,
-                                    addCartClick: () {
-                                  if (isGuest!.value == true) {
-                                    getGuestUserAlertDialog(
-                                        context, SearchScreenConstant.title);
-                                  } else {
-                                    Get.to(const CartScreen())!.then((value) {
-                                      Statusbar()
-                                          .trasparentStatusbarProfile(true);
-                                    });
-                                  }
-                                }, isEnable: isGuest!.value);
-                              },
-                            )
                           ],
                         ),
+                        getDynamicSizedBox(
+                          height: 0.5.h,
+                        ),
+                        // Row(
+                        //   crossAxisAlignment: CrossAxisAlignment.center,
+                        //   mainAxisAlignment: MainAxisAlignment.center,
+                        //   children: [
+                        //     RatingBar.builder(
+                        //       initialRating: 3.5,
+                        //       minRating: 1,
+                        //       direction: Axis.horizontal,
+                        //       allowHalfRating: true,
+                        //       itemCount: 1,
+                        //       itemSize: 3.5.w,
+                        //       // itemPadding:
+                        //       //     const EdgeInsets.symmetric(horizontal: 5.0),
+                        //       itemBuilder: (context, _) => const Icon(
+                        //         Icons.star,
+                        //         color: Colors.orange,
+                        //       ),
+                        //       onRatingUpdate: (rating) {
+                        //         logcat("RATING", rating);
+                        //       },
+                        //     ),
+                        //     getText(
+                        //       "3.2",
+                        //       TextStyle(
+                        //           fontFamily: fontSemiBold,
+                        //           color: lableColor,
+                        //           fontWeight:
+                        //               isDarkMode() ? FontWeight.w900 : null,
+                        //           fontSize:
+                        //               SizerUtil.deviceType == DeviceType.mobile
+                        //                   ? 8.sp
+                        //                   : 7.sp,
+                        //           height: 1.2),
+                        //     ),
+                        //     const Spacer(),
+                        //     Obx(
+                        //       () {
+                        //         return getAddToCartBtn(
+                        //             'Add to Cart', Icons.shopping_cart,
+                        //             addCartClick: () {
+                        //           if (isGuest!.value == true) {
+                        //             getGuestUserAlertDialog(
+                        //                 context, SearchScreenConstant.title);
+                        //           } else {
+                        //             Get.to(const CartScreen())!.then((value) {
+                        //               Statusbar()
+                        //                   .trasparentStatusbarProfile(true);
+                        //             });
+                        //           }
+                        //         }, isEnable: isGuest!.value);
+                        //       },
+                        //     )
+                        //   ],
+                        // ),
+                        Obx(
+                          () {
+                            return data.isInCart!.value == false
+                                ? getAddToCartBtn(
+                                    'Add to Cart', Icons.shopping_cart,
+                                    addCartClick: () async {
+                                    if (isGuest!.value == true) {
+                                      getGuestUserAlertDialog(
+                                          context, SearchScreenConstant.title);
+                                    } else {
+                                      data.isInCart!.value = true;
+                                      incrementDecrementCartItem(
+                                          isFromIcr: true,
+                                          data: data,
+                                          //itemList: popularItemList,
+                                          quantity: data.quantity!.value);
+                                    }
+                                    update();
+                                  }, isAddToCartClicked: data.isInCart!)
+                                : homeCartIncDecUi(
+                                    qty: data.quantity.toString(),
+                                    increment: () async {
+                                      incrementDecrementCartItemInList(
+                                          isFromIcr: true,
+                                          data: data,
+                                          // itemList: popularItemList,
+                                          quantity: data.quantity!.value);
+
+                                      update();
+                                    },
+                                    isFromPopular: false,
+                                    decrement: () async {
+                                      incrementDecrementCartItemInList(
+                                          isFromIcr: false,
+                                          data: data,
+                                          // itemList: popularItemList,
+                                          quantity: data.quantity!.value);
+                                      update();
+                                    });
+                          },
+                        ),
+                        // Obx(
+                        //   () {
+                        //     return getAddToCartBtn(
+                        //         'Add to Cart', Icons.shopping_cart,
+                        //         addCartClick: () {
+                        //       if (isGuest!.value == true) {
+                        //         getGuestUserAlertDialog(
+                        //             context, SearchScreenConstant.title);
+                        //       } else {
+                        //         Get.to(const CartScreen())!.then((value) {
+                        //           Statusbar().trasparentStatusbarProfile(true);
+                        //         });
+                        //       }
+                        //     }, isEnable: isGuest!.value);
+                        //   },
+                        // ),
                         getDynamicSizedBox(
                           height: 1.h,
                         ),

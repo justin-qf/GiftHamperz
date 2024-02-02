@@ -1,25 +1,30 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/Repository.dart';
+import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
+import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/homeModel.dart';
+import 'package:gifthamperz/models/recentFavProduct.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/FilterScreen/FIlterScreen.dart';
 import 'package:sizer/sizer.dart';
+import '../models/UpdateDashboardModel.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class ProductDetailScreenController extends GetxController {
-  List pageNavigation = [];
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
   final InternetController networkManager = Get.find<InternetController>();
@@ -41,83 +46,12 @@ class ProductDetailScreenController extends GetxController {
     update();
   }
 
-  RxList<SavedItem> staticData = <SavedItem>[
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemOne,
-          fit: BoxFit.cover,
-        ),
-        price: '\$19.99 -\$29.99',
-        name: 'Unicorn Roses -12 Long Stemmed tie Dyed Roses'),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemTwo,
-          fit: BoxFit.cover,
-        ),
-        price: '\$30.99 -\$29.99',
-        name: 'Unicorn Roses -12 Long Stemmed tie Dyed Roses'),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemThree,
-          fit: BoxFit.cover,
-        ),
-        price: '\$35.99 -\$29.99',
-        name: "Unicorn Roses -12 Long Stemmed tie Dyed Roses"),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemFour,
-          fit: BoxFit.cover,
-        ),
-        price: '\$50.99 -\$29.99',
-        name: "Unicorn Roses -12 Long Stemmed tie Dyed Roses"),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemFive,
-          fit: BoxFit.cover,
-        ),
-        price: '\$60.99 -\$29.99',
-        name: 'Unicorn Roses -12 Long Stemmed tie Dyed Roses'),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemSix,
-          fit: BoxFit.cover,
-        ),
-        price: '\$70.99 -\$29.99',
-        name: "Unicorn Roses -12 Long Stemmed tie Dyed Roses"),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemSeven,
-          fit: BoxFit.cover,
-        ),
-        price: '\$90.99 -\$29.99',
-        name: "Unicorn Roses -12 Long Stemmed tie Dyed Roses")
-  ].obs;
-
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
     }
   }
-
-  List<Widget> bannerItems = [
-    Image.asset(
-      'assets/pngs/slide_one.jpg',
-      fit: BoxFit.cover,
-    ),
-    Image.asset(
-      'assets/pngs/slide_two.jpg',
-      fit: BoxFit.cover,
-    ),
-    Image.asset(
-      'assets/pngs/slide_three.jpg',
-      fit: BoxFit.cover,
-    ),
-    Image.asset(
-      'assets/pngs/slide_four.jpg',
-      fit: BoxFit.cover,
-    ),
-  ];
 
   getFilterUi() {
     return GestureDetector(
@@ -165,11 +99,60 @@ class ProductDetailScreenController extends GetxController {
     );
   }
 
+  RxList recentProductList = [].obs;
 
-  getItemListItem(SavedItem data) {
-    return Obx(
-      () {
-        return FadeInUp(
+  void getRecentFav(context, int innerCatId) async {
+    state.value = ScreenState.apiLoading;
+    try {
+      if (networkManager.connectionType == 0) {
+        showDialogForScreen(
+            context, BottomConstant.home, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+      var response = await Repository.get({}, '${ApiUrl.recentFav}/$innerCatId',
+          allowHeader: false);
+      logcat("RECENT_FAV_RESPONSE::", response.body);
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        if (responseData['status'] == 1) {
+          state.value = ScreenState.apiSuccess;
+          message.value = '';
+          var homeData = RecentFavModel.fromJson(responseData);
+          recentProductList.clear();
+
+          if (homeData.data.isNotEmpty) {
+            recentProductList.addAll(homeData.data);
+            update();
+          }
+        } else {
+          message.value = responseData['message'];
+          showDialogForScreen(
+              context, BottomConstant.home, responseData['message'],
+              callback: () {});
+        }
+      } else {
+        state.value = ScreenState.apiError;
+        message.value = APIResponseHandleText.serverError;
+        showDialogForScreen(
+            context, BottomConstant.home, ServerError.servererror,
+            callback: () {});
+      }
+    } catch (e) {
+      logcat("Ecxeption", e);
+      state.value = ScreenState.apiError;
+      message.value = ServerError.servererror;
+      showDialogForScreen(context, BottomConstant.home, ServerError.servererror,
+          callback: () {});
+    }
+  }
+
+  getItemListItem(CommonProductList data) {
+    return Wrap(
+      children: [
+        FadeInUp(
           child: Container(
               width: 50.w,
               margin: EdgeInsets.only(right: 4.5.w),
@@ -200,25 +183,45 @@ class ProductDetailScreenController extends GetxController {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: 14.h,
-                      //padding: EdgeInsets.only(top: 0.2.h),
-                      width: double.infinity,
+                      width: SizerUtil.width,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
                             SizerUtil.deviceType == DeviceType.mobile
                                 ? 3.5.w
                                 : 2.5.w),
+                        border: isDarkMode()
+                            ? Border.all(
+                                color: grey, // Border color
+                                width: 1, // Border width
+                              )
+                            : Border.all(
+                                color: grey, // Border color
+                                width: 0.2, // Border width
+                              ),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(
                             SizerUtil.deviceType == DeviceType.mobile
                                 ? 3.5.w
                                 : 2.5.w),
-                        child: data.icon,
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          height: 12.h,
+                          imageUrl: APIImageUrl.url + data.images[0],
+                          placeholder: (context, url) => const Center(
+                            child:
+                                CircularProgressIndicator(color: primaryColor),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            Asset.productPlaceholder,
+                            height: 9.h,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(
-                      height: 1.5.h,
+                      height: 1.0.h,
                     ),
                     Container(
                       margin: EdgeInsets.only(left: 1.w, right: 1.w),
@@ -246,7 +249,7 @@ class ProductDetailScreenController extends GetxController {
                                 color: primaryColor,
                                 fontSize:
                                     SizerUtil.deviceType == DeviceType.mobile
-                                        ? 10.sp
+                                        ? 12.sp
                                         : 7.sp,
                                 height: 1.2),
                           ),
@@ -282,25 +285,25 @@ class ProductDetailScreenController extends GetxController {
                                         : 7.sp,
                                     height: 1.2),
                               ),
-                              const Spacer(),
-                              GestureDetector(
-                                onTap: () {
-                                  data.isSelected.value =
-                                      !data.isSelected.value;
-                                  update();
-                                },
-                                child: Icon(
-                                  data.isSelected.value
-                                      ? Icons.favorite_rounded
-                                      : Icons.favorite_border,
-                                  size: 3.h,
-                                  color: primaryColor,
-                                ),
-                              )
+                              // const Spacer(),
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     data.isSelected.value =
+                              //         !data.isSelected.value;
+                              //     update();
+                              //   },
+                              //   child: Icon(
+                              //     data.isSelected.value
+                              //         ? Icons.favorite_rounded
+                              //         : Icons.favorite_border,
+                              //     size: 3.h,
+                              //     color: primaryColor,
+                              //   ),
+                              // )
                             ],
                           ),
                           getDynamicSizedBox(
-                            height: 1.h,
+                            height: 0.5.h,
                           ),
                         ],
                       ),
@@ -308,8 +311,8 @@ class ProductDetailScreenController extends GetxController {
                   ],
                 ),
               )),
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -327,6 +330,7 @@ class ProductDetailScreenController extends GetxController {
 
   Widget getLableText(text, {isMainTitle}) {
     return Text(text,
+        //textAlign: TextAlign.center,
         style: TextStyle(
           color: isDarkMode() ? white : black,
           fontFamily: isMainTitle == true ? fontBold : null,
@@ -334,6 +338,8 @@ class ProductDetailScreenController extends GetxController {
           fontSize: isMainTitle == true ? 15.sp : 12.sp,
         ));
   }
+
+  
 
   Widget getCommonText(title, {bool? isHint}) {
     return Text(

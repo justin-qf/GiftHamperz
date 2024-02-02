@@ -1,12 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gifthamperz/configs/get_storage_key.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/controller/homeController.dart';
 import 'package:gifthamperz/models/DashboadModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/log.dart';
+import 'package:gifthamperz/views/DeliveryScreen/AddressScreen.dart';
 import 'package:intl/intl.dart';
+
+import '../models/UpdateDashboardModel.dart';
 
 bool isDarkMode() {
   bool isDark;
@@ -64,11 +70,12 @@ String getFormateDate(String date) {
   return formattedData;
 }
 
-incrementDecrementCartItem({
-  bool? isFromIcr,
-  CommonProductList? data,
-  int? quantity,
-}) async {
+incrementDecrementCartItem(
+    {bool? isFromIcr,
+    CommonProductList? data,
+    List<CommonProductList>? itemList,
+    int? quantity,
+    bool? isFromBuyNow}) async {
   if (isFromIcr == true) {
     List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
     int existingIndex = cartItems.indexWhere(
@@ -120,12 +127,64 @@ incrementDecrementCartItem({
       logcat("isItemIsLess", "DONE");
     }
   }
+
+  if (isFromBuyNow == true) {
+    Get.to(AddressScreen(
+      isFromBuyNow: true,
+      id: data!.id,
+    ))!
+        .then((value) {
+      Statusbar().trasparentStatusbarProfile(true);
+    });
+  }
+
+  // List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
+  // // Check if the product is already in the cart
+  // int existingIndex = cartItems.indexWhere(
+  //   (item) => item.id == data!.id,
+  // );
+  // if (existingIndex != 1) {
+  //   // Update the corresponding item in the other list
+  //   int otherListIndex = itemList!.indexWhere((item) => item.id == data!.id);
+  //   if (otherListIndex != -1) {
+  //     itemList[otherListIndex].quantity!.value = data!.quantity!.value;
+  //     itemList[otherListIndex].isInCart!.value = data.isInCart!.value;
+  //   }
+  //   updateQuantityInOtherList(data, itemList);
+  // }
+
   Get.find<HomeScreenController>().getTotalProductInCart();
+
+  if (itemList != null) {
+    // Update the corresponding item in the other list
+    int otherListIndex = itemList.indexWhere((item) => item.id == data!.id);
+    if (otherListIndex != -1) {
+      itemList[otherListIndex].quantity!.value = data!.quantity!.value;
+      itemList[otherListIndex].isInCart!.value = data.isInCart!.value;
+    }
+    updateQuantityInOtherList(data, itemList);
+  }
+}
+
+void updateQuantityInOtherList(
+    CommonProductList? data, List<CommonProductList> trendingList) {
+  // Find the item in the other list with the same ID
+  CommonProductList? itemInOtherList = findItemById(trendingList, data?.id);
+
+  // Update the quantity in the other list
+  itemInOtherList.quantity!.value = data?.quantity?.value ?? 0;
+}
+
+CommonProductList findItemById(List<CommonProductList> list, int? id) {
+  // Find the item in the list with the specified ID
+  return list.firstWhere((item) => item.id == id,
+      orElse: () => [] as CommonProductList);
 }
 
 incrementDecrementCartItemInList({
   bool? isFromIcr,
   CommonProductList? data,
+  List<CommonProductList>? itemList,
   int? quantity,
 }) async {
   // Fetch the current cart items from preferences
@@ -155,12 +214,15 @@ incrementDecrementCartItemInList({
     logcat("isItemIsLessssss", "DONE");
 
     if (data!.quantity!.value == 1) {
+      logcat("Quanity::::::", data.quantity!.value.toString());
       data.isInCart!.value = false;
       cartItems[existingIndex].quantity!.value -= 1;
       await UserPreferences().addToCart(
         data,
         -1,
       );
+      updateQuantityInOtherList(data, itemList!);
+      Get.find<HomeScreenController>().update();
     } else {
       if (data.quantity!.value > 0) {
         // Fetch the current cart items from preferences
@@ -181,7 +243,41 @@ incrementDecrementCartItemInList({
         data.isInCart!.value = false;
       }
     }
-
-    Get.find<HomeScreenController>().getTotalProductInCart();
   }
+
+  Get.find<HomeScreenController>().getTotalProductInCart();
+  // Update the corresponding item in the other list
+  if (itemList != null) {
+    int otherListIndex = itemList.indexWhere((item) => item.id == data.id);
+    if (otherListIndex != -1) {
+      itemList[otherListIndex].quantity!.value = data.quantity!.value;
+      itemList[otherListIndex].isInCart!.value = data.isInCart!.value;
+    }
+  }
+  updateQuantityInOtherList(data, itemList!);
+}
+
+String formatPrice(double price) {
+  NumberFormat numberFormat = NumberFormat.currency(
+    symbol: '',
+    decimalDigits: 2,
+    locale: 'en_IN', // Use 'en_IN' for the Indian number format
+  );
+  return numberFormat.format(price);
+}
+
+String getCurrentDate() {
+  // Get current date
+  DateTime now = DateTime.now();
+
+  // Format the date
+  return DateFormat('yyyy-MM-dd').format(now);
+}
+
+String getCurrentTime() {
+  // Get current time
+  DateTime now = DateTime.now();
+
+  // Format the time
+  return DateFormat('HH:mm:ss').format(now);
 }

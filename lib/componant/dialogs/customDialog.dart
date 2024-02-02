@@ -65,7 +65,7 @@ class CustomRoundedDialog extends StatelessWidget {
                 getDynamicSizedBox(height: 2.h),
                 Text(
                   textAlign: TextAlign.center,
-                  "Your order has been placed successfull!\nOrder infromation was sent to your email.",
+                  "Your order has been placed successfully!\nFor more detail, go to my orders.",
                   style: TextStyle(
                     color: black,
                     fontFamily: fontBold,
@@ -108,6 +108,7 @@ class CustomRoundedDialog extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class CustomCartItemDetailDialog extends StatelessWidget {
   CustomCartItemDetailDialog(
       this.imageUrl, this.title, this.price, this.description,
@@ -139,7 +140,7 @@ class CustomCartItemDetailDialog extends StatelessWidget {
                   ? null
                   : [
                       BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: grey.withOpacity(0.2),
                           blurRadius: 10.0,
                           offset: const Offset(0, 1),
                           spreadRadius: 3.0)
@@ -163,7 +164,7 @@ class CustomCartItemDetailDialog extends StatelessWidget {
                   ),
                 ),
                 getDynamicSizedBox(height: 0.7.h),
-                getRichText('Price: ', '\$$price'),
+                getRichText('Price: ', '\u20B9$price'),
                 getDynamicSizedBox(height: 0.5.h),
                 getRichText('Description: ', description),
                 getDynamicSizedBox(height: 2.h),

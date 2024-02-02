@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:gifthamperz/api_handle/CommonApiStructure.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
+import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
@@ -18,13 +18,15 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/filter_controller.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/favouriteModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
+import 'package:gifthamperz/models/loginModel.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/FilterScreen/FIlterScreen.dart';
 import 'package:sizer/sizer.dart';
-import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
@@ -53,76 +55,10 @@ class SavedScreenController extends GetxController {
   }
 
   final RxString searchQuery = ''.obs; // For storing the search query
-  // RxList<SavedItem> get filteredList {
-  //   if (searchQuery.isEmpty) {
-  //     update();
-  //     return staticList;
-  //   } else {
-  //     update();
-  //     return staticList
-  //         .where((item) =>
-  //             item.name.toLowerCase().contains(searchQuery.value.toLowerCase()))
-  //         .toList()
-  //         .obs;
-  //   }
-  // }
-
   void setSearchQuery(String query) {
     searchQuery.value = query;
     update();
   }
-
-  final RxList<SavedItem> staticList = <SavedItem>[
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemOne,
-          fit: BoxFit.cover,
-        ),
-        price: '\$19.99 -\$29.99',
-        name: 'Unicorn Roses -12 Long Stemmed tie Dyed Roses'),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemTwo,
-          fit: BoxFit.cover,
-        ),
-        price: '\$30.99 -\$29.99',
-        name: 'Birthday\nGifts'),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemThree,
-          fit: BoxFit.cover,
-        ),
-        price: '\$35.99 -\$29.99',
-        name: "Unicorn Roses -12 Long Stemmed tie Dyed Roses"),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemFour,
-          fit: BoxFit.cover,
-        ),
-        price: '\$50.99 -\$29.99',
-        name: "Flower\nLovers"),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemFive,
-          fit: BoxFit.cover,
-        ),
-        price: '\$60.99 -\$29.99',
-        name: 'Unicorn Roses -12 Long Stemmed tie Dyed Roses'),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemOne,
-          fit: BoxFit.cover,
-        ),
-        price: '\$70.99 -\$29.99',
-        name: "Occations"),
-    SavedItem(
-        icon: Image.asset(
-          Asset.itemFour,
-          fit: BoxFit.cover,
-        ),
-        price: '\$90.99 -\$29.99',
-        name: "Flower\nLovers")
-  ].obs;
 
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
@@ -179,7 +115,7 @@ class SavedScreenController extends GetxController {
     );
   }
 
-  getItemListItem(BuildContext context, FavouriteList item) {
+  getItemListItem(BuildContext context, CommonProductList item) {
     return FadeInUp(
       child: Wrap(
         children: [
@@ -188,14 +124,16 @@ class SavedScreenController extends GetxController {
                 SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
             child: Container(
               width: double.infinity,
-              margin: EdgeInsets.only(bottom: 0.5.h, left: 1.w, right: 2.w),
-              padding: EdgeInsets.only(left: 1.2.w, right: 1.2.w, top: 1.2.w),
+              margin: EdgeInsets.only(bottom: 0.6.h, left: 1.w, right: 2.w),
               decoration: BoxDecoration(
                 border: isDarkMode()
-                    ? null
+                    ? Border.all(
+                        color: grey, // Border color
+                        width: 1, // Border width
+                      )
                     : Border.all(
                         color: grey, // Border color
-                        width: 0.5, // Border width
+                        width: 0.2, // Border width
                       ),
                 color: isDarkMode() ? itemDarkBackgroundColor : white,
                 borderRadius: BorderRadius.circular(
@@ -224,142 +162,151 @@ class SavedScreenController extends GetxController {
                               : 2.5.w),
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
-                        height: 22.h,
-                        imageUrl: '${APIImageUrl.url}widget.data.imgUrl',
+                        height: 15.h,
+                        imageUrl: APIImageUrl.url + item.images[0],
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(color: primaryColor),
                         ),
                         errorWidget: (context, url, error) => Image.asset(
                           Asset.productPlaceholder,
-                          height: 25.h,
-                          width: 25.h,
+                          height: 15.h,
+                          width: 15.h,
                           fit: BoxFit.contain,
                         ),
                         imageBuilder: (context, imageProvider) => Image(
                           image: imageProvider,
-                          height: 25.h,
-                          width: 25.h,
+                          height: 15.h,
+                          width: 15.h,
                           fit: BoxFit.contain,
                         ),
                       ),
                     ),
                   ),
                   SizedBox(
-                    height: 1.5.h,
+                    height: 1.0.h,
                   ),
-                  getText(
-                    item.name,
-                    TextStyle(
-                        fontFamily: fontSemiBold,
-                        fontWeight: FontWeight.w500,
-                        overflow: TextOverflow.ellipsis,
-                        color: isDarkMode() ? black : black,
-                        fontSize: SizerUtil.deviceType == DeviceType.mobile
-                            ? 10.sp
-                            : 7.sp,
-                        height: 1.2),
-                  ),
-                  getDynamicSizedBox(
-                    height: 0.5.h,
-                  ),
-                  getText(
-                    '\u20B9${'100'}',
-                    TextStyle(
-                        fontFamily: fontBold,
-                        color: primaryColor,
-                        fontSize: SizerUtil.deviceType == DeviceType.mobile
-                            ? 9.sp
-                            : 7.sp,
-                        height: 1.2),
-                  ),
-                  getDynamicSizedBox(
-                    height: 0.5.h,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // Expanded(
-                      //   child: RatingBar.builder(
-                      //     initialRating: 3.5,
-                      //     minRating: 1,
-                      //     direction: Axis.horizontal,
-                      //     allowHalfRating: true,
-                      //     itemCount: 5,
-                      //     itemSize: 3.5.w,
-                      //     // itemPadding:
-                      //     //     const EdgeInsets.symmetric(horizontal: 5.0),
-                      //     itemBuilder: (context, _) => const Icon(
-                      //       Icons.star,
-                      //       color: Colors.orange,
-                      //     ),
-                      //     onRatingUpdate: (rating) {
-                      //       logcat("RATING", rating);
-                      //     },
-                      //   ),
-                      // ),
-                      // Expanded(
-                      //   child: getText(
-                      //     "35 Reviews",
-                      //     TextStyle(
-                      //         fontFamily: fontSemiBold,
-                      //         color: lableColor,
-                      //         fontWeight: isDarkMode() ? FontWeight.w900 : null,
-                      //         fontSize:
-                      //             SizerUtil.deviceType == DeviceType.mobile
-                      //                 ? 8.sp
-                      //                 : 7.sp,
-                      //         height: 1.2),
-                      //   ),
-                      // ),
-                      RatingBar.builder(
-                        initialRating: 3.5,
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        itemCount: 1,
-                        itemSize: 3.5.w,
-                        itemBuilder: (context, _) => const Icon(
-                          Icons.star,
-                          color: Colors.orange,
+                  Container(
+                    margin: EdgeInsets.only(left: 1.5.w, right: 1.5.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        getText(
+                          item.name,
+                          TextStyle(
+                              fontFamily: fontSemiBold,
+                              fontWeight: FontWeight.w500,
+                              overflow: TextOverflow.ellipsis,
+                              color: isDarkMode() ? black : black,
+                              fontSize:
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 10.sp
+                                      : 7.sp,
+                              height: 1.2),
                         ),
-                        onRatingUpdate: (rating) {
-                          logcat("RATING", rating);
-                        },
-                      ),
-                      getText(
-                        "3.5",
-                        TextStyle(
-                            fontFamily: fontSemiBold,
-                            color: lableColor,
-                            fontWeight: isDarkMode() ? FontWeight.w600 : null,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 9.sp
-                                : 7.sp,
-                            height: 1.2),
-                      ),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          addFavouriteAPI(
-                              context,
-                              networkManager,
-                              item.id.toString(),
-                              '1',
-                              ProductDetailScreenConstant.title,
-                              isFromList: true,
-                              item: item,
-                              favouriteFilterList: favouriteFilterList);
-                          // data.isSelected.value = !data.isSelected.value;
-                          update();
-                        },
-                        child: Icon(
-                          Icons.favorite_rounded,
-                          size: 3.h,
-                          color: primaryColor,
+                        getDynamicSizedBox(
+                          height: 0.5.h,
                         ),
-                      )
-                    ],
+                        getText(
+                          '\u20B9${item.price}',
+                          TextStyle(
+                              fontFamily: fontBold,
+                              color: primaryColor,
+                              fontSize:
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 12.sp
+                                      : 7.sp,
+                              height: 1.2),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Expanded(
+                            //   child: RatingBar.builder(
+                            //     initialRating: 3.5,
+                            //     minRating: 1,
+                            //     direction: Axis.horizontal,
+                            //     allowHalfRating: true,
+                            //     itemCount: 5,
+                            //     itemSize: 3.5.w,
+                            //     // itemPadding:
+                            //     //     const EdgeInsets.symmetric(horizontal: 5.0),
+                            //     itemBuilder: (context, _) => const Icon(
+                            //       Icons.star,
+                            //       color: Colors.orange,
+                            //     ),
+                            //     onRatingUpdate: (rating) {
+                            //       logcat("RATING", rating);
+                            //     },
+                            //   ),
+                            // ),
+                            // Expanded(
+                            //   child: getText(
+                            //     "35 Reviews",
+                            //     TextStyle(
+                            //         fontFamily: fontSemiBold,
+                            //         color: lableColor,
+                            //         fontWeight: isDarkMode() ? FontWeight.w900 : null,
+                            //         fontSize:
+                            //             SizerUtil.deviceType == DeviceType.mobile
+                            //                 ? 8.sp
+                            //                 : 7.sp,
+                            //         height: 1.2),
+                            //   ),
+                            // ),
+                            RatingBar.builder(
+                              initialRating: item.averageRating != null
+                                  ? item.averageRating!
+                                  : 0.0,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 1,
+                              itemSize: 3.5.w,
+                              unratedColor: Colors.orange,
+                              itemBuilder: (context, _) => const Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                              ),
+                              onRatingUpdate: (rating) {
+                                logcat("RATING", rating);
+                              },
+                            ),
+                            getText(
+                              item.averageRating != null
+                                  ? item.averageRating.toString()
+                                  : 0.0.toString(),
+                              TextStyle(
+                                  fontFamily: fontSemiBold,
+                                  color: lableColor,
+                                  fontWeight:
+                                      isDarkMode() ? FontWeight.w600 : null,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 9.sp
+                                          : 7.sp,
+                                  height: 1.2),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () {
+                                addFavouriteAPI(
+                                  context,
+                                  item.productId.toString(),
+                                  item: item,
+                                );
+                                update();
+                              },
+                              child: Icon(
+                                Icons.favorite_rounded,
+                                size: 3.h,
+                                color: primaryColor,
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   getDynamicSizedBox(
                     height: 1.h,
@@ -405,149 +352,189 @@ class SavedScreenController extends GetxController {
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-          return Container(
-            padding:
-                EdgeInsets.only(left: 3.w, right: 3.w, top: 2.h, bottom: 2.h),
+          return SingleChildScrollView(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Container(
-              color: isDarkMode() ? darkBackgroundColor : transparent,
-              child: Column(
-                children: [
-                  getFilterToolbar(FilterScreenConstant.title, isFilter: true,
-                      callback: () {
-                    Navigator.pop(context);
-                  }),
-                  getDynamicSizedBox(height: 1.h),
-                  getDivider(),
-                  getDynamicSizedBox(height: 1.h),
-                  Expanded(
-                      child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        getDynamicSizedBox(height: 1.h),
-                        getLable(FilterScreenConstant.type, isFromFilter: true),
-                        getDynamicSizedBox(height: 2.h),
-                        Obx(
-                          () {
-                            return Container(
-                              margin: EdgeInsets.only(left: 5.w, right: 5.w),
-                              child: GridView.count(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  childAspectRatio: 4,
-                                  crossAxisCount: 2,
-                                  children: List.generate(
-                                      controller.flowersList.length, (index) {
-                                    return controller.getRoundShapCheckBox(
-                                        controller.flowersList[index]);
-                                  })),
-                            );
-                          },
-                        ),
-                        getDynamicSizedBox(height: 1.h),
-                        getLable(FilterScreenConstant.occassions,
-                            isFromFilter: true),
-                        getDynamicSizedBox(height: 2.h),
-                        Obx(
-                          () {
-                            return Container(
-                              margin: EdgeInsets.only(left: 5.w, right: 5.w),
-                              child: GridView.count(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  childAspectRatio: 4,
-                                  crossAxisCount: 2,
-                                  children: List.generate(
-                                      controller.occassionList.length, (index) {
-                                    return controller.getRoundShapCheckBox(
-                                        controller.occassionList[index]);
-                                  })),
-                            );
-                          },
-                        ),
-                        getDynamicSizedBox(height: 1.h),
-                        getLable(FilterScreenConstant.color,
-                            isFromFilter: true),
-                        getDynamicSizedBox(height: 2.h),
-                        Obx(
-                          () {
-                            return Container(
-                              margin: EdgeInsets.only(left: 5.w, right: 5.w),
-                              child: GridView.count(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  childAspectRatio: 4,
-                                  crossAxisCount: 2,
-                                  children: List.generate(
-                                      controller.colorsList.length, (index) {
-                                    return controller
-                                        .getRoundShapCheckBoxWithColors(
-                                            controller.colorsList[index]);
-                                  })),
-                            );
-                          },
-                        ),
-                        getDynamicSizedBox(height: 2.h),
-                        getPriceLable(
-                            controller.startValue.toStringAsFixed(2).toString(),
-                            controller.endValue.toStringAsFixed(2).toString()),
-                        SfRangeSliderTheme(
-                            data: SfRangeSliderThemeData(
-                              activeLabelStyle: TextStyle(
-                                color: isDarkMode()
-                                    ? priceRangeBackgroundColor
-                                    : grey,
-                                fontSize: 12.sp,
-                                fontFamily: fontBold,
-                              ),
-                              inactiveLabelStyle: TextStyle(
-                                color: isDarkMode()
-                                    ? priceRangeBackgroundColor.withOpacity(0.5)
-                                    : grey,
-                                fontFamily: fontBold,
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                            child: SfRangeSlider(
-                              min: 0.0,
-                              max: 200,
-                              values: controller.values,
-                              interval: 50,
-                              showTicks: true,
-                              showLabels: true,
-                              enableTooltip: true,
-                              minorTicksPerInterval: 1,
-                              inactiveColor: isDarkMode()
-                                  ? priceRangeBackgroundColor
-                                  : grey,
-                              activeColor: primaryColor,
-                              onChanged: (SfRangeValues values) {
-                                setState(() {
-                                  controller.startValue = values.start;
-                                  controller.endValue = values.end;
-                                  controller.values = values;
-                                });
+              padding:
+                  EdgeInsets.only(left: 3.w, right: 3.w, top: 2.h, bottom: 2.h),
+              child: Container(
+                color: isDarkMode() ? darkBackgroundColor : transparent,
+                child: Column(
+                  children: [
+                    getFilterToolbar(FilterScreenConstant.title, isFilter: true,
+                        callback: () {
+                      Navigator.pop(context);
+                    }),
+                    getDynamicSizedBox(height: 1.h),
+                    getDivider(),
+                    getDynamicSizedBox(height: 1.h),
+                    ListView.builder(
+                      itemCount: 1,
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return Column(
+                          children: [
+                            // getLable(FilterScreenConstant.type, isFromFilter: true),
+                            // getDynamicSizedBox(height: 2.h),
+                            // Obx(
+                            //   () {
+                            //     return Container(
+                            //       margin: EdgeInsets.only(left: 5.w, right: 5.w),
+                            //       child: GridView.count(
+                            //           physics: const NeverScrollableScrollPhysics(),
+                            //           shrinkWrap: true,
+                            //           childAspectRatio: 4,
+                            //           crossAxisCount: 2,
+                            //           children: List.generate(
+                            //               controller.flowersList.length, (index) {
+                            //             return controller.getRoundShapCheckBox(
+                            //                 controller.flowersList[index]);
+                            //           })),
+                            //     );
+                            //   },
+                            // ),
+                            // getDynamicSizedBox(height: 1.h),
+                            // getLable(FilterScreenConstant.occassions,
+                            //     isFromFilter: true),
+                            // getDynamicSizedBox(height: 2.h),
+                            // Obx(
+                            //   () {
+                            //     return Container(
+                            //       margin: EdgeInsets.only(left: 5.w, right: 5.w),
+                            //       child: GridView.count(
+                            //           physics: const NeverScrollableScrollPhysics(),
+                            //           shrinkWrap: true,
+                            //           childAspectRatio: 4,
+                            //           crossAxisCount: 2,
+                            //           children: List.generate(
+                            //               controller.occassionList.length, (index) {
+                            //             return controller.getRoundShapCheckBox(
+                            //                 controller.occassionList[index]);
+                            //           })),
+                            //     );
+                            //   },
+                            // ),
+                            getDynamicSizedBox(height: 1.h),
+                            getLable(FilterScreenConstant.color,
+                                isFromFilter: true),
+                            Obx(
+                              () {
+                                return Container(
+                                  margin:
+                                      EdgeInsets.only(left: 2.w, right: 2.w),
+                                  child: GridView.count(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      childAspectRatio: 4,
+                                      crossAxisCount: 2,
+                                      children: List.generate(
+                                          controller.colorsList.length,
+                                          (index) {
+                                        return controller.getReviewCheckBox(
+                                            controller.color[index]);
+                                      })),
+                                );
                               },
-                            )),
-                        getDynamicSizedBox(height: 5.h),
-                        Container(
-                          margin: EdgeInsets.only(
-                            left: 8.w,
-                            right: 8.w,
-                          ),
-                          child: FadeInUp(
-                              from: 50,
-                              child: getSecondaryFormButton(
-                                  () {}, Button.update,
-                                  isvalidate: true)),
-                        ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                      ],
+                            ),
+                            getDynamicSizedBox(height: 2.h),
+                            getLable(FilterScreenConstant.review,
+                                isFromFilter: true),
+                            Obx(
+                              () {
+                                return Container(
+                                  margin:
+                                      EdgeInsets.only(left: 2.w, right: 2.w),
+                                  child: GridView.count(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      childAspectRatio: 4,
+                                      crossAxisCount: 2,
+                                      children: List.generate(
+                                          controller.review.length, (index) {
+                                        return controller.getReviewCheckBox(
+                                            controller.review[index]);
+                                      })),
+                                );
+                              },
+                            ),
+                            getDynamicSizedBox(height: 3.h),
+                            getPriceLable(
+                                controller.startValue
+                                    .toStringAsFixed(2)
+                                    .toString(),
+                                controller.endValue
+                                    .toStringAsFixed(2)
+                                    .toString()),
+                            Theme(
+                                data: Theme.of(context).copyWith(
+                                  sliderTheme: SliderTheme.of(context).copyWith(
+                                    activeTrackColor: primaryColor,
+                                    inactiveTrackColor: isDarkMode()
+                                        ? priceRangeBackgroundColor
+                                        : grey,
+                                    thumbColor: primaryColor,
+                                    overlayColor: primaryColor.withOpacity(0.3),
+                                    valueIndicatorColor: primaryColor,
+                                    activeTickMarkColor: primaryColor,
+                                    inactiveTickMarkColor: isDarkMode()
+                                        ? priceRangeBackgroundColor
+                                            .withOpacity(0.5)
+                                        : grey,
+                                    valueIndicatorTextStyle: TextStyle(
+                                      color: isDarkMode()
+                                          ? priceRangeBackgroundColor
+                                          : grey,
+                                      fontSize: 12.sp,
+                                      fontFamily: fontBold,
+                                    ),
+                                  ),
+                                ),
+                                child: SfRangeSlider(
+                                  min: 0.0,
+                                  max: 2000,
+                                  values: controller.values,
+                                  interval: 500,
+                                  showTicks: true,
+                                  showLabels: true,
+                                  enableTooltip: true,
+                                  minorTicksPerInterval: 1,
+                                  inactiveColor: isDarkMode()
+                                      ? priceRangeBackgroundColor
+                                      : grey,
+                                  activeColor: primaryColor,
+                                  onChanged: (SfRangeValues values) {
+                                    setState(() {
+                                      controller.startValue = values.start;
+                                      controller.endValue = values.end;
+                                      controller.values = values;
+                                    });
+                                  },
+                                )),
+                            getDynamicSizedBox(height: 4.h),
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: 8.w,
+                                right: 8.w,
+                              ),
+                              child: FadeInUp(
+                                  from: 50,
+                                  child: getSecondaryFormButton(() {
+                                    Navigator.pop(context);
+                                  }, Button.apply, isvalidate: true)),
+                            ),
+                            SizedBox(
+                              height: 2.h,
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                  )),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -559,7 +546,7 @@ class SavedScreenController extends GetxController {
   void applyFilter(String keyword, isFilter) {
     favouriteFilterList.clear();
     if (isFilter == true) {
-      for (FavouriteList model in favouriteList) {
+      for (CommonProductList model in favouriteList) {
         if (model.name.toLowerCase().contains(keyword.toLowerCase())) {
           favouriteFilterList.add(model);
           logcat('applyFilter::::', favouriteFilterList);
@@ -628,6 +615,66 @@ class SavedScreenController extends GetxController {
       showDialogForScreen(
           context, CategoryScreenConstant.title, ServerError.servererror,
           callback: () {});
+    }
+  }
+
+  void addFavouriteAPI(
+    context,
+    String productId, {
+    CommonProductList? item,
+  }) async {
+    var loadingIndicator = LoadingProgressDialog();
+    loadingIndicator.show(context, '');
+    try {
+      if (networkManager.connectionType == 0) {
+        loadingIndicator.hide(context);
+        showDialogForScreen(
+            context, ProductDetailScreenConstant.title, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+      UserData? getUserData = await UserPreferences().getSignInInfo();
+      logcat('loginPassingData', {
+        "user_id": getUserData!.id.toString().trim(),
+        "product_id": productId.toString().trim(),
+        "type": "1",
+      });
+
+      var response = await Repository.post({
+        "user_id": getUserData.id.toString().trim(),
+        "product_id": productId.toString().trim(),
+        "type": "1",
+      }, ApiUrl.addFavourite, allowHeader: true);
+      loadingIndicator.hide(context);
+      var data = jsonDecode(response.body);
+      logcat("tag", data);
+      if (response.statusCode == 200) {
+        if (data['status'] == 1) {
+          showCustomToast(context, data['message'].toString());
+          for (CommonProductList mo in List.from(favouriteFilterList)) {
+            if (productId == mo.productId.toString()) {
+              favouriteFilterList.remove(mo);
+            }
+          }
+          update();
+        } else {
+          showCustomToast(context, data['message'].toString());
+        }
+      } else {
+        showDialogForScreen(
+            context, ProductDetailScreenConstant.title, data['message'] ?? "",
+            callback: () {});
+        loadingIndicator.hide(context);
+      }
+    } catch (e) {
+      logcat("Exception", e);
+      showDialogForScreen(
+          context, ProductDetailScreenConstant.title, ServerError.servererror,
+          callback: () {});
+    } finally {
+      loadingIndicator.hide(context);
     }
   }
 }
