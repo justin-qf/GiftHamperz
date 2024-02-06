@@ -31,14 +31,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
   @override
   void initState() {
-    logcat("IS_COUNT", controller.reviewList.length.toString());
-    reviewApiCall(context);
+    controller.reviewApiCall(context);
     super.initState();
     setState(() {});
-  }
-
-  reviewApiCall(BuildContext context) {
-    controller.getReviewList(context, 0, true);
   }
 
   @override
@@ -74,7 +69,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                             return Future.delayed(
                               const Duration(seconds: 1),
                               () {
-                                controller.getReviewList(context, 0, true);
+                                controller.getReviewList(context, 0, true,
+                                    isRefress: true);
                               },
                             );
                           },
@@ -356,7 +352,28 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           shrinkWrap: true,
           itemBuilder: (context, index) {
             ReviewData model = controller.reviewList[index];
-            return controller.getListItem(context, model, index);
+            return Column(
+              children: [
+                controller.getListItem(context, model, index),
+                index == controller.reviewList.length - 1 &&
+                        controller.nextPageURL.value.isNotEmpty
+                    ? Container(
+                        margin: EdgeInsets.only(
+                            top: 2.h, left: 25.w, right: 25.w, bottom: 0.8.h),
+                        child: getMiniButton(
+                          () {
+                            controller.isLoading.value = true;
+                            controller.currentPage++;
+                            controller.getReviewList(
+                                context, controller.currentPage, false);
+                            setState(() {});
+                          },
+                          Common.viewMore,
+                        ),
+                      )
+                    : Container()
+              ],
+            );
           },
         ),
       );
@@ -411,7 +428,10 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

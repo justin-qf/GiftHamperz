@@ -18,6 +18,7 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/filter_controller.dart';
+import 'package:gifthamperz/controller/productDetailController.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/favouriteModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
@@ -26,6 +27,7 @@ import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/FilterScreen/FIlterScreen.dart';
+import 'package:gifthamperz/views/ProductDetailScreen/ProductDetailScreen.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../utils/enum.dart';
@@ -115,207 +117,220 @@ class SavedScreenController extends GetxController {
     );
   }
 
-  getItemListItem(BuildContext context, CommonProductList item) {
-    return FadeInUp(
-      child: Wrap(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(
-                SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
-            child: Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(bottom: 0.6.h, left: 1.w, right: 2.w),
-              decoration: BoxDecoration(
-                border: isDarkMode()
-                    ? Border.all(
-                        color: grey, // Border color
-                        width: 1, // Border width
-                      )
-                    : Border.all(
-                        color: grey, // Border color
-                        width: 0.2, // Border width
+  getItemListItem(BuildContext context, CommonProductList? item) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(
+          ProductDetailScreen(
+            'Saved',
+            data: item,
+          ),
+          transition: Transition.fadeIn,
+          curve: Curves.easeInOut,
+        );
+      },
+      child: FadeInUp(
+        child: Wrap(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(
+                  SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
+              child: Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(bottom: 0.6.h, left: 1.w, right: 2.w),
+                decoration: BoxDecoration(
+                  border: isDarkMode()
+                      ? Border.all(
+                          color: grey, // Border color
+                          width: 1, // Border width
+                        )
+                      : Border.all(
+                          color: grey, // Border color
+                          width: 0.2, // Border width
+                        ),
+                  color: isDarkMode() ? itemDarkBackgroundColor : white,
+                  borderRadius: BorderRadius.circular(
+                      SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: SizerUtil.width,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            SizerUtil.deviceType == DeviceType.mobile
+                                ? 3.5.w
+                                : 2.5.w),
+                        border: Border.all(
+                          color: grey, // Border color
+                          width: 0.3, // Border width
+                        ),
                       ),
-                color: isDarkMode() ? itemDarkBackgroundColor : white,
-                borderRadius: BorderRadius.circular(
-                    SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: SizerUtil.width,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                          SizerUtil.deviceType == DeviceType.mobile
-                              ? 3.5.w
-                              : 2.5.w),
-                      border: Border.all(
-                        color: grey, // Border color
-                        width: 0.3, // Border width
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            SizerUtil.deviceType == DeviceType.mobile
+                                ? 3.5.w
+                                : 2.5.w),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          height: 15.h,
+                          imageUrl: APIImageUrl.url + item!.images[0],
+                          placeholder: (context, url) => const Center(
+                            child:
+                                CircularProgressIndicator(color: primaryColor),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            Asset.productPlaceholder,
+                            height: 15.h,
+                            width: 15.h,
+                            fit: BoxFit.contain,
+                          ),
+                          imageBuilder: (context, imageProvider) => Image(
+                            image: imageProvider,
+                            height: 15.h,
+                            width: 15.h,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          SizerUtil.deviceType == DeviceType.mobile
-                              ? 3.5.w
-                              : 2.5.w),
-                      child: CachedNetworkImage(
-                        fit: BoxFit.cover,
-                        height: 15.h,
-                        imageUrl: APIImageUrl.url + item.images[0],
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(color: primaryColor),
-                        ),
-                        errorWidget: (context, url, error) => Image.asset(
-                          Asset.productPlaceholder,
-                          height: 15.h,
-                          width: 15.h,
-                          fit: BoxFit.contain,
-                        ),
-                        imageBuilder: (context, imageProvider) => Image(
-                          image: imageProvider,
-                          height: 15.h,
-                          width: 15.h,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
+                    SizedBox(
+                      height: 1.0.h,
                     ),
-                  ),
-                  SizedBox(
-                    height: 1.0.h,
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(left: 1.5.w, right: 1.5.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        getText(
-                          item.name,
-                          TextStyle(
-                              fontFamily: fontSemiBold,
-                              fontWeight: FontWeight.w500,
-                              overflow: TextOverflow.ellipsis,
-                              color: isDarkMode() ? black : black,
-                              fontSize:
-                                  SizerUtil.deviceType == DeviceType.mobile
-                                      ? 10.sp
-                                      : 7.sp,
-                              height: 1.2),
-                        ),
-                        getDynamicSizedBox(
-                          height: 0.5.h,
-                        ),
-                        getText(
-                          '\u20B9${item.price}',
-                          TextStyle(
-                              fontFamily: fontBold,
-                              color: primaryColor,
-                              fontSize:
-                                  SizerUtil.deviceType == DeviceType.mobile
-                                      ? 12.sp
-                                      : 7.sp,
-                              height: 1.2),
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            // Expanded(
-                            //   child: RatingBar.builder(
-                            //     initialRating: 3.5,
-                            //     minRating: 1,
-                            //     direction: Axis.horizontal,
-                            //     allowHalfRating: true,
-                            //     itemCount: 5,
-                            //     itemSize: 3.5.w,
-                            //     // itemPadding:
-                            //     //     const EdgeInsets.symmetric(horizontal: 5.0),
-                            //     itemBuilder: (context, _) => const Icon(
-                            //       Icons.star,
-                            //       color: Colors.orange,
-                            //     ),
-                            //     onRatingUpdate: (rating) {
-                            //       logcat("RATING", rating);
-                            //     },
-                            //   ),
-                            // ),
-                            // Expanded(
-                            //   child: getText(
-                            //     "35 Reviews",
-                            //     TextStyle(
-                            //         fontFamily: fontSemiBold,
-                            //         color: lableColor,
-                            //         fontWeight: isDarkMode() ? FontWeight.w900 : null,
-                            //         fontSize:
-                            //             SizerUtil.deviceType == DeviceType.mobile
-                            //                 ? 8.sp
-                            //                 : 7.sp,
-                            //         height: 1.2),
-                            //   ),
-                            // ),
-                            RatingBar.builder(
-                              initialRating: item.averageRating != null
-                                  ? item.averageRating!
-                                  : 0.0,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 1,
-                              itemSize: 3.5.w,
-                              unratedColor: Colors.orange,
-                              itemBuilder: (context, _) => const Icon(
-                                Icons.star,
-                                color: Colors.orange,
-                              ),
-                              onRatingUpdate: (rating) {
-                                logcat("RATING", rating);
-                              },
-                            ),
-                            getText(
-                              item.averageRating != null
-                                  ? item.averageRating.toString()
-                                  : 0.0.toString(),
-                              TextStyle(
-                                  fontFamily: fontSemiBold,
-                                  color: lableColor,
-                                  fontWeight:
-                                      isDarkMode() ? FontWeight.w600 : null,
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
-                                          ? 9.sp
-                                          : 7.sp,
-                                  height: 1.2),
-                            ),
-                            const Spacer(),
-                            GestureDetector(
-                              onTap: () {
-                                addFavouriteAPI(
-                                  context,
-                                  item.productId.toString(),
-                                  item: item,
-                                );
-                                update();
-                              },
-                              child: Icon(
-                                Icons.favorite_rounded,
-                                size: 3.h,
+                    Container(
+                      margin: EdgeInsets.only(left: 1.5.w, right: 1.5.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          getText(
+                            item.name,
+                            TextStyle(
+                                fontFamily: fontSemiBold,
+                                fontWeight: FontWeight.w500,
+                                overflow: TextOverflow.ellipsis,
+                                color: isDarkMode() ? black : black,
+                                fontSize:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 10.sp
+                                        : 7.sp,
+                                height: 1.2),
+                          ),
+                          getDynamicSizedBox(
+                            height: 0.5.h,
+                          ),
+                          getText(
+                            '${IndiaRupeeConstant.inrCode}${item.price}',
+                            TextStyle(
+                                fontFamily: fontBold,
                                 color: primaryColor,
+                                fontSize:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 12.sp
+                                        : 7.sp,
+                                height: 1.2),
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              // Expanded(
+                              //   child: RatingBar.builder(
+                              //     initialRating: 3.5,
+                              //     minRating: 1,
+                              //     direction: Axis.horizontal,
+                              //     allowHalfRating: true,
+                              //     itemCount: 5,
+                              //     itemSize: 3.5.w,
+                              //     // itemPadding:
+                              //     //     const EdgeInsets.symmetric(horizontal: 5.0),
+                              //     itemBuilder: (context, _) => const Icon(
+                              //       Icons.star,
+                              //       color: Colors.orange,
+                              //     ),
+                              //     onRatingUpdate: (rating) {
+                              //       logcat("RATING", rating);
+                              //     },
+                              //   ),
+                              // ),
+                              // Expanded(
+                              //   child: getText(
+                              //     "35 Reviews",
+                              //     TextStyle(
+                              //         fontFamily: fontSemiBold,
+                              //         color: lableColor,
+                              //         fontWeight: isDarkMode() ? FontWeight.w900 : null,
+                              //         fontSize:
+                              //             SizerUtil.deviceType == DeviceType.mobile
+                              //                 ? 8.sp
+                              //                 : 7.sp,
+                              //         height: 1.2),
+                              //   ),
+                              // ),
+                              RatingBar.builder(
+                                initialRating: item.averageRating != null
+                                    ? item.averageRating!
+                                    : 0.0,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 1,
+                                itemSize: 3.5.w,
+                                unratedColor: Colors.orange,
+                                itemBuilder: (context, _) => const Icon(
+                                  Icons.star,
+                                  color: Colors.orange,
+                                ),
+                                onRatingUpdate: (rating) {
+                                  logcat("RATING", rating);
+                                },
                               ),
-                            )
-                          ],
-                        ),
-                      ],
+                              getText(
+                                item.averageRating != null
+                                    ? item.averageRating.toString()
+                                    : 0.0.toString(),
+                                TextStyle(
+                                    fontFamily: fontSemiBold,
+                                    color: lableColor,
+                                    fontWeight:
+                                        isDarkMode() ? FontWeight.w600 : null,
+                                    fontSize: SizerUtil.deviceType ==
+                                            DeviceType.mobile
+                                        ? 9.sp
+                                        : 7.sp,
+                                    height: 1.2),
+                              ),
+                              const Spacer(),
+                              GestureDetector(
+                                onTap: () {
+                                  addFavouriteAPI(
+                                    context,
+                                    item.productId.toString(),
+                                    item: item,
+                                  );
+                                  update();
+                                },
+                                child: Icon(
+                                  Icons.favorite_rounded,
+                                  size: 3.h,
+                                  color: primaryColor,
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  getDynamicSizedBox(
-                    height: 1.h,
-                  ),
-                ],
+                    getDynamicSizedBox(
+                      height: 1.h,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -613,7 +628,7 @@ class SavedScreenController extends GetxController {
       state.value = ScreenState.apiError;
       message.value = ServerError.servererror;
       showDialogForScreen(
-          context, CategoryScreenConstant.title, ServerError.servererror,
+          context, SavedScreenText.title, ServerError.servererror,
           callback: () {});
     }
   }
@@ -629,7 +644,7 @@ class SavedScreenController extends GetxController {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
         showDialogForScreen(
-            context, ProductDetailScreenConstant.title, Connection.noConnection,
+            context, SavedScreenText.title, Connection.noConnection,
             callback: () {
           Get.back();
         });
@@ -658,20 +673,21 @@ class SavedScreenController extends GetxController {
               favouriteFilterList.remove(mo);
             }
           }
+          await UserPreferences.removeFromFavorites(productId);
           update();
         } else {
           showCustomToast(context, data['message'].toString());
         }
       } else {
         showDialogForScreen(
-            context, ProductDetailScreenConstant.title, data['message'] ?? "",
+            context, SavedScreenText.title, data['message'] ?? "",
             callback: () {});
         loadingIndicator.hide(context);
       }
     } catch (e) {
       logcat("Exception", e);
       showDialogForScreen(
-          context, ProductDetailScreenConstant.title, ServerError.servererror,
+          context, SavedScreenText.title, ServerError.servererror,
           callback: () {});
     } finally {
       loadingIndicator.hide(context);

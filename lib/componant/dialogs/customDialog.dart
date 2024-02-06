@@ -10,12 +10,9 @@ import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
-import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/AddressController.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/views/LoginScreen/LoginScreen.dart';
-import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
 import 'package:sizer/sizer.dart';
 
 class CustomRoundedDialog extends StatelessWidget {
@@ -55,7 +52,7 @@ class CustomRoundedDialog extends StatelessWidget {
               children: [
                 getDynamicSizedBox(height: 4.h),
                 Text(
-                  'Order Successfull!',
+                  AddressScreenTextConstant.orderSuccess,
                   style: TextStyle(
                     fontSize: 20.sp,
                     color: black,
@@ -65,7 +62,7 @@ class CustomRoundedDialog extends StatelessWidget {
                 getDynamicSizedBox(height: 2.h),
                 Text(
                   textAlign: TextAlign.center,
-                  "Your order has been placed successfully!\nFor more detail, go to my orders.",
+                  AddressScreenTextConstant.orderPlaced,
                   style: TextStyle(
                     color: black,
                     fontFamily: fontBold,
@@ -75,8 +72,8 @@ class CustomRoundedDialog extends StatelessWidget {
                 getDynamicSizedBox(height: 4.h),
                 Container(
                   margin: EdgeInsets.only(
-                    left: 5.w,
-                    right: 5.w,
+                    left: 4.w,
+                    right: 4.w,
                   ),
                   child: FadeInUp(
                     from: 50,
@@ -164,7 +161,7 @@ class CustomCartItemDetailDialog extends StatelessWidget {
                   ),
                 ),
                 getDynamicSizedBox(height: 0.7.h),
-                getRichText('Price: ', '\u20B9$price'),
+                getRichText('Price: ', '${IndiaRupeeConstant.inrCode}$price'),
                 getDynamicSizedBox(height: 0.5.h),
                 getRichText('Description: ', description),
                 getDynamicSizedBox(height: 2.h),
@@ -266,7 +263,7 @@ class CustomLoginAlertRoundedDialog extends StatelessWidget {
               children: [
                 getDynamicSizedBox(height: 4.h),
                 Text(
-                  'Login!',
+                  LoginDialogText.loginTitle,
                   style: TextStyle(
                     fontSize: 20.sp,
                     color: black,
@@ -276,7 +273,7 @@ class CustomLoginAlertRoundedDialog extends StatelessWidget {
                 getDynamicSizedBox(height: 2.h),
                 Text(
                   textAlign: TextAlign.center,
-                  "Please login for a smooth experience.",
+                  LoginDialogText.msg,
                   style: TextStyle(
                     color: black,
                     fontFamily: fontBold,

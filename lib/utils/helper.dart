@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/get_storage_key.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/controller/homeController.dart';
@@ -280,4 +281,36 @@ String getCurrentTime() {
 
   // Format the time
   return DateFormat('HH:mm:ss').format(now);
+}
+
+getDarkModeDatePicker() {
+  return ThemeData.dark().copyWith(
+      primaryColor: white,
+      buttonTheme: ButtonThemeData(
+        textTheme: ButtonTextTheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50), // Set your border radius
+        ),
+      ),
+      useMaterial3: true,
+      colorScheme: const ColorScheme.dark(
+          //   primary:
+          //       primaryColor, // Set your primary color
+          // )
+          ));
+}
+
+getLightModeDatePicker() {
+  return ThemeData.light().copyWith(
+    buttonTheme: ButtonThemeData(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0), // Set your border radius
+      ),
+    ),
+    useMaterial3: true,
+    colorScheme: const ColorScheme.light(
+      primary: primaryColor, // Set your primary color
+      background: white,
+    ).copyWith(secondary: white), // Set date selected color to white
+  );
 }

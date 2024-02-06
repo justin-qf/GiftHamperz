@@ -1,6 +1,6 @@
 class ApiUrl {
 //  static const liveApiUrl = "https://queryfinders.com/meditrack/public/api/";
-  static const buildApiUrl = "http://192.168.1.4/qfs_ecommerce/api/";
+  static const buildApiUrl = "http://192.168.1.12/qfs_ecommerce/api/";
   static const register = 'registration';
   static const login = 'login';
   static const banner = 'banner/list';
@@ -21,7 +21,7 @@ class ApiUrl {
   static const addOrder = 'order/add';
   static const getOrderList = 'order/list';
   static const getBlogTypeList = 'blog/type/list';
-  static const getBlogList = 'blog/list?page=';
+  static const getBlogList = 'blog/list';
   static const getProductList = 'product/list';
   static const getBrandList = 'brand/list';
   static const getHome = 'product/home/list';

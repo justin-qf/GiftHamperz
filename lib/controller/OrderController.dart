@@ -14,9 +14,9 @@ import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/OrderModel.dart';
-import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/OrderScreen/OrderDetailScreen/OrderDetailScreen.dart';
@@ -92,6 +92,7 @@ class OrderScreenController extends GetxController {
           context,
         );
       }
+      Statusbar().trasparentStatusbarIsNormalScreen();
       // loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -101,6 +102,9 @@ class OrderScreenController extends GetxController {
           message.value = '';
           isLoading.value = false;
           update();
+          if (isRefress == true) {
+            orderList.clear();
+          }
           if (responseData.data.data.isNotEmpty) {
             orderList.addAll(responseData.data.data);
             orderList.refresh();
@@ -124,7 +128,7 @@ class OrderScreenController extends GetxController {
           message.value = data['message'];
           state.value = ScreenState.apiError;
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'].toString(),
+              context, OrderScreenConstant.title, data['message'].toString(),
               callback: () {});
         }
       } else {
@@ -132,10 +136,15 @@ class OrderScreenController extends GetxController {
         isLoading.value = false;
         message.value = APIResponseHandleText.serverError;
         showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'].toString(),
+            context, OrderScreenConstant.title, data['message'].toString(),
             callback: () {});
       }
     } catch (e) {
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       isLoading.value = false;
       state.value = ScreenState.apiError;
       message.value = ServerError.servererror;
@@ -230,7 +239,7 @@ class OrderScreenController extends GetxController {
                         ),
                         getDynamicSizedBox(width: 1.w),
                         Text(
-                          'Delivered',
+                          OrderScreenConstant.delivered,
                           style: TextStyle(
                             fontSize: SizerUtil.deviceType == DeviceType.mobile
                                 ? 10.sp
@@ -243,7 +252,7 @@ class OrderScreenController extends GetxController {
                     ),
                     getDynamicSizedBox(height: 0.5.h),
                     Text(
-                      ('Order Id: ${data.orderId.toString()}'),
+                      ("${OrderScreenConstant.orderId} ${data.orderId}"),
                       style: TextStyle(
                           fontSize: SizerUtil.deviceType == DeviceType.mobile
                               ? 13.sp
@@ -254,7 +263,7 @@ class OrderScreenController extends GetxController {
                     ),
                     getDynamicSizedBox(height: 0.5.h),
                     Text(
-                      ('Order Date: ${getFormateDate(data.dateOfOrder.toString())}'),
+                      ('${OrderScreenConstant.orderDate} ${getFormateDate(data.dateOfOrder.toString())}'),
                       style: TextStyle(
                           fontSize: SizerUtil.deviceType == DeviceType.mobile
                               ? 10.sp
@@ -269,7 +278,7 @@ class OrderScreenController extends GetxController {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          ('\u{20B9}${formatPrice(double.parse(data.totalAmount.toString()))}'),
+                          ('${IndiaRupeeConstant.inrCode}${formatPrice(double.parse(data.totalAmount.toString()))}'),
                           style: TextStyle(
                               fontSize:
                                   SizerUtil.deviceType == DeviceType.mobile
@@ -280,7 +289,7 @@ class OrderScreenController extends GetxController {
                         ),
                         const Spacer(),
                         Text(
-                          ('View Details'),
+                          OrderScreenConstant.viewDetails,
                           style: TextStyle(
                               fontSize:
                                   SizerUtil.deviceType == DeviceType.mobile
@@ -290,11 +299,6 @@ class OrderScreenController extends GetxController {
                               fontFamily: fontExtraBold,
                               color: isDarkMode() ? black : black),
                         ),
-                        // getOrderButton(() {
-                        //   Get.to(OrderDetailScreen(
-                        //     data: data,
-                        //   ));
-                        // })
                       ],
                     ),
                   ],

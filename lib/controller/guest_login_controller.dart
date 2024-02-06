@@ -224,12 +224,12 @@ class GuestLoginController extends GetxController {
             Get.find<SearchScreenController>().getGuestLogin();
           }
 
-          if (screenName == AddAddressText.addressTitle) {
+          if (screenName == AddressScreenTextConstant.addressTitle) {
             Get.find<AddressScreenController>()
                 .getAddressList(context, 0, true);
           }
 
-          if (screenName == AddAddressText.addressTitle) {
+          if (screenName == AddressScreenTextConstant.addressTitle) {
             Get.find<AddressScreenController>()
                 .getAddressList(context, 0, true);
             Get.find<AddressScreenController>().getGuestUser();

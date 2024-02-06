@@ -18,6 +18,7 @@ import 'package:pinput/pinput.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../configs/colors_constant.dart';
 
+// ignore: must_be_immutable
 class OtpScreen extends StatefulWidget {
   OtpScreen({
     this.mobile,

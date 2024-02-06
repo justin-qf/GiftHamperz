@@ -16,6 +16,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
 import '../../utils/enum.dart';
 
+// ignore: must_be_immutable
 class InnerSubCategoryScreen extends StatefulWidget {
   InnerSubCategoryScreen(
       {super.key, required this.categoryId, required this.subcategoryId});
@@ -130,11 +131,12 @@ class _InnerSubCategoryScreenState extends State<InnerSubCategoryScreen>
         Container(
             margin: EdgeInsets.symmetric(horizontal: 20.w),
             child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
+                ? Text(controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-                  )
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black))
                 : button),
       ],
     );

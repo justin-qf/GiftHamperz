@@ -130,7 +130,7 @@ class OrderData {
   int shippingAddressStateId;
   String shippingAddressStateName;
   int shippingAddressStateCode;
-  List<OrderDetail> orderDetails;
+  List<CommonProductList> orderDetails;
 
   OrderData({
     required this.id,
@@ -202,8 +202,8 @@ class OrderData {
         shippingAddressStateId: json["shipping_address_state_id"],
         shippingAddressStateName: json["shipping_address_state_name"],
         shippingAddressStateCode: json["shipping_address_state_code"],
-        orderDetails: List<OrderDetail>.from(
-            json["order_details"].map((x) => OrderDetail.fromJson(x))),
+        orderDetails: List<CommonProductList>.from(
+            json["order_details"].map((x) => CommonProductList.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {

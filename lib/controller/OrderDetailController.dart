@@ -10,9 +10,11 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/OrderModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
+import 'package:gifthamperz/views/ProductDetailScreen/ProductDetailScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
@@ -46,7 +48,7 @@ class OrderDetailScreenController extends GetxController {
       //   update();
       // }
       double productCost = 0.0; // Initialize productCost as a double
-      for (OrderDetail item in data!.orderDetails) {
+      for (CommonProductList item in data!.orderDetails) {
         double itemPrice = double.parse(item.qty) * item.price;
         productCost += itemPrice; // Accumulate the numeric value
         update();
@@ -179,155 +181,164 @@ class OrderDetailScreenController extends GetxController {
     );
   }
 
-  Widget getListItem(OrderDetail data) {
-    return FadeInUp(
-      child: Container(
-        width: SizerUtil.width,
-        margin: EdgeInsets.only(right: 2.w, bottom: 2.0.h),
-        padding: EdgeInsets.only(right: 2.w, top: 2.w, left: 2.w, bottom: 2.w),
-        decoration: BoxDecoration(
-          //color: grey.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(1.5.h),
-          // border: isDarkMode()
-          //     ? null
-          //     : Border.all(
-          //         color: grey, // Border color
-          //         width: 0.7, // Border width
-          //       ),
-          color: isDarkMode() ? tileColour : white,
-          boxShadow: [
-            BoxShadow(
-                color: grey.withOpacity(0.5),
-                blurRadius: 3.0,
-                offset: const Offset(0, 3),
-                spreadRadius: 0.5)
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(
-            SizerUtil.deviceType == DeviceType.mobile ? 1.5.w : 2.2.w,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FadeInDown(
-                child: Container(
-                  //width: 30.w,
-                  padding: const EdgeInsets.all(0.5),
-                  decoration: BoxDecoration(
-                    border: isDarkMode()
-                        ? Border.all(
-                            color: isDarkMode() ? grey : grey, // Border color
-                            width: 0.2, // Border width
-                          )
-                        : Border.all(
-                            color: grey, // Border color
-                            width: 0.6, // Border width
-                          ),
-                    color: isDarkMode() ? black : white,
-                    borderRadius: BorderRadius.circular(
-                        SizerUtil.deviceType == DeviceType.mobile
-                            ? 3.w
-                            : 2.2.w),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                        SizerUtil.deviceType == DeviceType.mobile
-                            ? 3.w
-                            : 2.2.w),
-                    child: CachedNetworkImage(
-                      fit: BoxFit.cover,
-                      imageUrl: APIImageUrl.url + data.images[0].toString(),
-                      height: 12.h,
-                      width: 12.h,
-                      placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(color: primaryColor),
-                      ),
-                      errorWidget: (context, url, error) => Image.asset(
-                        Asset.productPlaceholder,
-                        height: 12.h,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              getDynamicSizedBox(width: 3.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      data.name,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontFamily: fontBold,
-                        fontWeight: FontWeight.w800,
-                        color: isDarkMode() ? black : black,
-                        fontSize: 12.sp,
-                      ),
-                    ),
-                    getDynamicSizedBox(height: 1.h),
-                    RichText(
-                      overflow: TextOverflow.clip,
-                      textAlign: TextAlign.center,
-                      softWrap: true,
-                      textScaleFactor: 1,
-                      text: TextSpan(
-                        text: '\u{20B9}${data.price} | ',
-                        style: TextStyle(
-                          color: primaryColor,
-                          fontFamily: fontRegular,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 11.sp,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: data.tags,
-                            style: TextStyle(
-                              fontFamily: fontBold,
-                              color: isDarkMode() ? lableColor : black,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    getDynamicSizedBox(height: 0.5.h),
-                    RichText(
-                      overflow: TextOverflow.clip,
-                      textAlign: TextAlign.center,
-                      softWrap: true,
-                      textScaleFactor: 1,
-                      text: TextSpan(
-                        text: 'Quantity : ',
-                        style: TextStyle(
-                          color: isDarkMode() ? black : lableColor,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 11.sp,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: data.qty.toString(),
-                            style: TextStyle(
-                              color: isDarkMode() ? black : black,
-                              fontFamily: fontBold,
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    getDynamicSizedBox(height: 1.h),
-                    //getDivider(),
-                  ],
-                ),
-              ),
+  Widget getListItem(CommonProductList data) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(ProductDetailScreen(
+          'Trending',
+          data: data,
+        ));
+      },
+      child: FadeInUp(
+        child: Container(
+          width: SizerUtil.width,
+          margin: EdgeInsets.only(right: 2.w, bottom: 2.0.h),
+          padding:
+              EdgeInsets.only(right: 2.w, top: 2.w, left: 2.w, bottom: 2.w),
+          decoration: BoxDecoration(
+            //color: grey.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(1.5.h),
+            // border: isDarkMode()
+            //     ? null
+            //     : Border.all(
+            //         color: grey, // Border color
+            //         width: 0.7, // Border width
+            //       ),
+            color: isDarkMode() ? tileColour : white,
+            boxShadow: [
+              BoxShadow(
+                  color: grey.withOpacity(0.5),
+                  blurRadius: 3.0,
+                  offset: const Offset(0, 3),
+                  spreadRadius: 0.5)
             ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(
+              SizerUtil.deviceType == DeviceType.mobile ? 1.5.w : 2.2.w,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FadeInDown(
+                  child: Container(
+                    //width: 30.w,
+                    padding: const EdgeInsets.all(0.5),
+                    decoration: BoxDecoration(
+                      border: isDarkMode()
+                          ? Border.all(
+                              color: isDarkMode() ? grey : grey, // Border color
+                              width: 0.2, // Border width
+                            )
+                          : Border.all(
+                              color: grey, // Border color
+                              width: 0.6, // Border width
+                            ),
+                      color: isDarkMode() ? black : white,
+                      borderRadius: BorderRadius.circular(
+                          SizerUtil.deviceType == DeviceType.mobile
+                              ? 3.w
+                              : 2.2.w),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                          SizerUtil.deviceType == DeviceType.mobile
+                              ? 3.w
+                              : 2.2.w),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: APIImageUrl.url + data.images[0].toString(),
+                        height: 12.h,
+                        width: 12.h,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(color: primaryColor),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          Asset.productPlaceholder,
+                          height: 12.h,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                getDynamicSizedBox(width: 3.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        data.name,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontFamily: fontBold,
+                          fontWeight: FontWeight.w800,
+                          color: isDarkMode() ? black : black,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                      getDynamicSizedBox(height: 1.h),
+                      RichText(
+                        overflow: TextOverflow.clip,
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        textScaleFactor: 1,
+                        text: TextSpan(
+                          text: '${IndiaRupeeConstant.inrCode}${data.price} | ',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontFamily: fontRegular,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 11.sp,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: data.tags,
+                              style: TextStyle(
+                                fontFamily: fontBold,
+                                color: isDarkMode() ? lableColor : black,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      getDynamicSizedBox(height: 0.5.h),
+                      RichText(
+                        overflow: TextOverflow.clip,
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        textScaleFactor: 1,
+                        text: TextSpan(
+                          text: 'Quantity : ',
+                          style: TextStyle(
+                            color: isDarkMode() ? black : lableColor,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11.sp,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: data.qty.toString(),
+                              style: TextStyle(
+                                color: isDarkMode() ? black : black,
+                                fontFamily: fontBold,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      getDynamicSizedBox(height: 1.h),
+                      //getDivider(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -430,7 +441,7 @@ class OrderDetailScreenController extends GetxController {
                     height: 0.5.h,
                   ),
                   getText(
-                    '${data.sku}\u20B9',
+                    '${IndiaRupeeConstant.inrCode}${data.price}',
                     TextStyle(
                         fontFamily: fontBold,
                         color: primaryColor,

@@ -345,7 +345,7 @@ class HomeDetailScreenController extends GetxController {
                                   height: 0.5.h,
                                 ),
                                 getText(
-                                  '\u20B9${data.price}',
+                                  '${IndiaRupeeConstant.inrCode}${data.price}',
                                   TextStyle(
                                       fontFamily: fontBold,
                                       color: primaryColor,

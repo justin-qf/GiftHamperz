@@ -21,10 +21,10 @@ class LoginConst {
 }
 
 class APIImageUrl {
-  static const url = 'http://192.168.1.4/qfs_ecommerce/public/storage/';
+  static const url = 'http://192.168.1.12/qfs_ecommerce/public/storage/';
 }
 
-class AddAddressText {
+class AddressScreenTextConstant {
   static const title = 'New Delivery Address';
   static const addressTitle = 'My Address';
   static const userName = 'User Name';
@@ -53,6 +53,11 @@ class AddAddressText {
   static const add = 'ADD';
   static const payment = 'PAYMENT';
   static const startShopping = 'Start Shopping';
+  static const orderSuccess = 'Order Successfull!';
+  static const orderPlaced =
+      'Your order has been placed successfully!\nFor more detail, go to my orders.';
+  static const home = 'HOME';
+  static const work = 'WORK';
 }
 
 class OtpConstant {
@@ -157,10 +162,18 @@ class CartScreenConstant {
   static const title = "Cart";
 }
 
+class IndiaRupeeConstant {
+  static const inrCode = "\u{20B9}";
+}
+
 class OrderScreenConstant {
   static const title = "My Orders";
   static const editPic = "Edit Photo";
   static const update = "Update";
+  static const delivered = "Delivered";
+  static const orderId = "Order Id:";
+  static const orderDate = "Order Date:";
+  static const viewDetails = "View Details";
 }
 
 class ProductScreenConstant {
@@ -277,6 +290,11 @@ class DashboardText {
   static const viewuploads = 'View\nUploads';
   static const text =
       'Doctors are people \nwho practice medicine \nDoctors are trained to \nkeep people healthy \nand to heal the sick.';
+}
+
+class LoginDialogText {
+  static const loginTitle = 'Login!';
+  static const msg = 'Please login for a smooth experience.';
 }
 
 class SavedScreenText {

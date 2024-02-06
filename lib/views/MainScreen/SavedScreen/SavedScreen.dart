@@ -56,6 +56,8 @@ class _SavedScreenState extends State<SavedScreen>
     Statusbar().trasparentStatusbarIsNormalScreen();
     return CustomParentScaffold(
         onWillPop: () async {
+          logcat("ISBACK_PRESS_FROM_SAVED_SCREEN", "DONE");
+          widget.callBack(0);
           return false;
         },
         onTap: () {
@@ -209,7 +211,7 @@ class _SavedScreenState extends State<SavedScreen>
         itemCount: controller.favouriteFilterList.length,
       );
     } else {
-      return noDataFoundWidget();
+      return noDataFoundWidget(isFromBlog: true);
     }
   }
 
@@ -259,7 +261,10 @@ class _SavedScreenState extends State<SavedScreen>
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

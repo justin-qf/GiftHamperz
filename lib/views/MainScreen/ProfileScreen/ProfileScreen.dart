@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
@@ -21,8 +22,10 @@ import 'package:gifthamperz/views/EditProfile/EditProfileScreen.dart';
 import 'package:gifthamperz/views/OrderScreen/OrderScreen.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  ProfileScreen(this.callBack, {super.key});
+  Function callBack;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -67,7 +70,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return CustomParentScaffold(
       onWillPop: () async {
         logcat("onWillPop", "DONE");
-        return true;
+        widget.callBack(0);
+        return false;
       },
       onTap: () {
         controller.hideKeyboard(context);
@@ -95,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Positioned(
                 left: 5.w,
-                top: 30.h,
+                top: 30.5.h,
                 child: SizedBox(
                   width: SizerUtil.width,
                   child: FadeInLeft(child: Obx(
@@ -105,30 +109,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(50)),
-                                    child: CachedNetworkImage(
-                                      fit: BoxFit.cover,
-                                      height: 9.h,
-                                      imageUrl: controller.profilePic.value,
-                                      placeholder: (context, url) => SizedBox(
-                                        height: 9.h,
-                                        child: const Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: CircularProgressIndicator(
-                                                color: primaryColor),
-                                          ),
-                                        ),
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: transparent,
+                                      border: Border.all(
+                                        color: black,
+                                        // Set the border color here
+                                        width: 1.5, // Set the border width
                                       ),
-                                      errorWidget: (context, url, error) =>
-                                          Image.asset(
-                                        Asset.avaterTwoholder,
-                                        height: 9.h,
-                                        width: 9.h,
-                                        fit: BoxFit.cover,
-                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(50)),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(50)),
+                                      child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          height: 8.h,
+                                          imageUrl: controller.profilePic.value,
+                                          placeholder: (context, url) =>
+                                              SizedBox(
+                                                height: 8.h,
+                                                child: const Center(
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsets.all(8.0),
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            color:
+                                                                primaryColor),
+                                                  ),
+                                                ),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              SvgPicture.asset(
+                                                Asset.profile,
+                                                fit: BoxFit.cover,
+                                                // ignore: deprecated_member_use
+                                                color: black,
+                                                height: 8.h,
+                                                width: 8.h,
+                                              )),
                                     ),
                                   ),
                                   Expanded(

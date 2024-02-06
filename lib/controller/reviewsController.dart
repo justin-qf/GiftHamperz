@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
@@ -52,6 +53,11 @@ class ReviewsScreenController extends GetxController {
     commentctr = TextEditingController();
     commentNode = FocusNode();
     super.onInit();
+  }
+
+  reviewApiCall(BuildContext context) {
+    getReviewList(context, 0, true);
+    update();
   }
 
   void hideKeyboard(context) {
@@ -337,13 +343,13 @@ class ReviewsScreenController extends GetxController {
   getListItem(BuildContext context, ReviewData data, int index) {
     DateTime dateTime = DateTime.parse(data.createdAt);
     String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
+    // ignore: prefer_typing_uninitialized_variables
     var name;
     if (data.firstName != null) {
       name = data.firstName;
     } else {
       name = "User Name";
     }
-
     return FadeInUp(
       child: Wrap(
         children: [
@@ -351,7 +357,7 @@ class ReviewsScreenController extends GetxController {
             width: SizerUtil.width,
             margin: EdgeInsets.only(bottom: 1.5.h, right: 3.w, left: 3.w),
             padding:
-                EdgeInsets.only(left: 2.w, right: 2.w, top: 0.5.h, bottom: 1.h),
+                EdgeInsets.only(left: 1.w, right: 1.w, top: 0.5.h, bottom: 1.h),
             decoration: BoxDecoration(
               //color: grey.withOpacity(0.2),
               borderRadius: BorderRadius.circular(1.7.h),
@@ -373,7 +379,7 @@ class ReviewsScreenController extends GetxController {
                   children: [
                     FadeInDown(
                       child: Container(
-                        margin: EdgeInsets.only(top: 0.2.h, left: 2.5.w),
+                        margin: EdgeInsets.only(top: 0.2.h, left: 1.5.w),
                         child: ClipRRect(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(50)),
@@ -386,17 +392,20 @@ class ReviewsScreenController extends GetxController {
                               child: CircularProgressIndicator(
                                   color: primaryColor),
                             ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              Asset.userholder,
+                            errorWidget: (context, url, error) =>
+                                SvgPicture.asset(
+                              Asset.profile,
+                              fit: BoxFit.cover,
+                              // ignore: deprecated_member_use
+                              color: isDarkMode() ? white : black,
                               height: 7.h,
                               width: 7.h,
-                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
                       ),
                     ),
-                    getDynamicSizedBox(width: 3.w),
+                    getDynamicSizedBox(width: 2.w),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,12 +450,13 @@ class ReviewsScreenController extends GetxController {
                                     fontSize: 12.sp,
                                   )),
                               const Spacer(),
-                              Text("[$formattedDate]",
+                              Text(formattedDate,
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
                                     fontFamily: fontBold,
                                     fontSize: 12.sp,
                                   )),
+                              getDynamicSizedBox(width: 1.w)
                             ],
                           ),
                           //getDynamicSizedBox(height: 1.0.h),
@@ -461,7 +471,7 @@ class ReviewsScreenController extends GetxController {
                             ? 4.w
                             : 2.2.w),
                     child: Padding(
-                      padding: EdgeInsets.only(left: 3.w),
+                      padding: EdgeInsets.only(left: 2.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -716,10 +726,13 @@ class ReviewsScreenController extends GetxController {
   RxBool isLoading = false.obs;
   RxString fomatedDate = "".obs;
 
-  void getReviewList(context, currentPage, bool hideloading) async {
+  void getReviewList(context, currentPage, bool hideloading,
+      {bool? isRefress}) async {
+    var loadingIndicator = LoadingProgressDialog();
     if (hideloading == true) {
       state.value = ScreenState.apiLoading;
     } else {
+      loadingIndicator.show(context, '');
       isLoading.value = true;
       update();
     }
@@ -727,7 +740,7 @@ class ReviewsScreenController extends GetxController {
     try {
       if (networkManager.connectionType == 0) {
         showDialogForScreen(
-            context, OrderScreenConstant.title, Connection.noConnection,
+            context, ReviewsScreenConstant.title, Connection.noConnection,
             callback: () {
           Get.back();
         });
@@ -737,6 +750,11 @@ class ReviewsScreenController extends GetxController {
       var pageURL = ApiUrl.listReview;
       logcat("URL", pageURL.toString());
       var response = await Repository.get({}, pageURL, allowHeader: false);
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       Statusbar().trasparentStatusbarIsNormalScreen();
       // loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
@@ -747,17 +765,29 @@ class ReviewsScreenController extends GetxController {
           isLoading.value = false;
           update();
           var responseData = ReviewModel.fromJson(data);
-          // reviewList.clear();
-          reviewList.addAll(responseData.data.data);
-          nextPageURL.value = responseData.data.nextPageUrl.toString();
-          // currentPage++;
+
+          if (isRefress == true) {
+            reviewList.clear();
+          }
+          if (responseData.data.data.isNotEmpty) {
+            reviewList.addAll(responseData.data.data);
+            reviewList.refresh();
+          }
+          if (responseData.data.nextPageUrl != 'null' &&
+              responseData.data.nextPageUrl != null) {
+            nextPageURL.value = responseData.data.nextPageUrl.toString();
+            update();
+          } else {
+            nextPageURL.value = "";
+            update();
+          }
           update();
         } else {
           isLoading.value = false;
           message.value = data['message'];
           state.value = ScreenState.apiError;
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'].toString(),
+              context, ReviewsScreenConstant.title, data['message'].toString(),
               callback: () {});
         }
       } else {
@@ -765,10 +795,15 @@ class ReviewsScreenController extends GetxController {
         isLoading.value = false;
         message.value = APIResponseHandleText.serverError;
         showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'].toString(),
+            context, ReviewsScreenConstant.title, data['message'].toString(),
             callback: () {});
       }
     } catch (e) {
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       isLoading.value = false;
       state.value = ScreenState.apiError;
       message.value = ServerError.servererror;

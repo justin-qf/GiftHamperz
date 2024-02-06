@@ -953,7 +953,7 @@ Widget backButtonWidget(callback, {bool? fromFilter, bool? fromReviewImage}) {
 
 Widget getLogo() {
   return Container(
-      padding: EdgeInsets.only(left: 2.5.w, right: 1.w),
+      padding: EdgeInsets.only(left: 2.w, right: 1.w),
       height: 3.6.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),

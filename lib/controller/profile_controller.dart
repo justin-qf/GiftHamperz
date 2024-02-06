@@ -8,6 +8,7 @@ import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/models/UserModel.dart';
@@ -148,6 +149,7 @@ class ProfileController extends GetxController {
       var response = await Repository.get(
           {}, "${ApiUrl.getUser}/${getUserData!.id}",
           allowHeader: true);
+      Statusbar().trasparentStatusbarProfile(false);
       loadingIndicator.hide(context);
       logcat("RESPONSE::", response.body);
       if (response.statusCode == 200) {

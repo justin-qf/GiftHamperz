@@ -13,6 +13,7 @@ import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/CartController.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
@@ -71,6 +72,7 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Statusbar().trasparentStatusbarIsNormalScreen();
     return CustomParentScaffold(
       onWillPop: () async {
         return true;
@@ -136,7 +138,7 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                   const Spacer(),
                                   Text(
-                                      '${'Total: '}\u20B9${formatPrice(controller.finalProductPrice.value)}',
+                                      '${'Total: '}${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
                                       style: TextStyle(
                                         color: isDarkMode() ? white : black,
                                         fontFamily: fontBold,
@@ -224,7 +226,9 @@ class _CartScreenState extends State<CartScreen> {
                                         //Get.back(result: true);
                                         Get.offAll(const BottomNavScreen());
                                         // onClick!();
-                                      }, AddAddressText.startShopping,
+                                      },
+                                          AddressScreenTextConstant
+                                              .startShopping,
                                           isvalidate: true)),
                                 ),
                               )
@@ -273,19 +277,19 @@ class _CartScreenState extends State<CartScreen> {
                                       getDivider(),
                                       getDynamicSizedBox(height: 1.h),
                                       controller.getOrderText('Product Cost',
-                                          '\u20B9${formatPrice(controller.productPrice.value)}',
+                                          '${IndiaRupeeConstant.inrCode}${formatPrice(controller.productPrice.value)}',
                                           isNormal: true),
                                       getDynamicSizedBox(height: 1.h),
                                       controller.getOrderText('Delivery Charge',
-                                          '+ \u20B9${formatPrice(controller.deliveryPrice.value)}',
+                                          '+ ${IndiaRupeeConstant.inrCode}${formatPrice(controller.deliveryPrice.value)}',
                                           isNormal: true),
                                       getDynamicSizedBox(height: 1.h),
                                       controller.getOrderText('Discount',
-                                          '- \u20B9${formatPrice(controller.discountPrice.value)}',
+                                          '- ${IndiaRupeeConstant.inrCode}${formatPrice(controller.discountPrice.value)}',
                                           isNormal: true),
                                       getDynamicSizedBox(height: 1.h),
                                       controller.getOrderText('Total',
-                                          '\u20B9${formatPrice(controller.finalProductPrice.value)}',
+                                          '${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
                                           isNormal: false),
                                       getDynamicSizedBox(height: 3.h),
                                       Container(
@@ -454,9 +458,10 @@ class _CartScreenState extends State<CartScreen> {
                                 textScaleFactor: 1,
                                 text: TextSpan(
                                   text:
-                                      '\u20B9${formatPrice(data.price.toDouble())}',
+                                      '${IndiaRupeeConstant.inrCode}${formatPrice(data.price.toDouble())}',
                                   style: TextStyle(
-                                      color: primaryColor,
+                                      color:
+                                          isDarkMode() ? white : primaryColor,
                                       fontWeight: FontWeight.w500,
                                       fontSize: 11.sp),
                                   children: [

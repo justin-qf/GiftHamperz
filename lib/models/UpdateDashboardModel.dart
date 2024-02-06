@@ -125,6 +125,7 @@ class CommonProductList {
   int innerSubcategoryId;
   int brandId;
   int sku;
+  String qty;
   List<String> images;
   List<String> thumbnailUrl;
   int isActive;
@@ -167,6 +168,7 @@ class CommonProductList {
       required this.innerSubcategoryId,
       required this.brandId,
       required this.sku,
+      required this.qty,
       required this.images,
       required this.thumbnailUrl,
       required this.isActive,
@@ -212,6 +214,7 @@ class CommonProductList {
         innerSubcategoryId: json["inner_subcategory_id"],
         brandId: json["brand_id"],
         sku: json["sku"],
+        qty: json["qty"] ?? '',
         images: List<String>.from(json["images"].map((x) => x) ?? ''),
         thumbnailUrl: List<String>.from(json["thumbnail_url"].map((x) => x)),
         isActive: json["is_active"],
@@ -258,6 +261,7 @@ class CommonProductList {
         "inner_subcategory_id": innerSubcategoryId,
         "brand_id": brandId,
         "sku": sku,
+        "qty": qty,
         "images": List<dynamic>.from(images.map((x) => x)),
         "thumbnail_url": List<dynamic>.from(thumbnailUrl.map((x) => x)),
         "is_active": isActive,
@@ -302,6 +306,7 @@ class CommonProductList {
     int? innerSubcategoryId,
     int? brandId,
     int? sku,
+    String? qty,
     List<String>? images,
     List<String>? thumbnailUrl,
     int? isActive,
@@ -344,6 +349,7 @@ class CommonProductList {
         innerSubcategoryId: innerSubcategoryId ?? this.innerSubcategoryId,
         brandId: brandId ?? this.brandId,
         sku: sku ?? this.sku,
+        qty: qty ?? this.qty,
         images: images ?? this.images,
         thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
         isActive: isActive ?? this.isActive,

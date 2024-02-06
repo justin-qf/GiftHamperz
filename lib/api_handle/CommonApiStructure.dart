@@ -8,6 +8,7 @@ import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
+import 'package:gifthamperz/controller/productDetailController.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
@@ -54,7 +55,16 @@ void addFavouriteAPI(context, InternetController networkManager,
             break;
           }
         }
+        //Product added to favorites.!
+        //Product removed from favorites.!
         showCustomToast(context, data['message'].toString());
+        if (data['message'].toString() == 'Product added to favorites.!') {
+          Get.find<ProductDetailScreenController>().getIsProductAddToFav(true);
+          await UserPreferences.addToFavorites(productId);
+        } else {
+          Get.find<ProductDetailScreenController>().getIsProductAddToFav(false);
+          await UserPreferences.removeFromFavorites(productId);
+        }
       } else {
         showCustomToast(context, data['message'].toString());
       }

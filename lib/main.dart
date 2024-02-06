@@ -81,11 +81,6 @@ class HomeState extends State<MainScreen> {
                       GlobalMaterialLocalizations.delegate,
                       GlobalWidgetsLocalizations.delegate,
                     ],
-                    // supportedLocales: localizationService.keys.keys
-                    //     .map((locale) => Locale.fromSubtags(
-                    //         languageCode: locale.split('_')[0],
-                    //         countryCode: locale.split('_')[1]))
-                    //     .toList(),
                     builder: (context, child) {
                       return MediaQuery(
                         data: MediaQuery.of(context)
@@ -96,8 +91,8 @@ class HomeState extends State<MainScreen> {
                     enableLog: true,
                     title: AppConstant.name,
                     theme: !ctr.isDark.value
-                        ? ThemeData.light()
-                        : ThemeData.dark(),
+                        ? ThemeData.light(useMaterial3: true)
+                        : ThemeData.dark(useMaterial3: true),
                     debugShowCheckedModeBanner: false,
                     home: const Splashscreen(),
                     defaultTransition: Transition.cupertino,

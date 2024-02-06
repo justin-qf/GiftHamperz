@@ -13,6 +13,27 @@ class UserPreferences {
   var userKey = "user";
   var tokenKey = "token";
 
+  static const String favoriteKeyPrefix = 'favorite_';
+
+  static Future<void> addToFavorites(String productId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(_getFavoriteKey(productId), true);
+  }
+
+  static Future<void> removeFromFavorites(String productId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(_getFavoriteKey(productId), false);
+  }
+
+  static Future<bool> isFavorite(String productId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_getFavoriteKey(productId)) ?? false;
+  }
+
+  static String _getFavoriteKey(String productId) {
+    return '$favoriteKeyPrefix$productId';
+  }
+
   getPref() async {
     return await SharedPreferences.getInstance();
   }

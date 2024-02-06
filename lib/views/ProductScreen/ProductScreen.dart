@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -19,6 +18,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:marquee/marquee.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class ProductScreen extends StatefulWidget {
   ProductScreen(
       {super.key,
@@ -50,14 +50,6 @@ class _ProductScreenState extends State<ProductScreen>
       widget.subcategoryId,
       widget.innerSubcategoryId,
     );
-    // controller.getProductList(
-    //     context,
-    //     controller.currentPage,
-    //     true,
-    //     widget.categoryId,
-    //     widget.subcategoryId,
-    //     widget.innerSubcategoryId,
-    //     widget.brandId);
     super.initState();
   }
 
@@ -98,49 +90,9 @@ class _ProductScreenState extends State<ProductScreen>
                     return Container();
                   }),
                 ),
-                if (controller.isShowMoreLoading.value == true)
-                  SizedBox(
-                      height: SizerUtil.height,
-                      width: SizerUtil.width,
-                      child: Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: white,
-                            ),
-                            height: 50,
-                            width: 50,
-                            padding: const EdgeInsets.all(10),
-                            child: LoadingAnimationWidget.discreteCircle(
-                              color: primaryColor,
-                              size: 35,
-                            ),
-                          ),
-                        ),
-                      ))
               ],
             ),
           )
-          // Expanded(
-          //   child: Container(
-          //     margin: EdgeInsets.only(left: 3.w, right: 3.w),
-          //     child: MasonryGridView.count(
-          //       physics: const BouncingScrollPhysics(),
-          //       padding: EdgeInsets.only(bottom: 5.h),
-          //       crossAxisCount:
-          //           SizerUtil.deviceType == DeviceType.mobile ? 2 : 3,
-          //       mainAxisSpacing: 10,
-          //       crossAxisSpacing: 4,
-          //       itemBuilder: (context, index) {
-          //         ProductListData data = controller.productList[index];
-          //         return controller.getListItem(data);
-          //       },
-          //       itemCount: controller.productList.length,
-          //     ),
-          //   ),
-          // ),
         ]),
       ),
     );
@@ -221,12 +173,15 @@ class _ProductScreenState extends State<ProductScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
+            margin: EdgeInsets.symmetric(horizontal: 10.w),
             child: controller.message.value.isNotEmpty
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],
@@ -237,7 +192,7 @@ class _ProductScreenState extends State<ProductScreen>
     // ignore: unrelated_type_equality_checks
     if (controller.isLoading == true) {
       return SizedBox(
-        height: SizerUtil.height / 1.3,
+        height: SizerUtil.height / 1.2,
         child: Center(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(100),
@@ -257,38 +212,53 @@ class _ProductScreenState extends State<ProductScreen>
           ),
         ),
       );
-    } else if (controller.isLoading == false &&
+    } else if (controller.isLoading.value == false &&
         controller.productList.isNotEmpty) {
       return MasonryGridView.count(
         physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.only(bottom: 5.h, left: 1.5.w, right: 1.5.w),
+        padding: EdgeInsets.only(bottom: 2.h, left: 1.5.w, right: 1.5.w),
         crossAxisCount: SizerUtil.deviceType == DeviceType.mobile ? 2 : 3,
         mainAxisSpacing: 10,
         crossAxisSpacing: 4,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           CommonProductList model = controller.productList[index];
-          logcat("IMAGE_URL", APIImageUrl.url + model.images.toString());
-          return controller.getListItem(context, model, widget.categoryId,
-              widget.subcategoryId, widget.innerSubcategoryId);
+          return Column(
+            children: [
+              controller.getListItem(context, model, widget.categoryId,
+                  widget.subcategoryId, widget.innerSubcategoryId),
+              index == controller.productList.length - 1 &&
+                      controller.nextPageURL.value.isNotEmpty
+                  ? Container(
+                      margin: EdgeInsets.only(
+                          top: 2.h, left: 25.w, right: 25.w, bottom: 0.8.h),
+                      child: getMiniButton(
+                        () {
+                          controller.isLoading.value = true;
+                          controller.currentPage++;
+                          controller.getProductList(
+                            context,
+                            controller.currentPage,
+                            false,
+                            widget.categoryId,
+                            widget.subcategoryId,
+                            widget.innerSubcategoryId,
+                            controller.selectedBrandId!,
+                            //isRefress: true
+                          );
+                          setState(() {});
+                        },
+                        Common.viewMore,
+                      ),
+                    )
+                  : Container()
+            ],
+          );
         },
         itemCount: controller.productList.length,
       );
     } else {
-      return SizedBox(
-        height: SizerUtil.height / 1.3,
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget(isFromBlog: true);
     }
   }
 
@@ -314,7 +284,8 @@ class _ProductScreenState extends State<ProductScreen>
               widget.categoryId,
               widget.subcategoryId,
               widget.innerSubcategoryId,
-              controller.selectedBrandId!);
+              controller.selectedBrandId!,
+              isRefress: true);
         }
       },
       child: AnimatedContainer(

@@ -10,6 +10,7 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/OrderDetailController.dart';
 import 'package:gifthamperz/models/OrderModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
@@ -93,7 +94,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   // CategoryItem data =
                                   //     controller.categoryList[index];
                                   // return controller.getCategoryListItem(data);
-                                  OrderDetail data =
+                                  CommonProductList data =
                                       controller.orderDetailList[index];
                                   logcat("categoryList", data.name.toString());
                                   return controller.getListItem(data);
@@ -327,32 +328,32 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   controller.getLableText('Order Summary'),
                   getDynamicSizedBox(height: 1.h),
                   controller.getOrderText('Product Cost',
-                      '\u{20B9}${formatPrice(double.parse(controller.finalProductCost.value.toString()))}',
+                      '${IndiaRupeeConstant.inrCode}${formatPrice(double.parse(controller.finalProductCost.value.toString()))}',
                       isNormal: true),
                   getDynamicSizedBox(height: 1.h),
-                  controller.getOrderText(
-                      'Shiping Charge', '\u{20B9}${widget.data!.shipingCharge}',
+                  controller.getOrderText('Shiping Charge',
+                      '${IndiaRupeeConstant.inrCode}${widget.data!.shipingCharge}',
                       isNormal: true),
                   getDynamicSizedBox(height: 1.h),
-                  controller.getOrderText(
-                      'Discount', '-\u{20B9}${widget.data!.discount}',
+                  controller.getOrderText('Discount',
+                      '-${IndiaRupeeConstant.inrCode}${widget.data!.discount}',
                       isNormal: true),
                   getDynamicSizedBox(height: 1.h),
                   controller.getOrderText('Total',
-                      '\u{20B9}${formatPrice(double.parse(widget.data!.totalAmount))}',
+                      '${IndiaRupeeConstant.inrCode}${formatPrice(double.parse(widget.data!.totalAmount))}',
                       isNormal: false),
-                  getDynamicSizedBox(height: 3.h),
-                  Container(
-                    margin: EdgeInsets.only(
-                      left: 5.w,
-                      right: 5.w,
-                    ),
-                    child: FadeInUp(
-                      from: 50,
-                      child: getSecondaryFormButton(() {}, Button.check,
-                          isvalidate: true),
-                    ),
-                  ),
+                  //getDynamicSizedBox(height: 3.h),
+                  // Container(
+                  //   margin: EdgeInsets.only(
+                  //     left: 5.w,
+                  //     right: 5.w,
+                  //   ),
+                  //   child: FadeInUp(
+                  //     from: 50,
+                  //     child: getSecondaryFormButton(() {}, Button.check,
+                  //         isvalidate: true),
+                  //   ),
+                  // ),
                   getDynamicSizedBox(height: 3.h),
                 ],
               ),

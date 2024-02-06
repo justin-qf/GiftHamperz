@@ -165,6 +165,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         context: context,
                                         initialDate: controller.selectedDate,
                                         firstDate: DateTime(1950),
+                                        builder: (BuildContext context,
+                                            Widget? child) {
+                                          return Theme(
+                                            data: isDarkMode()
+                                                ? getDarkModeDatePicker()
+                                                : getLightModeDatePicker(),
+                                            child: child!,
+                                          );
+                                        },
                                         lastDate: DateTime.now()
                                             .add(const Duration(days: 0)));
                                     if (pickedDate != null &&
@@ -199,8 +208,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           duration: const Duration(milliseconds: 300),
                           child: Container(
                               margin: EdgeInsets.only(
-                                left: 8.w,
-                                right: 8.w,
+                                left: 6.w,
+                                right: 6.w,
                               ),
                               child: Obx(
                                 () {

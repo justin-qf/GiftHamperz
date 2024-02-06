@@ -19,7 +19,6 @@ import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/CategoryScreen/CategoryScreen.dart';
 import 'package:gifthamperz/views/MainScreen/HomeScreen/DetailScreen/DetailScreen.dart';
@@ -39,7 +38,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var controller = Get.put(HomeScreenController());
-  //int? totalItemsCount = 0;
   bool dialogShown = false;
   bool? isGuest = true;
 
@@ -48,11 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     controller.pageController =
         PageController(initialPage: controller.currentPage);
-    //controller.getCategoryList(context);
-    //controller.getBannerList(context);
     controller.getHome(context);
     startAutoScroll();
-    //getTotalProductInCart();
     controller.getTotalProductInCart();
     showGuestUserLogin();
   }
@@ -79,18 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Make sure to update the state if necessary
     //setState(() {});
   }
-
-  // getTotalProductInCart() async {
-  //   // Fetch the current cart items from preferences
-  //   List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
-  //   logcat("cartItems", cartItems.length.toString());
-  //   // Get the total length of the list
-  //   controller.totalItemsCount.value = cartItems.length;
-  //   setState(() {});
-  // }
 
   void startAutoScroll() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -153,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.only(bottom: 5.h),
+                padding: EdgeInsets.only(bottom: 3.h),
                 physics: const BouncingScrollPhysics(),
                 child: Obx(() {
                   switch (controller.state.value) {
@@ -183,7 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget apiSuccess(ScreenState state) {
     // ignore: unrelated_type_equality_checks
     if (controller.state == ScreenState.apiSuccess &&
-        controller.bannerList.isNotEmpty) {
+        controller.homeData != null &&
+        controller.homeData!.data.trendList.isNotEmpty) {
       return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -193,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
               setSearchBar(context, controller.searchCtr, 'home',
                   onCancleClick: () {
                 controller.searchCtr.text = '';
-                logcat("onCANCLE", "DONE");
                 setState(() {
                   controller.isSearch = false;
                 });
@@ -216,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         BannerList bannerItems = controller.bannerList[index];
                         return Container(
                           margin: EdgeInsets.only(
-                              top: 1.h, left: 5.w, right: 4.w, bottom: 1.h),
+                              top: 1.h, left: 2.w, right: 3.w, bottom: 1.h),
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
                             color: isDarkMode() ? black : white,
@@ -225,8 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             boxShadow: [
                               BoxShadow(
                                   color: isDarkMode()
-                                      ? Colors.white.withOpacity(0.2)
-                                      : Colors.black.withOpacity(0.2),
+                                      ? white.withOpacity(0.2)
+                                      : black.withOpacity(0.2),
                                   spreadRadius: 0.1,
                                   blurRadius: 10,
                                   offset: const Offset(0.5, 0.5)),
@@ -286,13 +271,12 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               height: 0.5.h,
             ),
-            getHomeLable("Category", () {
-              Get.to(const CategoryScreen());
-              // Get.to(DetailScreen(
-              //   title: DashboardText.categoryTitle,
-              // ));
+            getHomeLable(DashboardText.categoryTitle, () {
+              Get.to(const CategoryScreen())!.then((value) {
+                controller.getHome(context);
+                controller.getTotalProductInCart();
+              });
             }),
-            //getDynamicSizedBox(height: 1.0.h),
             SizedBox(
               height: 13.h,
               child: Obx(
@@ -300,14 +284,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   return controller.categoryList.isNotEmpty
                       ? ListView.builder(
                           physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.only(left: 4.w, top: 0.5.h),
+                          padding: EdgeInsets.only(
+                              left: 2.w, right: 1.w, top: 0.5.h),
                           shrinkWrap: false,
                           scrollDirection: Axis.horizontal,
                           clipBehavior: Clip.antiAlias,
                           itemBuilder: (context, index) {
-                            // CategoryItem data =
-                            //     controller.categoryList[index];
-                            // return controller.getCategoryListItem(data);
                             CategoryList data = controller.categoryList[index];
                             return controller.getCategoryListItem(data);
                           },
@@ -323,6 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 isFromTrending: true,
               ))!
                   .then((value) {
+                controller.getHome(context);
                 controller.getTotalProductInCart();
               });
             }),
@@ -333,13 +316,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? SizedBox(
                         height: 26.h,
                         child: ListView.builder(
-                            padding: EdgeInsets.only(left: 4.w, right: 2.w),
+                            padding: EdgeInsets.only(left: 2.w, right: 1.w),
                             physics: const BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
                             clipBehavior: Clip.antiAlias,
                             itemBuilder: (context, index) {
-                              // HomeItem data = controller.staticData[index];
-                              // return controller.getListItem(data);
                               CommonProductList data =
                                   controller.trendingItemList[index];
                               return controller.getListItem(context, data,
@@ -352,30 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     : Container();
               },
             ),
-            Container(
-              width: SizerUtil.width,
-              height: 15.h,
-              padding: EdgeInsets.all(0.2.h),
-              margin: EdgeInsets.only(left: 5.w, right: 4.w),
-              decoration: BoxDecoration(
-                  color: isDarkMode() ? darkBackgroundColor : white,
-                  boxShadow: const [
-                    BoxShadow(
-                        color: grey,
-                        blurRadius: 1.0,
-                        offset: Offset(0, 3),
-                        spreadRadius: 0.5)
-                  ],
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(2.h),
-                  )),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(2.h),
-                  child: Image.asset(
-                    Asset.homeBanner,
-                    fit: BoxFit.cover,
-                  )),
-            ),
+            homeOfferBanner(),
             getDynamicSizedBox(height: 2.h),
             getHomeLable(DashboardText.populerTitle, () async {
               Get.to(DetailScreen(
@@ -383,6 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 isFromTrending: false,
               ))!
                   .then((value) {
+                controller.getHome(context);
                 controller.getTotalProductInCart();
               });
             }),
@@ -393,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? SizedBox(
                         height: 27.h,
                         child: ListView.builder(
-                            padding: EdgeInsets.only(left: 4.w, right: 2.w),
+                            padding: EdgeInsets.only(left: 2.w, right: 1.w),
                             physics: const BouncingScrollPhysics(),
                             shrinkWrap: true,
                             scrollDirection: Axis.horizontal,
@@ -462,7 +421,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

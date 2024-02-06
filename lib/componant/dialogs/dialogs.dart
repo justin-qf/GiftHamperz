@@ -7,6 +7,7 @@ import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/input/form_inputs.dart';
 import 'package:gifthamperz/componant/input/style.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/controller/guest_login_controller.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -392,7 +393,7 @@ Future showValidationDialog(
 getGuestUserLogin(BuildContext context, String screemName) async {
   return await showGeneralDialog(
     context: context,
-    barrierDismissible: true,
+    barrierDismissible: false,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: Colors.black54,
     transitionDuration: const Duration(milliseconds: 600),
@@ -427,6 +428,7 @@ Future<Future> getLoginBottomSheetDialog(
   return showModalBottomSheet(
       context: parentContext,
       clipBehavior: Clip.antiAlias,
+      isDismissible: false,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
         topLeft: Radius.circular(13.w),
@@ -485,6 +487,14 @@ Future<Future> getLoginBottomSheetDialog(
                               child: InkWell(
                                 onTap: () {
                                   Navigator.pop(context);
+                                  if (controller.isOtpVisible!.value == true) {
+                                    controller.isOtpVisible!.value = false;
+                                    setState(() {});
+                                  }
+                                  if (screenName == CartScreenConstant.title) {
+                                    Statusbar()
+                                        .trasparentStatusbarIsNormalScreen();
+                                  }
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.only(
@@ -496,7 +506,7 @@ Future<Future> getLoginBottomSheetDialog(
                                       children: [
                                         Icon(
                                           Icons.close_rounded,
-                                          color: Colors.black,
+                                          color: black,
                                           size: SizerUtil.deviceType ==
                                                   DeviceType.mobile
                                               ? 25

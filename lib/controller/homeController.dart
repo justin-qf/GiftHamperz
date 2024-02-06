@@ -448,7 +448,7 @@ class HomeScreenController extends GetxController {
                             Row(
                               children: [
                                 getText(
-                                  '\u20B9${data.sku}',
+                                  '${IndiaRupeeConstant.inrCode}${data.sku}',
                                   TextStyle(
                                       fontFamily: fontBold,
                                       color: primaryColor,
@@ -691,8 +691,8 @@ class HomeScreenController extends GetxController {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(
                                   SizerUtil.deviceType == DeviceType.mobile
-                                      ? 3.5.w
-                                      : 2.5.w),
+                                      ? 4.w
+                                      : 2.2.w),
                               border: isDarkMode()
                                   ? Border.all(
                                       color: grey, // Border color
@@ -703,8 +703,8 @@ class HomeScreenController extends GetxController {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(
                                   SizerUtil.deviceType == DeviceType.mobile
-                                      ? 3.5.w
-                                      : 2.5.w),
+                                      ? 4.w
+                                      : 2.2.w),
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
                                 height: 12.h,
@@ -766,7 +766,7 @@ class HomeScreenController extends GetxController {
                             Row(
                               children: [
                                 getText(
-                                  '\u20B9${data.sku}',
+                                  '${IndiaRupeeConstant.inrCode}${data.price}',
                                   TextStyle(
                                       fontFamily: fontBold,
                                       color: primaryColor,
@@ -944,7 +944,6 @@ class HomeScreenController extends GetxController {
     );
   }
 
-  // RxList categoryList = [].obs;
   void getCategoryList(context) async {
     state.value = ScreenState.apiLoading;
     try {
@@ -993,8 +992,6 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  //RxList bannerList = [].obs;
-
   void getBannerList(context) async {
     state.value = ScreenState.apiLoading;
     try {
@@ -1041,15 +1038,16 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  // RxList trendingItemList = [].obs;
   RxList topItemList = [].obs;
   RxList bannerList = [].obs;
-  //RxList popularItemList = [].obs;
 
   RxList<CommonProductList> popularItemList = <CommonProductList>[].obs;
   RxList<CommonProductList> trendingItemList = <CommonProductList>[].obs;
 
   RxList categoryList = [].obs;
+
+  // ignore: prefer_typing_uninitialized_variables
+  HomeModel? homeData;
 
   void getHome(context) async {
     state.value = ScreenState.apiLoading;
@@ -1070,31 +1068,31 @@ class HomeScreenController extends GetxController {
         if (responseData['status'] == 1) {
           state.value = ScreenState.apiSuccess;
           message.value = '';
-          var homeData = HomeModel.fromJson(responseData);
+          homeData = HomeModel.fromJson(responseData);
           trendingItemList.clear();
           topItemList.clear();
           popularItemList.clear();
           bannerList.clear();
           categoryList.clear();
 
-          if (homeData.data.trendList.isNotEmpty) {
-            trendingItemList.addAll(homeData.data.trendList);
+          if (homeData!.data.trendList.isNotEmpty) {
+            trendingItemList.addAll(homeData!.data.trendList);
             update();
           }
 
-          if (homeData.data.categoryList.isNotEmpty) {
-            categoryList.addAll(homeData.data.categoryList);
+          if (homeData!.data.categoryList.isNotEmpty) {
+            categoryList.addAll(homeData!.data.categoryList);
             update();
           }
-          if (homeData.data.bannerList.isNotEmpty) {
-            bannerList.addAll(homeData.data.bannerList);
+          if (homeData!.data.bannerList.isNotEmpty) {
+            bannerList.addAll(homeData!.data.bannerList);
             update();
           }
 
           List<CommonProductList> cartItems =
               await UserPreferences().loadCartItems();
 
-          for (CommonProductList item in homeData.data.trendList) {
+          for (CommonProductList item in homeData!.data.trendList) {
             int existingIndex =
                 cartItems.indexWhere((cartItem) => cartItem.id == item.id);
             if (existingIndex != -1) {
@@ -1106,16 +1104,16 @@ class HomeScreenController extends GetxController {
             }
           }
 
-          if (homeData.data.topList.isNotEmpty) {
-            topItemList.addAll(homeData.data.topList);
+          if (homeData!.data.topList.isNotEmpty) {
+            topItemList.addAll(homeData!.data.topList);
             update();
           }
-          if (homeData.data.popularList.isNotEmpty) {
-            popularItemList.addAll(homeData.data.popularList);
+          if (homeData!.data.popularList.isNotEmpty) {
+            popularItemList.addAll(homeData!.data.popularList);
             update();
           }
 
-          for (CommonProductList item in homeData.data.popularList) {
+          for (CommonProductList item in homeData!.data.popularList) {
             int existingIndex =
                 cartItems.indexWhere((cartItem) => cartItem.id == item.id);
             if (existingIndex != -1) {

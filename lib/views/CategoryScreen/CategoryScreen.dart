@@ -163,7 +163,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

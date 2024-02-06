@@ -133,7 +133,10 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],
@@ -220,20 +223,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
         itemCount: controller.innerSubCategoryList.length,
       );
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 15.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 

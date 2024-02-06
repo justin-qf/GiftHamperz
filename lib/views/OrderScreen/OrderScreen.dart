@@ -51,7 +51,7 @@ class _OrderScreenState extends State<OrderScreen>
         color: isDarkMode() ? darkBackgroundColor : transparent,
         child: Column(children: [
           getOrderToolbar(OrderScreenConstant.title),
-          getDynamicSizedBox(height: 2.0.h),
+          getDynamicSizedBox(height: 1.0.h),
           Expanded(
             child: Stack(
               children: [
@@ -61,7 +61,8 @@ class _OrderScreenState extends State<OrderScreen>
                       return Future.delayed(
                         const Duration(seconds: 1),
                         () {
-                          controller.getOrderList(context, 0, true);
+                          controller.getOrderList(context, 0, true,
+                              isRefress: true);
                         },
                       );
                     },
@@ -132,7 +133,7 @@ class _OrderScreenState extends State<OrderScreen>
     if (controller.state == ScreenState.apiSuccess &&
         controller.orderList.isNotEmpty) {
       return ListView.builder(
-        padding: EdgeInsets.only(bottom: 2.h),
+        padding: EdgeInsets.only(bottom: 2.h, top: 1.h),
         physics: const BouncingScrollPhysics(),
         itemCount: controller.orderList.length,
         clipBehavior: Clip.antiAlias,
@@ -215,7 +216,10 @@ class _OrderScreenState extends State<OrderScreen>
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

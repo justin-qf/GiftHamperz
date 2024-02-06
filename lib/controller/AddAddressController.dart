@@ -59,9 +59,6 @@ class AddAddressController extends GetxController {
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
   String getPass = "";
-  RxString getImagePath = "".obs;
-  RxBool obsecureText = true.obs;
-  bool? isVerify;
   RxString addressType = "".obs;
   RxString apiPassingAddressType = "".obs;
   String? selectCity;
@@ -69,13 +66,6 @@ class AddAddressController extends GetxController {
   RxString cityId = "".obs;
   RxBool isGuest = false.obs;
   List<TextEditingController> controllers = [];
-
-  final List<String> city = [
-    'AHMEDABAD',
-    'VADODARA',
-    'RAJKOT',
-    'SURAT',
-  ];
 
   @override
   void onInit() {
@@ -123,7 +113,6 @@ class AddAddressController extends GetxController {
       deliverynamectr.text = itemData.name.toString();
       pincodectr.text = itemData.pincode.toString();
       cityId.value = itemData.cityId.toString();
-      logcat("cityIDDDDD", cityId.value);
       if (itemData.isOffice == 0) {
         addressType.value = "HOME";
         apiPassingAddressType.value = "0";
@@ -131,11 +120,6 @@ class AddAddressController extends GetxController {
         addressType.value = "WORK";
         apiPassingAddressType.value = "1";
       }
-      // ignore: unrelated_type_equality_checks
-      // if (itemData.cityId != "null" && itemData.cityId.toString().isNotEmpty) {
-      //   getCityList(context, itemData.cityId.toString());
-      // }
-
       validateDeliveryName(deliverynamectr.text);
       validateAddressline(addressLinectr.text);
       validateStreet(streetctr.text);
@@ -150,6 +134,8 @@ class AddAddressController extends GetxController {
       streetctr.text = "";
       landMarkctr.text = "";
       pincodectr.text = "";
+      addressType.value = "HOME";
+      apiPassingAddressType.value = "0";
     }
   }
 
@@ -159,7 +145,7 @@ class AddAddressController extends GetxController {
   void validateName(String? val) {
     userNameModel.update((model) {
       if (val != null && val.isEmpty) {
-        model!.error = AddAddressText.userNameHint;
+        model!.error = AddressScreenTextConstant.userNameHint;
         model.isValidate = false;
       } else {
         model!.error = null;
@@ -173,10 +159,10 @@ class AddAddressController extends GetxController {
   void validateEmail(String? val) {
     emailIdModel.update((model) {
       if (val != null && val.toString().trim().isEmpty) {
-        model!.error = AddAddressText.emailAddressHint;
+        model!.error = AddressScreenTextConstant.emailAddressHint;
         model.isValidate = false;
       } else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(emailIdCtr.text.trim())) {
-        model!.error = AddAddressText.emailAddresValidsHint;
+        model!.error = AddressScreenTextConstant.emailAddresValidsHint;
         model.isValidate = false;
       } else {
         model!.error = null;
@@ -203,7 +189,7 @@ class AddAddressController extends GetxController {
   void validatePinCode(String? val) {
     pinCodeModel.update((model) {
       if (val == null || val.isEmpty) {
-        model!.error = AddAddressText.pinCodeHint;
+        model!.error = AddressScreenTextConstant.pinCodeHint;
         model.isValidate = false;
       } else {
         model!.error = null;
@@ -216,7 +202,7 @@ class AddAddressController extends GetxController {
   void validateLandMark(String? val) {
     landMarkModel.update((model) {
       if (val == null || val.isEmpty) {
-        model!.error = AddAddressText.landmarkHint;
+        model!.error = AddressScreenTextConstant.landmarkHint;
         model.isValidate = false;
       } else {
         model!.error = null;
@@ -327,9 +313,8 @@ class AddAddressController extends GetxController {
     try {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
@@ -338,24 +323,25 @@ class AddAddressController extends GetxController {
           "${addressLinectr.text},${streetctr.text},${landMarkctr.text}";
 
       logcat('loginPassingData', {
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
         "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
         "is_office": apiPassingAddressType.value.toString().trim(),
         "is_active": isActive.value.toString().trim(),
-        "user_name": userNameCtr.toString().trim(),
+        "user_name": userNameCtr.text.toString().trim(),
         "email_id": emailIdCtr.text.toString().trim(),
       });
 
       var response = await Repository.post({
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
-        "city_id":
-            cityId.value.toString().trim(), // selectCity.toString().trim(),
+        "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
         "is_office": apiPassingAddressType.value.toString().trim(),
         "is_active": isActive.value.toString().trim(),
-        "user_name": userNameCtr.toString().trim() ?? '',
-        "email_id": emailIdCtr.text.toString().trim() ?? '',
+        "user_name": userNameCtr.text.toString().trim(),
+        "email_id": emailIdCtr.text.toString().trim(),
       }, ApiUrl.addAddress, allowHeader: true);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
@@ -363,24 +349,24 @@ class AddAddressController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {
             Get.back(result: true);
           });
         } else {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {});
         }
       } else {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'] ?? "",
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'] ?? "",
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
-      showDialogForScreen(
-          context, AddAddressText.addressTitle, ServerError.servererror,
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          ServerError.servererror,
           callback: () {});
     }
   }
@@ -391,9 +377,8 @@ class AddAddressController extends GetxController {
     try {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
@@ -402,6 +387,7 @@ class AddAddressController extends GetxController {
           "${addressLinectr.text}, ${streetctr.text}, ${landMarkctr.text}";
 
       logcat('loginPassingData', {
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
         "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
@@ -410,6 +396,7 @@ class AddAddressController extends GetxController {
       });
 
       var response = await Repository.update({
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
         "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
@@ -422,24 +409,24 @@ class AddAddressController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {
             Get.back(result: true);
           });
         } else {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {});
         }
       } else {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'] ?? "",
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'] ?? "",
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
-      showDialogForScreen(
-          context, AddAddressText.addressTitle, ServerError.servererror,
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          ServerError.servererror,
           callback: () {});
     }
   }

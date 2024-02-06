@@ -47,6 +47,7 @@ class AddressScreenController extends GetxController {
   RxString? totaAmount = "".obs;
   RxString? selectedAddId = "".obs;
   RxString? discount = "".obs;
+  var currentPage = 0;
 
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
@@ -101,35 +102,37 @@ class AddressScreenController extends GetxController {
     );
   }
 
-  void getAddressList(context, currentPage, bool hideloading) async {
+  void getAddressList(
+    context,
+    currentPage,
+    bool hideloading, {
+    bool? isRefress,
+  }) async {
+    var loadingIndicator = LoadingProgressDialog();
+
     if (hideloading == true) {
       state.value = ScreenState.apiLoading;
     } else {
+      loadingIndicator.show(context, '');
       isLoading.value = true;
       update();
     }
 
     try {
       if (networkManager.connectionType == 0) {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
       }
-      //var pageURL = ApiUrl.getAddress + currentPage.toString();
-      var pageURL = ApiUrl.getAddress;
-
-      logcat("URL", pageURL.toString());
+      var pageURL = '${ApiUrl.getAddress}?page=$currentPage';
       var response = await Repository.post({
         // "city_id": 25,
       }, pageURL, allowHeader: true);
 
       // loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
-      logcat("RESPONSE", jsonEncode(data));
-      logcat("StatusCode", response.statusCode.toString());
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           state.value = ScreenState.apiSuccess;
@@ -137,33 +140,47 @@ class AddressScreenController extends GetxController {
           isLoading.value = false;
           var responseData = AddressModel.fromJson(data);
           logcat("LISTEMPTY", responseData.data.data.length.toString());
-          if (responseData.data.data.isNotEmpty) {
+
+          if (isRefress == true) {
             addressList.clear();
+          }
+          if (responseData.data.data.isNotEmpty) {
             addressList.addAll(responseData.data.data);
+            addressList.refresh();
+          }
+
+          if (responseData.data.nextPageUrl != 'null' &&
+              responseData.data.nextPageUrl != null) {
             nextPageURL.value = responseData.data.nextPageUrl.toString();
+            update();
           } else {
-            //state.value = ScreenState.noDataFound;
+            nextPageURL.value = "";
+            update();
           }
           logcat("NextPageURL", nextPageURL.value.toString());
-          // currentPage++;
           update();
         } else {
           isLoading.value = false;
           message.value = data['message'];
           state.value = ScreenState.apiError;
-          showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'].toString(),
+          showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+              data['message'].toString(),
               callback: () {});
         }
       } else {
         state.value = ScreenState.apiError;
         isLoading.value = false;
         message.value = APIResponseHandleText.serverError;
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'].toString(),
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'].toString(),
             callback: () {});
       }
     } catch (e) {
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       isLoading.value = false;
       state.value = ScreenState.apiError;
       message.value = ServerError.servererror;
@@ -176,9 +193,8 @@ class AddressScreenController extends GetxController {
     try {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
@@ -196,30 +212,29 @@ class AddressScreenController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {
             Get.back(result: true);
           });
         } else {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {});
         }
       } else {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'] ?? "",
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'] ?? "",
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
-      showDialogForScreen(
-          context, AddAddressText.addressTitle, ServerError.servererror,
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          ServerError.servererror,
           callback: () {});
     }
   }
 
   getListItem(BuildContext context, AddressListItem data, int index) {
-    logcat("currentIndex-111", currentIndex.value.toString());
     String title;
     if (data.isOffice == 0) {
       title = '[Home]';
@@ -244,7 +259,7 @@ class AddressScreenController extends GetxController {
                     : transparent, // Set the border color here
                 width: isDarkMode() ? 3.0 : 2.0, // Set the border width
               ),
-              borderRadius: const BorderRadius.all(Radius.circular(15)),
+              borderRadius: const BorderRadius.all(Radius.circular(18)),
               boxShadow: [
                 BoxShadow(
                     color: isDarkMode()
@@ -295,7 +310,7 @@ class AddressScreenController extends GetxController {
                               ),
                               getDynamicSizedBox(height: 0.5.h),
                               Text(
-                                data.address.toString(),
+                                '${data.address} , ${data.cityName} , ${data.stateName}',
                                 style: TextStyle(
                                     fontSize: SizerUtil.deviceType ==
                                             DeviceType.mobile
@@ -317,7 +332,8 @@ class AddressScreenController extends GetxController {
                                 .then((value) {
                               logcat("value", value.toString());
                               if (value == true) {
-                                getAddressList(context, 0, true);
+                                getAddressList(context, 0, true,
+                                    isRefress: true);
                               }
                               Statusbar().trasparentStatusbarIsNormalScreen();
                             });
@@ -945,8 +961,6 @@ class AddressScreenController extends GetxController {
     }
   }
 
-  final orderList = <File>[];
-
   getBuyNowProductListWithCalculation(
       BuildContext context, int? id, bool? isFromBuyNow) async {
     List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
@@ -1001,85 +1015,86 @@ class AddressScreenController extends GetxController {
       bool? isFromBuyNow) async {
     var loadingIndicator = LoadingProgressDialog();
     loadingIndicator.show(context, '');
-    try {
-      if (networkManager.connectionType == 0) {
-        loadingIndicator.hide(context);
-        showDialogForScreen(
-            context, ReviewsScreenConstant.title, Connection.noConnection,
-            callback: () {
-          Get.back();
-        });
-        return;
-      }
-      UserData? getUserData = await UserPreferences().getSignInInfo();
-      String currentDate = getCurrentDate();
-      String currentTime = getCurrentTime();
-
-      var response = await Repository.post({
-        "customer_id": getUserData!.id.toString(),
-        "date_of_order": currentDate,
-        "billing_address_id": int.parse(selectedAddId!.value),
-        "shipping_address_id": int.parse(selectedAddId!.value),
-        "total_amount": double.parse(totaAmount!.value).toInt(),
-        "discount": double.parse(discount!.value).toInt(),
-        "date_of_delivery": currentDate,
-        "time_of_delivery": currentTime,
-        "shiping_charge": double.parse(
-          shipinCharge!.value,
-        ).toInt(),
-        "is_packing_seperetly": 0,
-        "gst_number": 1235689781451,
-        "product": productList,
-      }, ApiUrl.addOrder, allowHeader: true);
-
-      logcat("PassingData:::", {
-        "customer_id": getUserData.id.toString(),
-        "date_of_order": currentDate,
-        "billing_address_id": int.parse(selectedAddId!.value),
-        "shipping_address_id": int.parse(selectedAddId!.value),
-        "total_amount": double.parse(totaAmount!.value).toInt(),
-        "discount": double.parse(discount!.value).toInt(),
-        "date_of_delivery": currentDate,
-        "time_of_delivery": currentTime,
-        "shiping_charge": double.parse(
-          shipinCharge!.value,
-        ).toInt(),
-        "is_packing_seperetly": 0,
-        "gst_number": 1235689781451,
-        "product": productList,
-      });
-
+    //  try {
+    if (networkManager.connectionType == 0) {
       loadingIndicator.hide(context);
-      var data = jsonDecode(response.body);
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          Connection.noConnection, callback: () {
+        Get.back();
+      });
+      return;
+    }
+    UserData? getUserData = await UserPreferences().getSignInInfo();
+    String currentDate = getCurrentDate();
+    String currentTime = getCurrentTime();
 
-      if (response.statusCode == 200) {
-        if (data['status'] == 1) {
-          // Order placed successfully, you can handle the success case here
-          if (isFromBuyNow == true) {
-            await UserPreferences().removeCartItem(id ?? 0);
-          } else {
-            await UserPreferences().clearCartItems();
-          }
-          showCustomDialog(context);
+    var response = await Repository.post({
+      "customer_id": getUserData!.id.toString(),
+      "date_of_order": currentDate,
+      "billing_address_id": int.parse(selectedAddId!.value),
+      "shipping_address_id": int.parse(selectedAddId!.value),
+      "total_amount": double.parse(totaAmount!.value).toInt(),
+      "discount": double.parse(discount!.value).toInt(),
+      "date_of_delivery": currentDate,
+      "time_of_delivery": currentTime,
+      "shiping_charge": double.parse(
+        shipinCharge!.value,
+      ).toInt(),
+      "is_packing_seperetly": 0,
+      "gst_number": 1235689781451,
+      "product": productList,
+    }, ApiUrl.addOrder, allowHeader: true);
+
+    logcat("PassingData:::", {
+      "customer_id": getUserData.id.toString(),
+      "date_of_order": currentDate,
+      "billing_address_id": int.parse(selectedAddId!.value),
+      "shipping_address_id": int.parse(selectedAddId!.value),
+      "total_amount": double.parse(totaAmount!.value).toInt(),
+      "discount": double.parse(discount!.value).toInt(),
+      "date_of_delivery": currentDate,
+      "time_of_delivery": currentTime,
+      "shiping_charge": double.parse(
+        shipinCharge!.value,
+      ).toInt(),
+      "is_packing_seperetly": 0,
+      "gst_number": 1235689781451,
+      "product": productList,
+    });
+
+    loadingIndicator.hide(context);
+    var data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      if (data['status'] == 1) {
+        // Order placed successfully, you can handle the success case here
+        if (isFromBuyNow == true) {
+          await UserPreferences().removeCartItem(id ?? 0);
         } else {
-          showDialogForScreen(
-              context, ReviewsScreenConstant.title, data['message'],
-              callback: () {
-            commentctr.text = "";
-            isFormInvalidate.value = false;
-            update();
-          });
+          await UserPreferences().clearCartItems();
         }
+        showCustomDialog(context);
       } else {
         showDialogForScreen(
-            context, ReviewsScreenConstant.title, data['message'] ?? "",
-            callback: () {});
+            context, AddressScreenTextConstant.addressTitle, data['message'],
+            callback: () {
+          commentctr.text = "";
+          isFormInvalidate.value = false;
+          update();
+        });
       }
-    } catch (e) {
-      logcat("Exception", e);
-      showDialogForScreen(
-          context, ReviewsScreenConstant.title, ServerError.servererror,
+    } else {
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          data['message'] ?? "",
           callback: () {});
     }
   }
 }
+//     catch (e) {
+//       logcat("Exception", e);
+//       showDialogForScreen(
+//           context, AddAddressText.addressTitle, ServerError.servererror,
+//           callback: () {});
+//     }
+//   }
+// }

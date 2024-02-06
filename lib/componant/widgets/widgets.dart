@@ -224,7 +224,7 @@ Widget getRichText(title, desc) {
 Widget getHomeLable(String title, Function onCLick) {
   return FadeInRight(
     child: Container(
-      margin: EdgeInsets.only(left: 5.w, right: 2.w),
+      margin: EdgeInsets.only(left: 3.w, right: 2.w),
       width: SizerUtil.width,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,7 +332,7 @@ Widget getPriceLable(String startPrice, String endPrice) {
               fontSize: 13.sp,
             )),
         getDynamicSizedBox(width: 1.w),
-        Text("\u20B9$startPrice",
+        Text("${IndiaRupeeConstant.inrCode}$startPrice",
             style: TextStyle(
               color: primaryColor,
               fontFamily: fontBold,
@@ -346,7 +346,7 @@ Widget getPriceLable(String startPrice, String endPrice) {
               fontWeight: FontWeight.w500,
               fontSize: 12.sp,
             )),
-        Text("\u20B9$endPrice",
+        Text("${IndiaRupeeConstant.inrCode}$endPrice",
             style: TextStyle(
               color: primaryColor,
               fontFamily: fontBold,
@@ -751,9 +751,10 @@ Widget homeCartIncDecUi(
   );
 }
 
-Widget noDataFoundWidget() {
+Widget noDataFoundWidget({bool? isFromBlog}) {
   return SizedBox(
-    height: SizerUtil.height / 1.2,
+    height:
+        isFromBlog == true ? SizerUtil.height / 1.4 : SizerUtil.height / 1.2,
     child: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -770,5 +771,32 @@ Widget noDataFoundWidget() {
         ],
       ),
     ),
+  );
+}
+
+Widget homeOfferBanner() {
+  return Container(
+    width: SizerUtil.width,
+    height: 15.h,
+    padding: EdgeInsets.all(0.2.h),
+    margin: EdgeInsets.only(left: 3.5.w, right: 3.w),
+    decoration: BoxDecoration(
+        color: isDarkMode() ? darkBackgroundColor : white,
+        boxShadow: [
+          BoxShadow(
+              color: isDarkMode() ? white : grey,
+              blurRadius: 1.0,
+              offset: const Offset(0, 2),
+              spreadRadius: 0.5)
+        ],
+        borderRadius: BorderRadius.all(
+          Radius.circular(2.h),
+        )),
+    child: ClipRRect(
+        borderRadius: BorderRadius.circular(2.h),
+        child: Image.asset(
+          Asset.homeBanner,
+          fit: BoxFit.cover,
+        )),
   );
 }

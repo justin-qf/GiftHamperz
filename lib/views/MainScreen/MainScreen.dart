@@ -42,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
         SavedScreen(
           callback,
         ),
-        const ProfileScreen(),
+        ProfileScreen(callback),
       ];
     });
     super.initState();

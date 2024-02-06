@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
+import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
@@ -118,11 +119,14 @@ class ProductScreenController extends GetxController {
   RxBool isLoading = false.obs;
 
   void getProductList(context, currentPage, bool hideloading, categoryId,
-      subcategoryId, innerSubcategoryId, String brandId) async {
+      subcategoryId, innerSubcategoryId, String brandId,
+      {bool? isRefress}) async {
+    var loadingIndicator = LoadingProgressDialog();
     if (hideloading == true) {
       state.value = ScreenState.apiLoading;
     } else {
-      isLoading.value = true;
+      loadingIndicator.show(context, '');
+      //isLoading.value = true;
       update();
     }
 
@@ -147,7 +151,11 @@ class ProductScreenController extends GetxController {
         "inner_subcategory_id": innerSubcategoryId,
         "brand_id": brandId
       }, ApiUrl.getProductList, allowHeader: false);
-      // loadingIndicator.hide(context);
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       var data = jsonDecode(response.body);
       logcat("RESPONSE", data.toString());
       if (response.statusCode == 200) {
@@ -157,12 +165,21 @@ class ProductScreenController extends GetxController {
           isLoading.value = false;
           update();
           var responseData = ProductModel.fromJson(data);
-          productList.clear();
+
+          if (isRefress == true) {
+            productList.clear();
+          }
           if (responseData.data.data.isNotEmpty) {
             productList.addAll(responseData.data.data);
+            productList.refresh();
+          }
+          if (responseData.data.nextPageUrl != 'null' &&
+              responseData.data.nextPageUrl != null) {
             nextPageURL.value = responseData.data.nextPageUrl.toString();
+            update();
           } else {
-            //state.value = ScreenState.noDataFound;
+            nextPageURL.value = "";
+            update();
           }
           update();
         } else {
@@ -182,6 +199,11 @@ class ProductScreenController extends GetxController {
             callback: () {});
       }
     } catch (e) {
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       isLoading.value = false;
       state.value = ScreenState.apiError;
       message.value = ServerError.servererror;
@@ -333,7 +355,7 @@ class ProductScreenController extends GetxController {
                                   height: 0.5.h,
                                 ),
                                 getText(
-                                  '\u20B9${data.price}',
+                                  '${IndiaRupeeConstant.inrCode}${data.price}',
                                   TextStyle(
                                       fontFamily: fontBold,
                                       color: primaryColor,
