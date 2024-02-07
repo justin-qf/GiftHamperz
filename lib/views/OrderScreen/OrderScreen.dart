@@ -122,15 +122,13 @@ class _OrderScreenState extends State<OrderScreen>
               ],
             ),
           )
-          // getListViewItem()
         ]),
       ),
     );
   }
 
   Widget apiSuccess(ScreenState state) {
-    // ignore: unrelated_type_equality_checks
-    if (controller.state == ScreenState.apiSuccess &&
+    if (controller.state.value == ScreenState.apiSuccess &&
         controller.orderList.isNotEmpty) {
       return ListView.builder(
         padding: EdgeInsets.only(bottom: 2.h, top: 1.h),

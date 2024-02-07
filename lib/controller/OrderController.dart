@@ -83,8 +83,6 @@ class OrderScreenController extends GetxController {
         return;
       }
       var pageURL = '${ApiUrl.getOrderList}?page=$currentPage';
-      //var pageURL = ApiUrl.getOrderList;
-
       logcat("URL", pageURL.toString());
       var response = await Repository.post({}, pageURL, allowHeader: true);
       if (hideloading != true) {

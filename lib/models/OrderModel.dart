@@ -67,17 +67,17 @@ class Data {
         currentPage: json["current_page"],
         data: List<OrderData>.from(
             json["data"].map((x) => OrderData.fromJson(x))),
-        firstPageUrl: json["first_page_url"],
-        from: json["from"],
+        firstPageUrl: json["first_page_url"] ?? '',
+        from: json["from"] ?? 0,
         lastPage: json["last_page"],
-        lastPageUrl: json["last_page_url"],
+        lastPageUrl: json["last_page_url"] ?? '',
         links: List<Link>.from(json["links"].map((x) => Link.fromJson(x))),
         nextPageUrl: json["next_page_url"],
-        path: json["path"],
+        path: json["path"] ?? '',
         perPage: json["per_page"],
         prevPageUrl: json["prev_page_url"],
-        to: json["to"],
-        total: json["total"],
+        to: json["to"] ?? 0,
+        total: json["total"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -113,6 +113,7 @@ class OrderData {
   int isPackingSeperetly;
   String gstNumber;
   String address;
+  String name;
   int cityId;
   String pincode;
   int isOffice;
@@ -122,6 +123,7 @@ class OrderData {
   String stateName;
   int stateCode;
   String shippingAddress;
+  String shippingAddressName;
   int shippingAddressCityId;
   String shippingAddressPincode;
   int shippingAddressIsOffice;
@@ -148,6 +150,7 @@ class OrderData {
     required this.isPackingSeperetly,
     required this.gstNumber,
     required this.address,
+    required this.name,
     required this.cityId,
     required this.pincode,
     required this.isOffice,
@@ -157,6 +160,7 @@ class OrderData {
     required this.stateName,
     required this.stateCode,
     required this.shippingAddress,
+    required this.shippingAddressName,
     required this.shippingAddressCityId,
     required this.shippingAddressPincode,
     required this.shippingAddressIsOffice,
@@ -170,37 +174,38 @@ class OrderData {
 
   factory OrderData.fromJson(Map<String, dynamic> json) => OrderData(
         id: json["id"],
-        orderId: json["order_id"],
+        orderId: json["order_id"] ?? '',
         customerId: json["customer_id"],
-        dateOfOrder: DateTime.parse(json["date_of_order"].toString() ?? ''),
+        dateOfOrder: DateTime.parse(json["date_of_order"].toString()),
         billingAddressId: json["billing_address_id"],
         shippingAddressId: json["shipping_address_id"],
-        totalAmount: json["total_amount"],
+        totalAmount: json["total_amount"] ?? '',
         promocodeId: json["promocode_id"] ?? 0,
         discount: json["discount"],
-        dateOfDelivery:
-            DateTime.parse(json["date_of_delivery"].toString() ?? ''),
+        dateOfDelivery: DateTime.parse(json["date_of_delivery"].toString()),
         timeOfDelivery: json["time_of_delivery"] ?? '',
-        shipingCharge: json["shiping_charge"],
+        shipingCharge: json["shiping_charge"] ?? '',
         isPackingSeperetly: json["is_packing_seperetly"],
-        gstNumber: json["gst_number"],
-        address: json["address"],
+        gstNumber: json["gst_number"] ?? '',
+        address: json["address"] ?? '',
+        name: json["name"] ?? '',
         cityId: json["city_id"],
-        pincode: json["pincode"],
+        pincode: json["pincode"] ?? '',
         isOffice: json["is_office"],
         isActive: json["is_active"],
-        cityName: json["city_name"],
+        cityName: json["city_name"] ?? '',
         stateId: json["state_id"],
-        stateName: json["state_name"],
+        stateName: json["state_name"] ?? '',
         stateCode: json["state_code"],
-        shippingAddress: json["shipping_address"],
+        shippingAddress: json["shipping_address"] ?? '',
+        shippingAddressName: json["shipping_address_name"] ?? '',
         shippingAddressCityId: json["shipping_address_city_id"],
-        shippingAddressPincode: json["shipping_address_pincode"],
+        shippingAddressPincode: json["shipping_address_pincode"] ?? '',
         shippingAddressIsOffice: json["shipping_address_is_office"],
         shippingAddressIsActive: json["shipping_address_is_active"],
-        shippingAddressCityName: json["shipping_address_city_name"],
+        shippingAddressCityName: json["shipping_address_city_name"] ?? '',
         shippingAddressStateId: json["shipping_address_state_id"],
-        shippingAddressStateName: json["shipping_address_state_name"],
+        shippingAddressStateName: json["shipping_address_state_name"] ?? '',
         shippingAddressStateCode: json["shipping_address_state_code"],
         orderDetails: List<CommonProductList>.from(
             json["order_details"].map((x) => CommonProductList.fromJson(x))),
@@ -224,6 +229,7 @@ class OrderData {
         "is_packing_seperetly": isPackingSeperetly,
         "gst_number": gstNumber,
         "address": address,
+        "name": name,
         "city_id": cityId,
         "pincode": pincode,
         "is_office": isOffice,
@@ -233,6 +239,7 @@ class OrderData {
         "state_name": stateName,
         "state_code": stateCode,
         "shipping_address": shippingAddress,
+        "shipping_address_name": shippingAddressName,
         "shipping_address_city_id": shippingAddressCityId,
         "shipping_address_pincode": shippingAddressPincode,
         "shipping_address_is_office": shippingAddressIsOffice,

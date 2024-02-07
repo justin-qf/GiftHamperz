@@ -307,7 +307,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   controller.getLableText('Delivery Informations',
                       isMainTitle: false),
                   getDynamicSizedBox(height: 0.5.h),
-                  controller.getCommonText('Delivery Address'),
+                  controller.getCommonText('Delivery Address:'),
+                  getDynamicSizedBox(height: 0.5.h),
+                  controller.getCommonText(controller.userName!.toUpperCase(),
+                      isfromAddressName: true),
                   getDynamicSizedBox(height: 0.5.h),
                   controller.getCommonText(
                       '${widget.data!.address}. ${widget.data!.shippingAddressPincode}'),

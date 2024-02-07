@@ -692,8 +692,8 @@ Widget homeCartIncDecUi(
       padding: EdgeInsets.only(
           left: isFromPopular == true ? 2.w : 1.5.w,
           right: isFromPopular == true ? 2.w : 1.5.w,
-          top: 0.5.h,
-          bottom: 0.5.h),
+          top: 0.2.h,
+          bottom: 0.2.h),
       decoration: BoxDecoration(
           color: isDarkMode() ? darkBackgroundColor : darkGrey,
           boxShadow: [
@@ -716,7 +716,7 @@ Widget homeCartIncDecUi(
             },
             child: Icon(
               Icons.remove,
-              size: 2.h,
+              size: 3.h,
               color: isDarkMode() ? white : black,
             ),
           ),
@@ -741,7 +741,7 @@ Widget homeCartIncDecUi(
             },
             child: Icon(
               Icons.add,
-              size: 2.h,
+              size: 3.h,
               color: isDarkMode() ? white : black,
             ),
           ),

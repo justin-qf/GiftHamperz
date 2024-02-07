@@ -32,6 +32,7 @@ class OrderDetailScreenController extends GetxController {
   var currentPage = 0;
   RxList orderDetailList = [].obs;
   RxString finalProductCost = "".obs;
+  String? userName;
 
   setOrderTotalAmount(OrderData? data) {
     //totalAmount.value = data!.totalAmount + data.shipingCharge + data.discount;
@@ -55,6 +56,16 @@ class OrderDetailScreenController extends GetxController {
       }
       // Format productCost to have two decimal places
       finalProductCost.value = productCost.toStringAsFixed(2);
+
+      if (data.name != 'null' && data.name.isNotEmpty) {
+        if (data.isOffice == 0) {
+          userName = "${data.name} [HOME]";
+        } else {
+          userName = "${data.name} [WORK]";
+        }
+      } else {
+        userName = "";
+      }
     } catch (e) {
       logcat("ERROR", e.toString());
     }
@@ -104,7 +115,7 @@ class OrderDetailScreenController extends GetxController {
     );
   }
 
-  Widget getCommonText(title, {bool? isHint}) {
+  Widget getCommonText(title, {bool? isHint, bool? isfromAddressName}) {
     return Container(
       margin: EdgeInsets.only(left: 5.w, right: 5.w),
       child: FadeInUp(
@@ -118,7 +129,8 @@ class OrderDetailScreenController extends GetxController {
                       SizerUtil.deviceType == DeviceType.mobile ? 9.sp : 10.sp,
                 )
               : TextStyle(
-                  fontFamily: fontBold,
+                  fontFamily:
+                      isfromAddressName == true ? fontExtraBold : fontBold,
                   color: isDarkMode() ? lableColor : black,
                   fontSize:
                       SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
