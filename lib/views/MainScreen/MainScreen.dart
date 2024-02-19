@@ -42,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
         SavedScreen(
           callback,
         ),
-        const ProfileScreen(),
+        ProfileScreen(callback),
       ];
     });
     super.initState();
@@ -67,15 +67,18 @@ class _MyHomePageState extends State<MyHomePage> {
         padding:
             const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
         decoration: BoxDecoration(
+          // color: isDarkMode()
+          //     ? bottomMenuColor.withOpacity(0.7)
+          //     : bottomNavBackground.withOpacity(0.8),
           color: isDarkMode()
               ? bottomMenuColor.withOpacity(0.7)
-              : bottomNavBackground.withOpacity(0.8),
+              : white.withOpacity(0.8),
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           boxShadow: [
             BoxShadow(
               blurRadius: 10,
-              spreadRadius: 3,
-              color: black.withOpacity(.1),
+              spreadRadius: 2,
+              color: black.withOpacity(0.2),
             )
           ],
         ),

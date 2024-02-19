@@ -58,7 +58,7 @@ getMiniButton(Function fun, str, {bool? icon}) {
       height: SizerUtil.deviceType == DeviceType.mobile ? 5.h : 4.5.h,
       alignment: Alignment.center,
       padding: const EdgeInsets.only(top: 1),
-      width: SizerUtil.width / 3,
+      width: SizerUtil.width / 1,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
         color: primaryColor,
@@ -78,7 +78,7 @@ getMiniButton(Function fun, str, {bool? icon}) {
             str,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: Colors.white,
+                color: white,
                 fontFamily: fontBold,
                 fontSize:
                     SizerUtil.deviceType == DeviceType.mobile ? 11.sp : 8.sp),
@@ -104,7 +104,8 @@ getMiniButton(Function fun, str, {bool? icon}) {
   );
 }
 
-getSecondaryFormButton(Function fun, str, {isvalidate, bool? isFromDialog,bool? isEnable}) {
+getSecondaryFormButton(Function fun, str,
+    {isvalidate, bool? isFromDialog, bool? isEnable}) {
   return InkWell(
     onTap: () {
       fun();
@@ -367,10 +368,10 @@ commonBtn(str, Function fun, {required bool isvalidate}) {
       fun();
     },
     child: Container(
-      height: SizerUtil.deviceType == DeviceType.mobile ? 13.w : 6.h,
+      height: SizerUtil.deviceType == DeviceType.mobile ? 13.w : 10.h,
       alignment: Alignment.center,
       padding: EdgeInsets.only(
-          top: SizerUtil.deviceType == DeviceType.mobile ? 5 : 2),
+          top: SizerUtil.deviceType == DeviceType.mobile ? 3 : 2),
       width: SizerUtil.width,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(1.7.h),
@@ -391,10 +392,13 @@ commonBtn(str, Function fun, {required bool isvalidate}) {
               end: const FractionalOffset(1.0, 0.0),
               stops: const [0.0, 1.0],
               tileMode: TileMode.clamp)),
-      child: Text(
-        str,
-        style: TextStyle(
-            color: Colors.white, fontFamily: fontBold, fontSize: 14.sp),
+      child: Center(
+        child: Text(
+          str,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: white, fontFamily: fontBold, fontSize: 14.sp, height: 1.2),
+        ),
       ),
     ),
   );

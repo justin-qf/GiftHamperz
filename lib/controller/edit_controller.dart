@@ -11,8 +11,10 @@ import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
+import 'package:gifthamperz/models/UserModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:gifthamperz/models/validation_model.dart';
@@ -74,7 +76,7 @@ class EditProfileController extends GetxController {
     userNamectr = TextEditingController();
     dobCtr = TextEditingController();
     gederCtr = TextEditingController();
-    initDataSet();
+
     super.onInit();
   }
 
@@ -83,6 +85,7 @@ class EditProfileController extends GetxController {
 
   RxString selectGender = "".obs;
   DateTime selectedDate = DateTime.now();
+
   void updateDate(date) {
     dobCtr.text = date;
     update();
@@ -94,14 +97,38 @@ class EditProfileController extends GetxController {
     'Others',
   ].obs;
 
-  initDataSet() async {
+  initDataSet(UserDetailData? loginData) async {
     getUserData = await UserPreferences().getSignInInfo();
-    userNamectr.text = "${getUserData!.firstName} ${getUserData!.lastName}";
-    emailCtr.text = getUserData!.emailId.toString();
-    dobCtr.text = DateFormat(Date.dateFormat)
-        .format(DateTime.parse(getUserData!.dateOfBirth.toString().trim()));
-    selectGender.value = getUserData!.gender.capitalize.toString();
-    profilePic.value = APIImageUrl.url + getUserData!.profilePic.toString();
+    if (loginData != null) {
+      userNamectr.text = loginData.userName!;
+      emailCtr.text = loginData.emailId.toString();
+      selectGender.value = loginData.gender!.capitalize.toString();
+      profilePic.value = APIImageUrl.url + loginData.profilePic.toString();
+
+      logcat("DATE_BIRTH", loginData.dateOfBirth.toString());
+      if (loginData.dateOfBirth.toString() != "null" &&
+          loginData.dateOfBirth.toString().trim().isNotEmpty) {
+        dobCtr.text = DateFormat(Date.dateFormat)
+            .format(DateTime.parse(loginData.dateOfBirth.toString().trim()));
+        DateTime inputDate =
+            DateFormat("dd-MM-yyyy").parse(dobCtr.text.toString().trim());
+        String formattedDateTime =
+            DateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(inputDate);
+        selectedDate = DateTime.parse(formattedDateTime);
+      } else {
+        selectedDate = DateTime.now();
+        // dobCtr.text = DateFormat(Date.dateFormat)
+        //     .format(DateTime.parse(loginData.dateOfBirth.toString().trim()));
+      }
+    } else {
+      // userNamectr.text = "${getUserData!.firstName} ${getUserData!.lastName}";
+      // emailCtr.text = getUserData!.emailId.toString();
+      // dobCtr.text = DateFormat(Date.dateFormat)
+      //     .format(DateTime.parse(getUserData!.dateOfBirth.toString().trim()));
+      // selectGender.value = getUserData!.gender.capitalize.toString();
+      // profilePic.value = APIImageUrl.url + getUserData!.profilePic.toString();
+    }
+    Statusbar().trasparentStatusbarIsNormalScreen();
     update();
   }
 
@@ -214,11 +241,12 @@ class EditProfileController extends GetxController {
       children: [
         Container(
           height: SizerUtil.deviceType == DeviceType.mobile ? 15.h : 10.8.h,
-          margin: const EdgeInsets.only(right: 10),
+          margin: EdgeInsets.only(right: 2.w),
           width: SizerUtil.deviceType == DeviceType.mobile ? 15.h : 10.8.h,
           decoration: BoxDecoration(
+            color: white,
             border: Border.all(color: white, width: 1.w),
-            borderRadius: BorderRadius.circular(100.w),
+            borderRadius: BorderRadius.circular(20.w),
             boxShadow: [
               BoxShadow(
                 color: black.withOpacity(0.1),
@@ -227,38 +255,35 @@ class EditProfileController extends GetxController {
             ],
           ),
           child: CircleAvatar(
+            backgroundColor: isDarkMode() ? black : black,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(50.0),
+              borderRadius: BorderRadius.circular(20.w),
               child: avatarFile.value == null && profilePic.value.isNotEmpty
                   ? CachedNetworkImage(
-                      fit: BoxFit.fitWidth,
-                      // height: 15.h,
-                      // width: 30.w,
+                      fit: BoxFit.cover,
+                      width: 30.w,
                       imageUrl: profilePic.value,
                       placeholder: (context, url) => Padding(
-                            padding: EdgeInsets.all(2.w),
+                            padding: EdgeInsets.all(10.w),
                             child: const Center(
                               child: CircularProgressIndicator(
                                   color: primaryColor),
                             ),
                           ),
-                      imageBuilder: (context, imageProvider) => Image.network(
-                            profilePic.value,
-                            fit: BoxFit.fitWidth,
-                            //height: 2.h,
-                          ),
                       errorWidget: (context, url, error) => SvgPicture.asset(
-                            Asset.avatafr,
+                            Asset.profile,
+                            fit: BoxFit.cover,
                             // ignore: deprecated_member_use
                             color: isDarkMode() ? lableColor : white,
-                            height: 8.0.h,
-                            width: 8.0.h,
+                            height: 13.h,
+                            width: 13.h,
                           ))
                   : avatarFile.value == null
                       ? SvgPicture.asset(
-                          Asset.avatafr,
-                          height: 8.0.h,
-                          width: 8.0.h,
+                          fit: BoxFit.cover,
+                          Asset.profile,
+                          height: 13.h,
+                          width: 13.h,
                           // ignore: deprecated_member_use
                           color: isDarkMode() ? lableColor : white,
                         )
@@ -266,11 +291,12 @@ class EditProfileController extends GetxController {
                           avatarFile.value!,
                           height: 13.h,
                           width: 13.h,
+                          fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return SvgPicture.asset(
-                              Asset.profileimg,
-                              height: 10.h,
-                              width: 10.h,
+                              Asset.profile,
+                              height: 13.h,
+                              width: 13.h,
                             );
                           },
                         ),
@@ -389,22 +415,29 @@ class EditProfileController extends GetxController {
         return;
       }
 
-      DateTime originalDate =
-          DateFormat("dd-MM-yyyy").parse(dobCtr.text.toString().trim());
-      String formattedDate = DateFormat("yyyy-MM-dd").format(originalDate);
+      String? formattedDate = '';
+      if (dobCtr.text.toString().trim().isNotEmpty) {
+        DateTime originalDate =
+            DateFormat("dd-MM-yyyy").parse(dobCtr.text.toString().trim());
+        formattedDate = DateFormat("yyyy-MM-dd").format(originalDate);
+      }
 
       logcat('updatePasssingData', {
         "user_name": userNamectr.text.toString(),
         "email_id": emailCtr.text.toString().trim(),
-        "date_of_birth": formattedDate.toString(),
-        "gender": selectGender.value.toString().toLowerCase().trim(),
+        "date_of_birth": formattedDate.isNotEmpty ? formattedDate : '',
+        "gender": selectGender.value.toString().isNotEmpty
+            ? selectGender.value.toString().toLowerCase().trim()
+            : '',
       });
 
       var response = await Repository.multiPartPost({
         "user_name": userNamectr.text.toString(),
         "email_id": emailCtr.text.toString().trim(),
-        "date_of_birth": formattedDate.toString(),
-        "gender": selectGender.value.toString().toLowerCase().trim(),
+        "date_of_birth": formattedDate.isNotEmpty ? formattedDate : '',
+        "gender": selectGender.value.toString().isNotEmpty
+            ? selectGender.value.toString().toLowerCase().trim()
+            : '',
       }, "${ApiUrl.updateUser}/${getUserData!.id}",
           multiPart:
               avatarFile.value != null && avatarFile.value.toString().isNotEmpty
@@ -425,7 +458,7 @@ class EditProfileController extends GetxController {
         if (json['status'] == 1) {
           showDialogForScreen(
               context, EditScreenConstant.title, json['message'], callback: () {
-            Get.back();
+            Get.back(result: true);
           });
         } else {
           showDialogForScreen(
@@ -439,7 +472,7 @@ class EditProfileController extends GetxController {
     } catch (e) {
       logcat("Exception", e);
       showDialogForScreen(
-          context, RegistrationConstant.title, ServerError.servererror,
+          context, EditScreenConstant.title, ServerError.servererror,
           callback: () {});
     }
   }

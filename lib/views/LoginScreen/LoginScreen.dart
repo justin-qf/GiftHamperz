@@ -181,28 +181,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                     }),
                                   ),
                                 ),
-                                getLable(LoginConst.passwordLable),
-                                FadeInDown(
-                                  child: AnimatedSize(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Obx(() {
-                                      return getReactiveFormField(
-                                          node: controller.passNode,
-                                          controller: controller.passwordctr,
-                                          hintLabel: LoginConst.password,
-                                          wantSuffix: true,
-                                          isPass: true,
-                                          obscuretext: true,
-                                          onChanged: (val) {
-                                            controller.validatePassword(val);
-                                          },
-                                          fromObsecureText: "LOGIN",
-                                          inputType: TextInputType.text,
-                                          errorText:
-                                              controller.passModel.value.error);
-                                    }),
-                                  ),
-                                ),
+                                // getLable(LoginConst.passwordLable),
+                                // FadeInDown(
+                                //   child: AnimatedSize(
+                                //     duration: const Duration(milliseconds: 300),
+                                //     child: Obx(() {
+                                //       return getReactiveFormField(
+                                //           node: controller.passNode,
+                                //           controller: controller.passwordctr,
+                                //           hintLabel: LoginConst.password,
+                                //           wantSuffix: true,
+                                //           isPass: true,
+                                //           obscuretext: true,
+                                //           onChanged: (val) {
+                                //             controller.validatePassword(val);
+                                //           },
+                                //           fromObsecureText: "LOGIN",
+                                //           inputType: TextInputType.text,
+                                //           errorText:
+                                //               controller.passModel.value.error);
+                                //     }),
+                                //   ),
+                                // ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -216,7 +216,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           LoginConst.forgotpass,
                                           style: TextStyle(
                                               fontFamily: fontBold,
-                                              color: primaryColor,
+                                              color: isDarkMode()
+                                                  ? white
+                                                  : primaryColor,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 11.5.sp),
                                         ),
@@ -238,7 +240,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                       return getSecondaryFormButton(() {
                                         if (controller.isFormInvalidate.value ==
                                             true) {
-                                          controller.getSignIn(context);
+                                          controller.getSignIn(
+                                              context,
+                                              controller.numberCtr.text
+                                                  .toString());
                                         }
                                       }, LoginConst.buttonLabel,
                                           isvalidate: controller

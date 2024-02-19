@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
@@ -18,6 +19,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../utils/enum.dart';
 
+// ignore: must_be_immutable
 class SubCategoryScreen extends StatefulWidget {
   SubCategoryScreen({super.key, required this.categoryId});
   String? categoryId;
@@ -81,20 +83,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
         controller.subCategoryList.isNotEmpty) {
       return getListViewItem();
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 5.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -144,7 +133,10 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],
@@ -214,7 +206,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
           ),
         ),
       );
-    } else if (controller.isLoading == false &&
+    } else if (controller.isLoading.value == false &&
         controller.innerSubCategoryList.isNotEmpty) {
       return MasonryGridView.count(
         physics: const BouncingScrollPhysics(),
@@ -231,20 +223,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen>
         itemCount: controller.innerSubCategoryList.length,
       );
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 15.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 

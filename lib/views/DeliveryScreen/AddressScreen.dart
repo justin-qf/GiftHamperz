@@ -11,7 +11,6 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/AddressController.dart';
 import 'package:gifthamperz/models/addressModel.dart';
-import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/views/DeliveryScreen/AddAddressScreen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -19,8 +18,18 @@ import 'package:sizer/sizer.dart';
 
 import '../../utils/enum.dart';
 
+// ignore: must_be_immutable
 class AddressScreen extends StatefulWidget {
-  const AddressScreen({super.key});
+  AddressScreen(
+      {this.shipinCharge,
+      this.totaAmount,
+      this.discount,
+      this.isFromBuyNow,
+      this.id,
+      super.key});
+  String? shipinCharge, totaAmount, discount;
+  bool? isFromBuyNow;
+  int? id;
 
   @override
   State<AddressScreen> createState() => _AddressScreenState();
@@ -39,6 +48,9 @@ class _AddressScreenState extends State<AddressScreen> {
   void apiCalls() async {
     // ignore: use_build_context_synchronously
     controller.getAddressList(context, 0, true);
+    controller.initData(
+        widget.shipinCharge!, widget.totaAmount!, widget.discount!);
+    setState(() {});
   }
 
   @override
@@ -56,7 +68,7 @@ class _AddressScreenState extends State<AddressScreen> {
         child: Stack(children: [
           Column(
             children: [
-              getForgetToolbar(AddAddressText.addressTitle,
+              getForgetToolbar(AddressScreenTextConstant.addressTitle,
                   isList: true, showBackButton: true, callback: () {
                 Get.back();
               }),
@@ -69,11 +81,13 @@ class _AddressScreenState extends State<AddressScreen> {
                           return Future.delayed(
                             const Duration(seconds: 1),
                             () {
-                              controller.getAddressList(context, 0, true);
+                              controller.getAddressList(context, 0, true,
+                                  isRefress: true);
                             },
                           );
                         },
                         child: CustomScrollView(
+                          physics: const BouncingScrollPhysics(),
                           slivers: [
                             SliverToBoxAdapter(
                               child: Obx(() {
@@ -85,7 +99,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                       case ScreenState.noDataFound:
                                       case ScreenState.apiError:
                                         return SizedBox(
-                                          height: SizerUtil.height / 1.5,
+                                          height: SizerUtil.height / 1.2,
                                           child: apiOtherStates(
                                               controller.state.value),
                                         );
@@ -272,7 +286,7 @@ class _AddressScreenState extends State<AddressScreen> {
               child: Obx(() {
                 return setActionButton(
                   context,
-                  AddAddressText.add,
+                  AddressScreenTextConstant.add,
                   controller.currentIndex.value == -1 ? false : true,
                   onActionClick: () {
                     Get.to(AddAddressScreen(
@@ -281,20 +295,21 @@ class _AddressScreenState extends State<AddressScreen> {
                     ))!
                         .then((value) {
                       if (value == true) {
-                        apiCalls();
+                        controller.getAddressList(context, 0, true,
+                            isRefress: true);
                       }
                       Statusbar().trasparentStatusbarIsNormalScreen();
                     });
                   },
                   onClick: () async {
-                    //bool isGuest = await UserPreferences().getGuestUser();
                     if (controller.isGuest.value == true) {
                       // ignore: use_build_context_synchronously
                       getGuestUserAlertDialog(
-                          context, AddAddressText.addressTitle);
+                          context, AddressScreenTextConstant.addressTitle);
                     } else {
-                      //controller.showCustomDialog(context);
-                      controller.openCheckout();
+                      controller.getBuyNowProductListWithCalculation(
+                          context, widget.id, widget.isFromBuyNow);
+                      //controller.openCheckout();
                     }
                   },
                 );
@@ -309,33 +324,39 @@ class _AddressScreenState extends State<AddressScreen> {
     if (controller.state == ScreenState.apiSuccess &&
         controller.addressList.isNotEmpty) {
       return ListView.builder(
-        padding: EdgeInsets.only(bottom: 2.h),
+        padding: EdgeInsets.only(bottom: 20.h),
         physics: const BouncingScrollPhysics(),
         itemCount: controller.addressList.length,
         clipBehavior: Clip.antiAlias,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           var model = controller.addressList[index] as AddressListItem;
-          return controller.getListItem(context, model, index);
+          return Column(
+            children: [
+              controller.getListItem(context, model, index),
+              index == controller.addressList.length - 1 &&
+                      controller.nextPageURL.value.isNotEmpty
+                  ? Container(
+                      margin: EdgeInsets.only(
+                          top: 2.h, left: 25.w, right: 25.w, bottom: 0.8.h),
+                      child: getMiniButton(
+                        () {
+                          controller.isLoading.value = true;
+                          controller.currentPage++;
+                          controller.getAddressList(
+                              context, controller.currentPage, false);
+                          setState(() {});
+                        },
+                        Common.viewMore,
+                      ),
+                    )
+                  : Container()
+            ],
+          );
         },
       );
     } else {
-      return Container(
-        height: SizerUtil.height,
-        width: SizerUtil.width,
-        padding: EdgeInsets.only(bottom: 20.h),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              Common.datanotfound,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-            ),
-          ],
-        ),
-      );
+      return noDataFoundWidget(isFromBlog: true);
     }
   }
 
@@ -385,7 +406,10 @@ class _AddressScreenState extends State<AddressScreen> {
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

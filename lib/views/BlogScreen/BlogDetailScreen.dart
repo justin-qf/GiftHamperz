@@ -66,7 +66,8 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                                 width: 0.5, // Border width
                               ),
                         color: isDarkMode() ? itemDarkBackgroundColor : white,
-                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
                         boxShadow: [
                           BoxShadow(
                               color: isDarkMode()
@@ -85,7 +86,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                             widget.data.title,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                color: isDarkMode() ? white : black,
+                                color: isDarkMode() ? black : black,
                                 fontFamily: fontBold,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 13.sp),
@@ -111,7 +112,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                                     widget.data.shortDescription,
                                     textAlign: TextAlign.justify,
                                     style: TextStyle(
-                                        color: isDarkMode() ? white : black,
+                                        color: isDarkMode() ? black : black,
                                         fontFamily: fontRegular,
                                         fontWeight: FontWeight.w400,
                                         fontSize: 11.sp),

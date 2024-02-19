@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
@@ -28,7 +29,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   void initState() {
-    controller.getCategoryList(context);
+    controller.getCategoryList(context, 0, true);
     super.initState();
   }
 
@@ -54,63 +55,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
               Get.back();
             }),
             Expanded(
-              child: Container(
-                margin: EdgeInsets.only(left: 3.w, right: 3.w),
-                padding: EdgeInsets.only(
-                  top: 3.w,
-                ),
-                child: Obx(() {
-                  switch (controller.state.value) {
-                    case ScreenState.apiLoading:
-                    case ScreenState.noNetwork:
-                    case ScreenState.noDataFound:
-                    case ScreenState.apiError:
-                      return apiOtherStates(controller.state.value);
-                    case ScreenState.apiSuccess:
-                      return apiSuccess(controller.state.value);
-                    default:
-                      Container();
-                  }
-                  return Container();
-                }),
-                // Obx(
-                //   () {
-                //     if (controller.categoryList.isNotEmpty) {
-                //       return MasonryGridView.count(
-                //         physics: const BouncingScrollPhysics(),
-                //         padding: EdgeInsets.only(bottom: 13.h),
-                //         crossAxisCount:
-                //             SizerUtil.deviceType == DeviceType.mobile ? 2 : 3,
-                //         mainAxisSpacing: 10,
-                //         crossAxisSpacing: 4,
-                //         itemBuilder: (context, index) {
-                //           //Api Call
-                //           CategoryData data = controller.categoryList[index];
-                //           return controller.getListItem(data);
-                //         },
-                //         itemCount: controller.categoryList.length,
-                //       );
-                //     } else {
-                //       return Container(
-                //         margin: EdgeInsets.only(bottom: 15.h),
-                //         child: Center(
-                //           child: Text(
-                //             APIResponseHandleText.emptylist,
-                //             style: TextStyle(
-                //               fontFamily: fontMedium,
-                //               color: isDarkMode() ? white : black,
-                //               fontSize:
-                //                   SizerUtil.deviceType == DeviceType.mobile
-                //                       ? 10.sp
-                //                       : 7.sp,
-                //             ),
-                //           ),
-                //         ),
-                //       );
-                //     }
-                //   },
-                // ),
-              ),
+              child: Obx(() {
+                switch (controller.state.value) {
+                  case ScreenState.apiLoading:
+                  case ScreenState.noNetwork:
+                  case ScreenState.noDataFound:
+                  case ScreenState.apiError:
+                    return apiOtherStates(controller.state.value);
+                  case ScreenState.apiSuccess:
+                    return apiSuccess(controller.state.value);
+                  default:
+                    Container();
+                }
+                return Container();
+              }),
             )
           ],
         ),
@@ -124,32 +82,38 @@ class _CategoryScreenState extends State<CategoryScreen> {
         controller.categoryList.isNotEmpty) {
       return MasonryGridView.count(
         physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.only(bottom: 5.h, left: 3.w),
+        padding: EdgeInsets.only(bottom: 2.h, left: 5.w, right: 5.w, top: 2.h),
         crossAxisCount: SizerUtil.deviceType == DeviceType.mobile ? 2 : 3,
         mainAxisSpacing: 10,
         crossAxisSpacing: 4,
         itemBuilder: (context, index) {
-          //Api Call
           CategoryData data = controller.categoryList[index];
-          return controller.getListItem(data);
+          return Column(
+            children: [
+              controller.getOldListItem(data),
+              index == controller.categoryList.length - 1 &&
+                      controller.nextPageURL.value.isNotEmpty
+                  ? Container(
+                      margin: EdgeInsets.only(
+                          top: 2.h, left: 25.w, right: 25.w, bottom: 0.8.h),
+                      child: getMiniButton(
+                        () {
+                          controller.currentPage++;
+                          controller.getCategoryList(
+                              context, controller.currentPage, false);
+                          setState(() {});
+                        },
+                        Common.viewMore,
+                      ),
+                    )
+                  : Container()
+            ],
+          );
         },
         itemCount: controller.categoryList.length,
       );
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 15.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -181,7 +145,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
     if (state == ScreenState.noNetwork) {
       button = getMiniButton(() {
-        controller.getCategoryList(context);
+        controller.getCategoryList(context, controller.currentPage, true);
       }, BottomConstant.tryAgain);
     }
 
@@ -199,7 +163,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

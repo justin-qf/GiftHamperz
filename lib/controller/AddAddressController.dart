@@ -14,6 +14,7 @@ import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/models/addressModel.dart';
 import 'package:gifthamperz/models/cityModel.dart';
 import 'package:gifthamperz/models/validation_model.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
@@ -27,7 +28,9 @@ class AddAddressController extends GetxController {
       streetctr,
       cityctr,
       landMarkctr,
-      pincodectr;
+      pincodectr,
+      userNameCtr,
+      emailIdCtr;
 
   late FocusNode deliverynamenode,
       deliveryaddressnode,
@@ -35,7 +38,9 @@ class AddAddressController extends GetxController {
       streetnode,
       citynode,
       landMarknode,
-      pinCodenode;
+      pinCodenode,
+      userNameNode,
+      emailIdNode;
   var deliveryModel = ValidationModel(null, null, isValidate: false).obs;
   var deliveryaddressModel = ValidationModel(null, null, isValidate: false).obs;
   var addressLineModel = ValidationModel(null, null, isValidate: false).obs;
@@ -43,6 +48,8 @@ class AddAddressController extends GetxController {
   var cityModel = ValidationModel(null, null, isValidate: false).obs;
   var landMarkModel = ValidationModel(null, null, isValidate: false).obs;
   var pinCodeModel = ValidationModel(null, null, isValidate: false).obs;
+  var userNameModel = ValidationModel(null, null, isValidate: false).obs;
+  var emailIdModel = ValidationModel(null, null, isValidate: false).obs;
 
   late TextEditingController searchCityctr;
   late FocusNode searchCityNode;
@@ -52,27 +59,19 @@ class AddAddressController extends GetxController {
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
   String getPass = "";
-  RxString getImagePath = "".obs;
-  RxBool obsecureText = true.obs;
-  bool? isVerify;
   RxString addressType = "".obs;
   RxString apiPassingAddressType = "".obs;
   String? selectCity;
   RxString isActive = "1".obs;
   RxString cityId = "".obs;
-
+  RxBool isGuest = false.obs;
   List<TextEditingController> controllers = [];
-
-  final List<String> city = [
-    'AHMEDABAD',
-    'VADODARA',
-    'RAJKOT',
-    'SURAT',
-  ];
 
   @override
   void onInit() {
     pinCodenode = FocusNode();
+    userNameNode = FocusNode();
+    emailIdNode = FocusNode();
     landMarknode = FocusNode();
     deliverynamenode = FocusNode();
     deliveryaddressnode = FocusNode();
@@ -88,7 +87,14 @@ class AddAddressController extends GetxController {
     landMarkctr = TextEditingController();
     pincodectr = TextEditingController();
     searchCityctr = TextEditingController();
+    userNameCtr = TextEditingController();
+    emailIdCtr = TextEditingController();
     super.onInit();
+  }
+
+  getGuestUser() async {
+    isGuest.value = await UserPreferences().getGuestUserFromApi();
+    update();
   }
 
   setDataInFormFields(
@@ -107,7 +113,6 @@ class AddAddressController extends GetxController {
       deliverynamectr.text = itemData.name.toString();
       pincodectr.text = itemData.pincode.toString();
       cityId.value = itemData.cityId.toString();
-      logcat("cityIDDDDD", cityId.value);
       if (itemData.isOffice == 0) {
         addressType.value = "HOME";
         apiPassingAddressType.value = "0";
@@ -115,11 +120,6 @@ class AddAddressController extends GetxController {
         addressType.value = "WORK";
         apiPassingAddressType.value = "1";
       }
-      // ignore: unrelated_type_equality_checks
-      // if (itemData.cityId != "null" && itemData.cityId.toString().isNotEmpty) {
-      //   getCityList(context, itemData.cityId.toString());
-      // }
-
       validateDeliveryName(deliverynamectr.text);
       validateAddressline(addressLinectr.text);
       validateStreet(streetctr.text);
@@ -134,11 +134,44 @@ class AddAddressController extends GetxController {
       streetctr.text = "";
       landMarkctr.text = "";
       pincodectr.text = "";
+      addressType.value = "HOME";
+      apiPassingAddressType.value = "0";
     }
   }
 
   RxList imageObjectList = [].obs;
   RxString loginImgPath = "".obs;
+
+  void validateName(String? val) {
+    userNameModel.update((model) {
+      if (val != null && val.isEmpty) {
+        model!.error = AddressScreenTextConstant.userNameHint;
+        model.isValidate = false;
+      } else {
+        model!.error = null;
+        model.isValidate = true;
+      }
+    });
+
+    enablButton();
+  }
+
+  void validateEmail(String? val) {
+    emailIdModel.update((model) {
+      if (val != null && val.toString().trim().isEmpty) {
+        model!.error = AddressScreenTextConstant.emailAddressHint;
+        model.isValidate = false;
+      } else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(emailIdCtr.text.trim())) {
+        model!.error = AddressScreenTextConstant.emailAddresValidsHint;
+        model.isValidate = false;
+      } else {
+        model!.error = null;
+        model.isValidate = true;
+      }
+    });
+
+    enablButton();
+  }
 
   void validateDeliveryName(String? val) {
     deliveryModel.update((model) {
@@ -156,7 +189,7 @@ class AddAddressController extends GetxController {
   void validatePinCode(String? val) {
     pinCodeModel.update((model) {
       if (val == null || val.isEmpty) {
-        model!.error = AddAddressText.pinCodeHint;
+        model!.error = AddressScreenTextConstant.pinCodeHint;
         model.isValidate = false;
       } else {
         model!.error = null;
@@ -169,7 +202,7 @@ class AddAddressController extends GetxController {
   void validateLandMark(String? val) {
     landMarkModel.update((model) {
       if (val == null || val.isEmpty) {
-        model!.error = AddAddressText.landmarkHint;
+        model!.error = AddressScreenTextConstant.landmarkHint;
         model.isValidate = false;
       } else {
         model!.error = null;
@@ -232,18 +265,38 @@ class AddAddressController extends GetxController {
   }
 
   void enablButton() {
-    if (deliveryModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (addressLineModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (streetModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (landMarkModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
-    } else if (pinCodeModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
+    if (isGuest.value == true) {
+      if (userNameModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (emailIdModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (deliveryModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (addressLineModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (streetModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (landMarkModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (pinCodeModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else {
+        isFormInvalidate.value = true;
+      }
     } else {
-      isFormInvalidate.value = true;
+      if (deliveryModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (addressLineModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (streetModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (landMarkModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else if (pinCodeModel.value.isValidate == false) {
+        isFormInvalidate.value = false;
+      } else {
+        isFormInvalidate.value = true;
+      }
     }
   }
 
@@ -260,9 +313,8 @@ class AddAddressController extends GetxController {
     try {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
@@ -271,20 +323,25 @@ class AddAddressController extends GetxController {
           "${addressLinectr.text},${streetctr.text},${landMarkctr.text}";
 
       logcat('loginPassingData', {
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
         "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
         "is_office": apiPassingAddressType.value.toString().trim(),
         "is_active": isActive.value.toString().trim(),
+        "user_name": userNameCtr.text.toString().trim(),
+        "email_id": emailIdCtr.text.toString().trim(),
       });
 
       var response = await Repository.post({
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
-        "city_id":
-            cityId.value.toString().trim(), // selectCity.toString().trim(),
+        "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
         "is_office": apiPassingAddressType.value.toString().trim(),
         "is_active": isActive.value.toString().trim(),
+        "user_name": userNameCtr.text.toString().trim(),
+        "email_id": emailIdCtr.text.toString().trim(),
       }, ApiUrl.addAddress, allowHeader: true);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
@@ -292,24 +349,24 @@ class AddAddressController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {
             Get.back(result: true);
           });
         } else {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {});
         }
       } else {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'] ?? "",
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'] ?? "",
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
-      showDialogForScreen(
-          context, AddAddressText.addressTitle, ServerError.servererror,
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          ServerError.servererror,
           callback: () {});
     }
   }
@@ -320,9 +377,8 @@ class AddAddressController extends GetxController {
     try {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
@@ -331,6 +387,7 @@ class AddAddressController extends GetxController {
           "${addressLinectr.text}, ${streetctr.text}, ${landMarkctr.text}";
 
       logcat('loginPassingData', {
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
         "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
@@ -339,6 +396,7 @@ class AddAddressController extends GetxController {
       });
 
       var response = await Repository.update({
+        "name": deliverynamectr.text.toString().trim(),
         "address": storeAddress.toString().trim(),
         "city_id": cityId.value.toString().trim(),
         "pincode": pincodectr.text.toString().trim(),
@@ -351,24 +409,24 @@ class AddAddressController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {
             Get.back(result: true);
           });
         } else {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {});
         }
       } else {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'] ?? "",
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'] ?? "",
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
-      showDialogForScreen(
-          context, AddAddressText.addressTitle, ServerError.servererror,
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          ServerError.servererror,
           callback: () {});
     }
   }

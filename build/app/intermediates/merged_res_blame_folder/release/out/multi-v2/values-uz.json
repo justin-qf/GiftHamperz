@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.app.gifthamperz.app-mergeReleaseResources-28:/values-uz/values-uz.xml",
+            "outputFile": "com.app.gifthamperz.app-mergeReleaseResources-31:/values-uz/values-uz.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Hp\\.gradle\\caches\\transforms-3\\c4988ff80110f75080a936fc6f044848\\transformed\\core-1.10.1\\res\\values-uz\\values-uz.xml",
@@ -69,6 +69,23 @@
                         "startOffsets": "3512,3617,3767,3896,4005,4150,4283,4403,4659,4831,4939,5098,5230,5384,5546,5612,5673",
                         "endColumns": "104,149,128,108,144,132,119,105,171,107,158,131,153,161,65,60,79",
                         "endOffsets": "3612,3762,3891,4000,4145,4278,4398,4504,4826,4934,5093,5225,5379,5541,5607,5668,5748"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Hp\\.gradle\\caches\\transforms-3\\db35fab0c48f32b2eedc860e8daaf4fd\\transformed\\jetified-play-services-wallet-18.1.3\\res\\values-uz\\values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "202",
+                        "endColumns": "80",
+                        "endOffsets": "282"
+                    },
+                    "to": {
+                        "startLines": "56",
+                        "startColumns": "4",
+                        "startOffsets": "5938",
+                        "endColumns": "84",
+                        "endOffsets": "6018"
                     }
                 }
             ]

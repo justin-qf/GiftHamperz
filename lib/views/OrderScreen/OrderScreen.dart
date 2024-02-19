@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
@@ -50,7 +51,7 @@ class _OrderScreenState extends State<OrderScreen>
         color: isDarkMode() ? darkBackgroundColor : transparent,
         child: Column(children: [
           getOrderToolbar(OrderScreenConstant.title),
-          getDynamicSizedBox(height: 2.0.h),
+          getDynamicSizedBox(height: 1.0.h),
           Expanded(
             child: Stack(
               children: [
@@ -60,11 +61,13 @@ class _OrderScreenState extends State<OrderScreen>
                       return Future.delayed(
                         const Duration(seconds: 1),
                         () {
-                          controller.getOrderList(context, 0, true);
+                          controller.getOrderList(context, 0, true,
+                              isRefress: true);
                         },
                       );
                     },
                     child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverToBoxAdapter(
                           child: Obx(() {
@@ -76,7 +79,7 @@ class _OrderScreenState extends State<OrderScreen>
                                   case ScreenState.noDataFound:
                                   case ScreenState.apiError:
                                     return SizedBox(
-                                      height: SizerUtil.height / 1.5,
+                                      height: SizerUtil.height / 1.2,
                                       child: apiOtherStates(
                                           controller.state.value),
                                     );
@@ -119,42 +122,48 @@ class _OrderScreenState extends State<OrderScreen>
               ],
             ),
           )
-
-          // getListViewItem()
         ]),
       ),
     );
   }
 
   Widget apiSuccess(ScreenState state) {
-    // ignore: unrelated_type_equality_checks
-    if (controller.state == ScreenState.apiSuccess &&
+    if (controller.state.value == ScreenState.apiSuccess &&
         controller.orderList.isNotEmpty) {
       return ListView.builder(
-        padding: EdgeInsets.only(bottom: 2.h),
+        padding: EdgeInsets.only(bottom: 2.h, top: 1.h),
         physics: const BouncingScrollPhysics(),
         itemCount: controller.orderList.length,
         clipBehavior: Clip.antiAlias,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           OrderData model = controller.orderList[index];
-          return controller.getOrderListItem(context, model, index);
+          return Column(
+            children: [
+              controller.getOrderListItem(context, model, index),
+              index == controller.orderList.length - 1 &&
+                      controller.nextPageURL.value.isNotEmpty
+                  ? Container(
+                      margin: EdgeInsets.only(
+                          top: 2.h, left: 25.w, right: 25.w, bottom: 0.8.h),
+                      child: getMiniButton(
+                        () {
+                          controller.isLoading.value = true;
+                          controller.currentPage++;
+                          controller.getOrderList(
+                              context, controller.currentPage, false);
+                          setState(() {});
+                        },
+                        Common.viewMore,
+                      ),
+                    )
+                  : Container()
+            ],
+          );
         },
       );
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
-              Common.datanotfound,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-            ),
-          ),
-        ],
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -197,6 +206,7 @@ class _OrderScreenState extends State<OrderScreen>
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
             margin: EdgeInsets.symmetric(horizontal: 20.w),
@@ -204,7 +214,10 @@ class _OrderScreenState extends State<OrderScreen>
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

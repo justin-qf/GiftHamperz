@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
@@ -13,16 +14,18 @@ import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/mainScreenController.dart';
 import 'package:gifthamperz/controller/profile_controller.dart';
 import 'package:gifthamperz/controller/theme_controller.dart';
+import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/BlogScreen/BlogScreen.dart';
-import 'package:gifthamperz/views/ChangePasswordScreen/ChangePasswordScreen.dart';
 import 'package:gifthamperz/views/EditProfile/EditProfileScreen.dart';
 import 'package:gifthamperz/views/OrderScreen/OrderScreen.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  ProfileScreen(this.callBack, {super.key});
+  Function callBack;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -35,11 +38,30 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   var controller = Get.put(ProfileController());
-
+  bool? isGuest;
   @override
   void initState() {
-    super.initState();
+    getGuestUser();
     controller.setData();
+    getUserDataApi();
+    super.initState();
+  }
+
+  getUserDataApi() async {
+    try {
+      if (mounted) {
+        await Future.delayed(const Duration(seconds: 1)).then((value) {
+          controller.getUserById(context);
+        });
+      }
+    } catch (e) {
+      logcat("ERROR", e);
+    }
+  }
+
+  getGuestUser() async {
+    isGuest = await UserPreferences().getGuestUser();
+    setState(() {});
   }
 
   @override
@@ -48,7 +70,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return CustomParentScaffold(
       onWillPop: () async {
         logcat("onWillPop", "DONE");
-        return true;
+        widget.callBack(0);
+        return false;
       },
       onTap: () {
         controller.hideKeyboard(context);
@@ -76,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Positioned(
                 left: 5.w,
-                top: 30.h,
+                top: 30.5.h,
                 child: SizedBox(
                   width: SizerUtil.width,
                   child: FadeInLeft(child: Obx(
@@ -86,25 +109,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(50)),
-                                    child: CachedNetworkImage(
-                                      fit: BoxFit.cover,
-                                      height: 9.h,
-                                      imageUrl: controller.profilePic.value,
-                                      placeholder: (context, url) =>
-                                          const Center(
-                                        child: CircularProgressIndicator(
-                                            color: primaryColor),
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: transparent,
+                                      border: Border.all(
+                                        color: black,
+                                        // Set the border color here
+                                        width: 1.5, // Set the border width
                                       ),
-                                      errorWidget: (context, url, error) =>
-                                          Image.asset(
-                                        Asset.avaterTwoholder,
-                                        height: 9.h,
-                                        width: 9.h,
-                                        fit: BoxFit.cover,
-                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(50)),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(50)),
+                                      child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          height: 8.h,
+                                          imageUrl: controller.profilePic.value,
+                                          placeholder: (context, url) =>
+                                              SizedBox(
+                                                height: 8.h,
+                                                child: const Center(
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsets.all(8.0),
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            color:
+                                                                primaryColor),
+                                                  ),
+                                                ),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              SvgPicture.asset(
+                                                Asset.profile,
+                                                fit: BoxFit.cover,
+                                                // ignore: deprecated_member_use
+                                                color: black,
+                                                height: 8.h,
+                                                width: 8.h,
+                                              )),
                                     ),
                                   ),
                                   Expanded(
@@ -172,19 +218,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        FadeInUp(
-                          child: controller.getMenuListItem(
-                              title: ProfileConstant.title,
-                              callback: () {
-                                Get.to(const EditProfileScreen())!
-                                    .then((value) {
-                                  Statusbar().trasparentStatusbarProfile(false);
-                                });
-                              },
-                              color: profileOneColor,
-                              iconDate: Icons.person_rounded,
-                              icon: Asset.viewfamily),
-                        ),
+                        isGuest != true
+                            ? FadeInUp(
+                                child: controller.getMenuListItem(
+                                    title: ProfileConstant.title,
+                                    callback: () {
+                                      Get.to(EditProfileScreen(
+                                              controller.loginData))!
+                                          .then((value) {
+                                        Statusbar()
+                                            .trasparentStatusbarProfile(false);
+                                        if (value == true) {
+                                          getUserDataApi();
+                                        }
+                                      });
+                                    },
+                                    color: profileOneColor,
+                                    iconDate: Icons.person_rounded,
+                                    icon: Asset.viewfamily),
+                              )
+                            : Container(),
+                        // GetBuilder<ProfileController>(builder: (internetCtr) {
+                        //   if (controller.isGuest!.value == true) {
+                        //     return FadeInUp(
+                        //       child: controller.getMenuListItem(
+                        //           title: ProfileConstant.title,
+                        //           callback: () {
+                        //             Get.to(const EditProfileScreen())!
+                        //                 .then((value) {
+                        //               Statusbar()
+                        //                   .trasparentStatusbarProfile(false);
+                        //             });
+                        //           },
+                        //           color: profileOneColor,
+                        //           iconDate: Icons.person_rounded,
+                        //           icon: Asset.viewfamily),
+                        //     );
+                        //   } else {
+                        //     return Container();
+                        //   }
+                        // }),
                         FadeInUp(
                           child: controller.getMenuListItem(
                               title: ProfileConstant.order,
@@ -221,19 +294,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               iconDate: Icons.help_outline_outlined,
                               icon: Asset.viewfamily),
                         ),
-                        FadeInUp(
-                          child: controller.getMenuListItem(
-                              title: ProfileConstant.changePassword,
-                              callback: () {
-                                Get.to(const ChangePasswordScreen())!
-                                    .then((value) {
-                                  Statusbar().trasparentStatusbarProfile(false);
-                                });
-                              },
-                              color: profileSixColor,
-                              iconDate: Icons.lock_outline_rounded,
-                              icon: Asset.viewfamily),
-                        ),
+                        // FadeInUp(
+                        //   child: controller.getMenuListItem(
+                        //       title: ProfileConstant.changePassword,
+                        //       callback: () {
+                        //         Get.to(const ChangePasswordScreen())!
+                        //             .then((value) {
+                        //           Statusbar().trasparentStatusbarProfile(false);
+                        //         });
+                        //       },
+                        //       color: profileSixColor,
+                        //       iconDate: Icons.lock_outline_rounded,
+                        //       icon: Asset.viewfamily),
+                        // ),
                         FadeInUp(
                           child: controller.getMenuListItem(
                               title: ProfileConstant.blog,
@@ -255,16 +328,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               iconDate: Icons.brightness_4_outlined,
                               icon: Asset.viewfamily),
                         ),
-                        FadeInUp(
-                          child: controller.getMenuListItem(
-                              title: ProfileConstant.logout,
-                              callback: () {
-                                PopupDialogs(context, false);
-                              },
-                              color: profileThreeColor,
-                              iconDate: Icons.logout_outlined,
-                              icon: Asset.viewfamily),
-                        ),
+                        isGuest != true
+                            ? FadeInUp(
+                                child: controller.getMenuListItem(
+                                    title: ProfileConstant.logout,
+                                    callback: () {
+                                      PopupDialogs(context, false);
+                                    },
+                                    color: profileThreeColor,
+                                    iconDate: Icons.logout_outlined,
+                                    icon: Asset.viewfamily),
+                              )
+                            : Container()
                       ],
                     ),
                   ),
@@ -378,7 +453,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onChanged: (value) async {
                 controller.states = value;
                 controller.isDarkModeEnable.value =
-                    controller.isDarkModeEnable.value == 0 ? 1 : 0;
+                    controller.getStorage.read(GetStorageKey.IS_DARK_MODE) == 0
+                        ? 1
+                        : 0;
+                setState(() {});
+                // Delay for a short period to ensure the state changes are processed
+                await Future.delayed(const Duration(milliseconds: 50));
+
                 setState(() {});
                 await controller.getStorage.write(GetStorageKey.IS_DARK_MODE,
                     controller.isDarkModeEnable.value);
@@ -387,6 +468,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Get.find<ThemeController>().update();
                 logcat('DarkModeStatus',
                     (controller.getStorage.read(GetStorageKey.IS_DARK_MODE)));
+                // Delay before updating MainScreenController
+                await Future.delayed(const Duration(milliseconds: 50));
                 setState(() {});
                 Get.find<MainScreenController>().updateDarkMode();
               },

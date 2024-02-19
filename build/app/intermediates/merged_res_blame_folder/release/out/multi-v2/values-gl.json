@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.app.gifthamperz.app-mergeReleaseResources-28:/values-gl/values-gl.xml",
+            "outputFile": "com.app.gifthamperz.app-mergeReleaseResources-31:/values-gl/values-gl.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Hp\\.gradle\\caches\\transforms-3\\aba8f806953ea3dd8f794da3aeb78a12\\transformed\\jetified-play-services-base-18.0.1\\res\\values-gl\\values.xml",
@@ -18,6 +18,23 @@
                         "startOffsets": "3581,3687,3850,3979,4087,4246,4378,4497,4740,4911,5020,5189,5324,5489,5641,5708,5777",
                         "endColumns": "105,162,128,107,158,131,118,108,170,108,168,134,164,151,66,68,84",
                         "endOffsets": "3682,3845,3974,4082,4241,4373,4492,4601,4906,5015,5184,5319,5484,5636,5703,5772,5857"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Hp\\.gradle\\caches\\transforms-3\\db35fab0c48f32b2eedc860e8daaf4fd\\transformed\\jetified-play-services-wallet-18.1.3\\res\\values-gl\\values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "202",
+                        "endColumns": "73",
+                        "endOffsets": "275"
+                    },
+                    "to": {
+                        "startLines": "56",
+                        "startColumns": "4",
+                        "startOffsets": "6046",
+                        "endColumns": "77",
+                        "endOffsets": "6119"
                     }
                 },
                 {

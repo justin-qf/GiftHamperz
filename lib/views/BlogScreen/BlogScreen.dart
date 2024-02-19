@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
@@ -62,7 +63,8 @@ class _BlocgScreenState extends State<BlocgScreen>
                         const Duration(seconds: 1),
                         () {
                           controller.getBlogList(
-                              context, 1, controller.selectedBlogTypeId!, true);
+                              context, 1, controller.selectedBlogTypeId!, true,
+                              isRefress: true);
                         },
                       );
                     },
@@ -79,7 +81,7 @@ class _BlocgScreenState extends State<BlocgScreen>
                                   case ScreenState.noDataFound:
                                   case ScreenState.apiError:
                                     return SizedBox(
-                                      height: SizerUtil.height,
+                                      height: SizerUtil.height / 1.3,
                                       child: Center(
                                         child: apiOtherStates(
                                             controller.state.value),
@@ -136,20 +138,7 @@ class _BlocgScreenState extends State<BlocgScreen>
         controller.blogTypeList.isNotEmpty) {
       return getListViewItem();
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 5.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -172,15 +161,12 @@ class _BlocgScreenState extends State<BlocgScreen>
 
   Widget apiOtherStates(state) {
     if (state == ScreenState.apiLoading) {
-      return Container(
-        padding: EdgeInsets.only(bottom: 15.h),
-        child: Center(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 30,
-            ),
+      return Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(100),
+          child: LoadingAnimationWidget.discreteCircle(
+            color: primaryColor,
+            size: 30,
           ),
         ),
       );
@@ -213,11 +199,12 @@ class _BlocgScreenState extends State<BlocgScreen>
         Container(
             margin: EdgeInsets.symmetric(horizontal: 20.w),
             child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
+                ? Text(controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-                  )
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black))
                 : button),
       ],
     );
@@ -248,7 +235,7 @@ class _BlocgScreenState extends State<BlocgScreen>
               ),
             ),
           ));
-    } else if (controller.isLoading == false &&
+    } else if (controller.isLoading.value == false &&
         controller.blogList.isNotEmpty) {
       return ListView.builder(
         padding: EdgeInsets.only(bottom: 2.h),
@@ -258,24 +245,36 @@ class _BlocgScreenState extends State<BlocgScreen>
         shrinkWrap: true,
         itemBuilder: (context, index) {
           BlogDataList model = controller.blogList[index];
-          return controller.getBlogListItem(context, model, index);
+          return Column(
+            children: [
+              controller.getBlogListItem(context, model, index),
+              index == controller.blogList.length - 1 &&
+                      controller.nextPageURL.value.isNotEmpty
+                  ? Container(
+                      margin: EdgeInsets.only(
+                          top: 2.h, left: 25.w, right: 25.w, bottom: 0.8.h),
+                      child: getMiniButton(
+                        () {
+                          controller.isLoading.value = true;
+                          controller.currentPage++;
+                          controller.getBlogList(
+                              context,
+                              controller.currentPage,
+                              controller.selectedBlogTypeId!,
+                              false,
+                              isRefress: true);
+                          setState(() {});
+                        },
+                        Common.viewMore,
+                      ),
+                    )
+                  : Container()
+            ],
+          );
         },
       );
     } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 15.h),
-        child: Center(
-          child: Text(
-            APIResponseHandleText.emptylist,
-            style: TextStyle(
-              fontFamily: fontMedium,
-              color: isDarkMode() ? white : black,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 10.sp : 7.sp,
-            ),
-          ),
-        ),
-      );
+      return noDataFoundWidget(isFromBlog: true);
     }
   }
 
@@ -295,7 +294,8 @@ class _BlocgScreenState extends State<BlocgScreen>
           controller.selectedBlogTypeId =
               controller.blogTypeList[index].id.toString();
           controller.getBlogList(
-              context, 1, controller.selectedBlogTypeId!, false);
+              context, 1, controller.selectedBlogTypeId!, false,
+              isRefress: true);
         }
       },
       child: AnimatedContainer(

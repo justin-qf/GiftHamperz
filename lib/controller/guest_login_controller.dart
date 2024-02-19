@@ -137,7 +137,7 @@ class GuestLoginController extends GetxController {
 
       var response = await Repository.post({
         "mobile_no": number,
-      }, ApiUrl.getSignUpOtp, allowHeader: false);
+      }, ApiUrl.login, allowHeader: false);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -148,7 +148,7 @@ class GuestLoginController extends GetxController {
           otp!.value = data['otp'].toString();
           showDialogForScreen(
               context, LoginConst.buttonLabel, data['otp'].toString(),
-              callback: () {
+              isFromLogin: true, callback: () {
             // Get.to(OtpScreen(
             //   mobile: number.toString().trim(),
             //   otp: data['otp'].toString(),
@@ -199,18 +199,23 @@ class GuestLoginController extends GetxController {
       var response = await Repository.post({
         "mobile_no": mobile,
         "otp": otpController.text,
-      }, ApiUrl.getVerifyGuestOtp);
+      }, ApiUrl.verifyLoginOtp);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       logcat("verifyOtpAPI_RESPONSE", jsonEncode(data));
       if (response.statusCode == 200) {
-        logcat("STEP-1", 'DONE');
         if (data['status'] == 1) {
-          logcat("STEP-2", 'DONE');
           var loginData = LoginModel.fromJson(data);
           UserPreferences().saveSignInInfo(loginData.user);
           UserPreferences().setToken(loginData.user.token);
           UserPreferences().setIsGuestUser(false);
+          if (loginData.user.isGuestLogin == "false") {
+            logcat("isGuestLogin-1", loginData.user.isGuestLogin.toString());
+            UserPreferences().setIsGuestUserFromApi(false);
+          } else {
+            logcat("isGuestLogin-2", loginData.user.isGuestLogin.toString());
+            UserPreferences().setIsGuestUserFromApi(true);
+          }
 
           if (screenName == DashboardText.dashboard) {
             Get.find<HomeScreenController>().getHome(context);
@@ -219,12 +224,12 @@ class GuestLoginController extends GetxController {
             Get.find<SearchScreenController>().getGuestLogin();
           }
 
-          if (screenName == AddAddressText.addressTitle) {
+          if (screenName == AddressScreenTextConstant.addressTitle) {
             Get.find<AddressScreenController>()
                 .getAddressList(context, 0, true);
           }
 
-          if (screenName == AddAddressText.addressTitle) {
+          if (screenName == AddressScreenTextConstant.addressTitle) {
             Get.find<AddressScreenController>()
                 .getAddressList(context, 0, true);
             Get.find<AddressScreenController>().getGuestUser();
@@ -250,7 +255,6 @@ class GuestLoginController extends GetxController {
           });
         }
       } else {
-        logcat("STEP-4", jsonEncode(data));
         showDialogForScreen(context, VerificationScreen.title, data['message'],
             callback: () {
           startTimer();
@@ -259,7 +263,6 @@ class GuestLoginController extends GetxController {
         });
       }
     } catch (e) {
-      logcat("STEP-5", 'DONE');
       logcat("Exception", e);
       showDialogForScreen(
           context, VerificationScreen.title, ServerError.servererror,

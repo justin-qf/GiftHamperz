@@ -2,15 +2,12 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/input/form_inputs.dart';
 import 'package:gifthamperz/componant/input/style.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
-import 'package:gifthamperz/controller/CartController.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/controller/guest_login_controller.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -27,6 +24,7 @@ void showMessage(
     String? title,
     String? message,
     String? positiveButton,
+    bool? isFromLogin,
     String? negativeButton}) {
   showDialog(
       barrierDismissible: false,
@@ -72,9 +70,13 @@ void showMessage(
                         style: TextStyle(
                             fontSize: SizerUtil.deviceType == DeviceType.mobile
                                 ? 12.sp
-                                : 6.sp,
+                                : 10.sp,
                             fontFamily: fontMedium,
-                            color: isDarkMode() ? white : black),
+                            color: isDarkMode()
+                                ? isFromLogin == true
+                                    ? white
+                                    : white
+                                : black),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -86,7 +88,7 @@ void showMessage(
 }
 
 showDialogForScreen(context, String title, String message,
-    {Function? callback}) {
+    {Function? callback, bool? isFromLogin}) {
   showMessage(
       context: context,
       callback: () {
@@ -95,6 +97,7 @@ showDialogForScreen(context, String title, String message,
         }
         return true;
       },
+      isFromLogin: isFromLogin,
       message: message,
       title: title,
       negativeButton: '',
@@ -390,7 +393,7 @@ Future showValidationDialog(
 getGuestUserLogin(BuildContext context, String screemName) async {
   return await showGeneralDialog(
     context: context,
-    barrierDismissible: true,
+    barrierDismissible: false,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: Colors.black54,
     transitionDuration: const Duration(milliseconds: 600),
@@ -425,6 +428,7 @@ Future<Future> getLoginBottomSheetDialog(
   return showModalBottomSheet(
       context: parentContext,
       clipBehavior: Clip.antiAlias,
+      isDismissible: false,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
         topLeft: Radius.circular(13.w),
@@ -483,6 +487,14 @@ Future<Future> getLoginBottomSheetDialog(
                               child: InkWell(
                                 onTap: () {
                                   Navigator.pop(context);
+                                  if (controller.isOtpVisible!.value == true) {
+                                    controller.isOtpVisible!.value = false;
+                                    setState(() {});
+                                  }
+                                  if (screenName == CartScreenConstant.title) {
+                                    Statusbar()
+                                        .trasparentStatusbarIsNormalScreen();
+                                  }
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.only(
@@ -494,7 +506,7 @@ Future<Future> getLoginBottomSheetDialog(
                                       children: [
                                         Icon(
                                           Icons.close_rounded,
-                                          color: Colors.black,
+                                          color: black,
                                           size: SizerUtil.deviceType ==
                                                   DeviceType.mobile
                                               ? 25
@@ -529,12 +541,12 @@ Future<Future> getLoginBottomSheetDialog(
                                   focusedPinTheme: getPinTheme().copyWith(
                                     height: 68.0,
                                     width: 64.0,
-                                    decoration:
-                                        getPinTheme().decoration!.copyWith(
-                                              border: Border.all(
-                                                  color: const Color.fromRGBO(
-                                                      114, 178, 238, 1)),
-                                            ),
+                                    decoration: getPinTheme()
+                                        .decoration!
+                                        .copyWith(
+                                          border:
+                                              Border.all(color: primaryColor),
+                                        ),
                                   ),
                                   errorPinTheme: getPinTheme().copyWith(
                                     decoration: BoxDecoration(
@@ -556,6 +568,7 @@ Future<Future> getLoginBottomSheetDialog(
                                         onChanged: (val) {
                                           controller.validatePhone(val);
                                         },
+                                        isWhite: true,
                                         obscuretext: false,
                                         inputType: TextInputType.number,
                                         errorText:
@@ -585,7 +598,7 @@ Future<Future> getLoginBottomSheetDialog(
                                             controller.otp!.value.toString(),
                                             controller.numberCtr.text
                                                 .toString(),
-                                                screenName);
+                                            screenName);
                                       }
                                     } else {
                                       if (controller.isFormInvalidate.value ==
@@ -664,7 +677,7 @@ Future<Future> getLoginBottomSheetDialog(
                                                             FontWeight.w100,
                                                         fontFamily: fontRegular,
                                                         color: isDarkMode()
-                                                            ? white
+                                                            ? black
                                                             : labelTextColor),
                                                   ),
                                           );

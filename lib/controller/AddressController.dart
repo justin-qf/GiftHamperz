@@ -18,8 +18,8 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/addressModel.dart';
-import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/models/validation_model.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
@@ -32,13 +32,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:sizer/sizer.dart';
 import 'internet_controller.dart';
+import 'package:http/http.dart' as http;
 
 class AddressScreenController extends GetxController {
-  List pageNavigation = [];
-  RxInt currentTreeView = 2.obs;
-  RxBool isLiked = true.obs;
-  RxBool isTreeModeVertical = true.obs;
-  RxBool accessToDrawer = false.obs;
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
   final InternetController networkManager = Get.find<InternetController>();
@@ -47,21 +43,29 @@ class AddressScreenController extends GetxController {
   RxBool isLoading = false.obs;
   RxList addressList = [].obs;
   RxString nextPageURL = "".obs;
-
-  RxList<AddressItem> addressData = <AddressItem>[
-    AddressItem("Home", '137, Last Bus Stop, Bapunagar ,ahmedabad'),
-    AddressItem("Office", '510/Satva Icon, Vastral'),
-    AddressItem("Parent Home", '8312 North Lake Forest St. New York, NY-10003'),
-    AddressItem("Sister Home", '6524 North Lake Forest St. New York, NY-10035'),
-    AddressItem(
-        "Brother Home", '2541 North Lake Forest St. New York, NY-10014'),
-  ].obs;
+  RxString? shipinCharge = "".obs;
+  RxString? totaAmount = "".obs;
+  RxString? selectedAddId = "".obs;
+  RxString? discount = "".obs;
+  var currentPage = 0;
 
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
     }
+  }
+
+  initData(String shipinCharges, String finalAmount, String discountAmount) {
+    shipinCharge!.value = shipinCharges;
+    totaAmount!.value = finalAmount;
+    discount!.value = discountAmount;
+    update();
+  }
+
+  selectedAddressId(String id) {
+    selectedAddId!.value = id;
+    update();
   }
 
   RxBool isGuest = false.obs;
@@ -98,35 +102,37 @@ class AddressScreenController extends GetxController {
     );
   }
 
-  void getAddressList(context, currentPage, bool hideloading) async {
+  void getAddressList(
+    context,
+    currentPage,
+    bool hideloading, {
+    bool? isRefress,
+  }) async {
+    var loadingIndicator = LoadingProgressDialog();
+
     if (hideloading == true) {
       state.value = ScreenState.apiLoading;
     } else {
+      loadingIndicator.show(context, '');
       isLoading.value = true;
       update();
     }
 
     try {
       if (networkManager.connectionType == 0) {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
       }
-      //var pageURL = ApiUrl.getAddress + currentPage.toString();
-      var pageURL = ApiUrl.getAddress;
-
-      logcat("URL", pageURL.toString());
+      var pageURL = '${ApiUrl.getAddress}?page=$currentPage';
       var response = await Repository.post({
         // "city_id": 25,
       }, pageURL, allowHeader: true);
 
       // loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
-      logcat("RESPONSE", jsonEncode(data));
-      logcat("StatusCode", response.statusCode.toString());
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           state.value = ScreenState.apiSuccess;
@@ -134,33 +140,47 @@ class AddressScreenController extends GetxController {
           isLoading.value = false;
           var responseData = AddressModel.fromJson(data);
           logcat("LISTEMPTY", responseData.data.data.length.toString());
-          if (responseData.data.data.isNotEmpty) {
+
+          if (isRefress == true) {
             addressList.clear();
+          }
+          if (responseData.data.data.isNotEmpty) {
             addressList.addAll(responseData.data.data);
+            addressList.refresh();
+          }
+
+          if (responseData.data.nextPageUrl != 'null' &&
+              responseData.data.nextPageUrl != null) {
             nextPageURL.value = responseData.data.nextPageUrl.toString();
+            update();
           } else {
-            //state.value = ScreenState.noDataFound;
+            nextPageURL.value = "";
+            update();
           }
           logcat("NextPageURL", nextPageURL.value.toString());
-          // currentPage++;
           update();
         } else {
           isLoading.value = false;
           message.value = data['message'];
           state.value = ScreenState.apiError;
-          showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'].toString(),
+          showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+              data['message'].toString(),
               callback: () {});
         }
       } else {
         state.value = ScreenState.apiError;
         isLoading.value = false;
         message.value = APIResponseHandleText.serverError;
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'].toString(),
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'].toString(),
             callback: () {});
       }
     } catch (e) {
+      if (hideloading != true) {
+        loadingIndicator.hide(
+          context,
+        );
+      }
       isLoading.value = false;
       state.value = ScreenState.apiError;
       message.value = ServerError.servererror;
@@ -173,9 +193,8 @@ class AddressScreenController extends GetxController {
     try {
       if (networkManager.connectionType == 0) {
         loadingIndicator.hide(context);
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, Connection.noConnection,
-            callback: () {
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            Connection.noConnection, callback: () {
           Get.back();
         });
         return;
@@ -193,30 +212,29 @@ class AddressScreenController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {
             Get.back(result: true);
           });
         } else {
           showDialogForScreen(
-              context, AddAddressText.addressTitle, data['message'],
+              context, AddressScreenTextConstant.addressTitle, data['message'],
               callback: () {});
         }
       } else {
-        showDialogForScreen(
-            context, AddAddressText.addressTitle, data['message'] ?? "",
+        showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+            data['message'] ?? "",
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
-      showDialogForScreen(
-          context, AddAddressText.addressTitle, ServerError.servererror,
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          ServerError.servererror,
           callback: () {});
     }
   }
 
   getListItem(BuildContext context, AddressListItem data, int index) {
-    logcat("currentIndex-111", currentIndex.value.toString());
     String title;
     if (data.isOffice == 0) {
       title = '[Home]';
@@ -230,110 +248,122 @@ class AddressScreenController extends GetxController {
           child: Container(
             margin: EdgeInsets.only(
                 top: 1.h, left: 5.5.w, right: 5.5.w, bottom: 1.h),
-            padding:
-                EdgeInsets.only(top: 1.h, left: 4.w, right: 4.w, bottom: 1.h),
+            padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
-              color: isDarkMode() ? itemDarkBackgroundColor : white,
+              color: transparent,
               border: Border.all(
                 color: isSelected
-                    ? primaryColor
+                    ? isDarkMode()
+                        ? white
+                        : primaryColor
                     : transparent, // Set the border color here
-                width: 2.0, // Set the border width
+                width: isDarkMode() ? 3.0 : 2.0, // Set the border width
               ),
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              borderRadius: const BorderRadius.all(Radius.circular(18)),
               boxShadow: [
                 BoxShadow(
                     color: isDarkMode()
-                        ? grey.withOpacity(0.2)
-                        : grey.withOpacity(0.3),
+                        ? grey.withOpacity(0.0)
+                        : grey.withOpacity(0.2),
                     spreadRadius: 2,
                     blurRadius: 6,
                     offset: const Offset(0.3, 0.3)),
               ],
             ),
-            child: InkWell(
-              onTap: () {
-                currentIndex.value = isSelected ? -1 : index;
-                update();
-                logcat("currentIndex", currentIndex.value.toString());
-                //controller.currentIndex = index; // Select the item
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 60.w,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${data.name} $title",
-                              style: TextStyle(
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
-                                          ? 12.sp
-                                          : 13.sp,
-                                  fontFamily: fontBold,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDarkMode() ? white : black),
-                            ),
-                            getDynamicSizedBox(height: 0.5.h),
-                            Text(
-                              data.address.toString(),
-                              style: TextStyle(
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
-                                          ? 11.sp
-                                          : 13.sp,
-                                  fontFamily: fontBold,
-                                  color: lableColor),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          Get.to(AddAddressScreen(
-                            isFromEdit: true,
-                            itemData: data,
-                          ))!
-                              .then((value) {
-                            logcat("value", value.toString());
-                            if (value == true) {
-                              getAddressList(context, 0, true);
-                            }
-                            Statusbar().trasparentStatusbarIsNormalScreen();
-                          });
-                        },
-                        child: SizedBox(
-                          width: 8.w,
+            child: Container(
+              padding:
+                  EdgeInsets.only(top: 1.h, left: 4.w, right: 4.w, bottom: 1.h),
+              decoration: BoxDecoration(
+                color: isDarkMode() ? itemDarkBackgroundColor : white,
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
+              ),
+              child: InkWell(
+                onTap: () {
+                  currentIndex.value = isSelected ? -1 : index;
+                  update();
+                  logcat("currentIndex", currentIndex.value.toString());
+                  selectedAddressId(data.id.toString());
+                  //controller.currentIndex = index; // Select the item
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 60.w,
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.mode_edit_rounded,
-                                size: 2.3.h,
+                              Text(
+                                "${data.name} $title",
+                                style: TextStyle(
+                                    fontSize: SizerUtil.deviceType ==
+                                            DeviceType.mobile
+                                        ? 12.sp
+                                        : 13.sp,
+                                    fontFamily: fontBold,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDarkMode() ? black : black),
                               ),
-                              Radio(
-                                value: index,
-                                activeColor: primaryColor,
-                                groupValue: currentIndex.value,
-                                onChanged: (value) {
-                                  currentIndex.value = value as int;
-                                },
-                              )
+                              getDynamicSizedBox(height: 0.5.h),
+                              Text(
+                                '${data.address} , ${data.cityName} , ${data.stateName}',
+                                style: TextStyle(
+                                    fontSize: SizerUtil.deviceType ==
+                                            DeviceType.mobile
+                                        ? 11.sp
+                                        : 13.sp,
+                                    fontFamily: fontBold,
+                                    color: lableColor),
+                              ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(AddAddressScreen(
+                              isFromEdit: true,
+                              itemData: data,
+                            ))!
+                                .then((value) {
+                              logcat("value", value.toString());
+                              if (value == true) {
+                                getAddressList(context, 0, true,
+                                    isRefress: true);
+                              }
+                              Statusbar().trasparentStatusbarIsNormalScreen();
+                            });
+                          },
+                          child: SizedBox(
+                            width: 8.w,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.mode_edit_rounded,
+                                  size: 2.3.h,
+                                  color: isDarkMode() ? black : primaryColor,
+                                ),
+                                Radio(
+                                  value: index,
+                                  activeColor: isDarkMode() ? black : black,
+                                  groupValue: currentIndex.value,
+                                  onChanged: (value) {
+                                    currentIndex.value = value as int;
+                                  },
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -418,6 +448,7 @@ class AddressScreenController extends GetxController {
                               child: InkWell(
                                 onTap: () {
                                   Navigator.pop(context);
+                                  Get.offAll(const BottomNavScreen());
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.only(
@@ -700,23 +731,36 @@ class AddressScreenController extends GetxController {
                             ],
                           ),
                         ),
-                        Container(
-                            width: SizerUtil.width,
-                            margin: EdgeInsets.only(
-                              top: 2.h,
-                              left: 25.w,
-                              right: 25.w,
-                            ),
-                            child: FadeInUp(
-                                from: 50,
-                                child: Obx(() {
-                                  return commonBtn(Button.submit, () {
-                                    if (isFormInvalidate.value == true) {
-                                      addReviewAPI(context);
-                                      setState(() {});
-                                    }
-                                  }, isvalidate: isFormInvalidate.value);
-                                }))),
+                        SizedBox(
+                          height: 1.h,
+                          width: double.infinity,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                                width: SizerUtil.width / 3,
+                                child: FadeInUp(
+                                    from: 50,
+                                    child: Obx(() {
+                                      return commonBtn(Button.submit, () {
+                                        if (isFormInvalidate.value == true) {
+                                          addReviewAPI(context);
+                                          setState(() {});
+                                        }
+                                      }, isvalidate: isFormInvalidate.value);
+                                    }))),
+                            getDynamicSizedBox(width: 5.w),
+                            SizedBox(
+                                width: SizerUtil.width / 3,
+                                child: FadeInUp(
+                                    from: 50,
+                                    child: commonBtn(Common.continues, () {
+                                      Get.offAll(const BottomNavScreen());
+                                    }, isvalidate: true))),
+                          ],
+                        ),
                         SizedBox(
                           height: 2.h,
                           width: double.infinity,
@@ -750,8 +794,8 @@ class AddressScreenController extends GetxController {
               "${uploadMorePrescriptionFile.length} file selected";
           // validateUploadPrescription(presctr.text);
         }
-        logcat("SELECTED_PHOTO", uploadMorePrescriptionFile.length.toString());
-        logcat("SELECTED_PHOTO_LINK", uploadMorePrescriptionFile.toString());
+        //logcat("SELECTED_PHOTO", uploadMorePrescriptionFile.length.toString());
+        //logcat("SELECTED_PHOTO_LINK", uploadMorePrescriptionFile.toString());
       });
     } else {
       await ImagePicker()
@@ -769,6 +813,7 @@ class AddressScreenController extends GetxController {
           addMorePresctr.text = file.name;
           //validateUploadPrescription(presctr.text);
           uploadMorePrescriptionFile.add(File(file.path));
+          imageList.add(uploadMorePrescriptionFile[0]);
         }
       });
     }
@@ -806,8 +851,8 @@ class AddressScreenController extends GetxController {
     UserData? getUserData = await UserPreferences().getSignInInfo();
     var options = {
       'key': apiKey,
-      'amount':
-          500, // amount in the smallest currency unit (e.g., paise in India)
+      'amount': totaAmount!
+          .value, // amount in the smallest currency unit (e.g., paise in India)
       'name': 'GiftHamperz',
       'description': 'Product Description',
       'prefill': {
@@ -833,51 +878,205 @@ class AddressScreenController extends GetxController {
     }
   }
 
+  final imageList = <File>[];
   void addReviewAPI(context) async {
     var loadingIndicator = LoadingProgressDialog();
     loadingIndicator.show(context, '');
-    // try {
+    try {
+      if (networkManager.connectionType == 0) {
+        loadingIndicator.hide(context);
+        showDialogForScreen(
+            context, ReviewsScreenConstant.title, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+
+      UserData? getUserData = await UserPreferences().getSignInInfo();
+      List<http.MultipartFile> newList = [];
+
+      for (int i = 0; i < uploadMorePrescriptionFile.length; i++) {
+        var multipartFile = http.MultipartFile(
+            "images[$i]",
+            uploadMorePrescriptionFile[i].readAsBytes().asStream(),
+            uploadMorePrescriptionFile[i].lengthSync(),
+            filename: uploadMorePrescriptionFile[i].path.split('/').last);
+        newList.add(multipartFile);
+      }
+
+      Map<String, dynamic> body = {
+        "user_id": getUserData!.id.toString().trim(),
+        "product_id": "2",
+        "review": userRating.toString(),
+        "comment": commentctr.text.toString().trim(),
+      };
+
+      logcat('ReviewPassingData', {
+        "user_id": getUserData.id.toString().trim(),
+        "product_id": "2",
+        "review": userRating.toString(),
+        "comment": commentctr.text.toString().trim(),
+      });
+
+      var response = await Repository.multiPartPost(
+          body.cast<String, String>(), ApiUrl.review,
+          multiPart: null,
+          multiPartData: newList.isNotEmpty ? newList : null,
+          allowHeader: true);
+
+      loadingIndicator.hide(context);
+      var responseData = await response.stream.toBytes();
+      var result = String.fromCharCodes(responseData);
+      var data = jsonDecode(result);
+      if (response.statusCode == 200) {
+        if (data['status'] == 1) {
+          showDialogForScreen(
+              context, ReviewsScreenConstant.title, data['message'],
+              callback: () {
+            commentctr.text = "";
+            isFormInvalidate.value = false;
+            Get.offAll(const BottomNavScreen());
+            update();
+          });
+        } else {
+          showDialogForScreen(
+              context, ReviewsScreenConstant.title, data['message'],
+              callback: () {
+            commentctr.text = "";
+            isFormInvalidate.value = false;
+            update();
+          });
+        }
+      } else {
+        showDialogForScreen(
+            context, ReviewsScreenConstant.title, data['message'] ?? "",
+            callback: () {});
+      }
+    } catch (e) {
+      logcat("Exception", e);
+      showDialogForScreen(
+          context, ReviewsScreenConstant.title, ServerError.servererror,
+          callback: () {});
+    }
+  }
+
+  getBuyNowProductListWithCalculation(
+      BuildContext context, int? id, bool? isFromBuyNow) async {
+    List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
+    List<Map<String, dynamic>> productList = [];
+    productList.clear();
+    if (isFromBuyNow == true) {
+      shipinCharge!.value = "";
+      discount!.value = "";
+      totaAmount!.value = "";
+      for (CommonProductList item in cartItems) {
+        if (id == item.id) {
+          Map<String, dynamic> productDetails = {
+            "product_id": item.id,
+            "qty": item.quantity!.value,
+            "rate": item.price,
+            "total_amount": item.price * item.quantity!.value,
+          };
+          shipinCharge!.value = item.shippingCharge.toString();
+          discount!.value = item.discount.toString();
+          double itemPrice = item.quantity!.value.toDouble() * item.price;
+          // Calculate total item price
+          double totalItemPrice = itemPrice - item.discount;
+          // Add shipping charge to the total item cost
+          double totalCostForItem = totalItemPrice + item.shippingCharge;
+          totaAmount!.value = totalCostForItem.toString();
+          productList.add(productDetails);
+          update();
+        } else {
+          logcat("NOT_IN_CART", "DONE");
+        }
+      }
+      // ignore: use_build_context_synchronously
+      addOrderAPI(context, productList, id, isFromBuyNow);
+    } else {
+      // Populate product details from cart items
+      for (CommonProductList item in cartItems) {
+        Map<String, dynamic> productDetails = {
+          "product_id": item.id,
+          "qty": item.quantity!.value,
+          "rate": item.price,
+          "total_amount": item.price * item.quantity!.value,
+        };
+        productList.add(productDetails);
+      }
+
+      // ignore: use_build_context_synchronously
+      addOrderAPI(context, productList, id, isFromBuyNow);
+    }
+  }
+
+  void addOrderAPI(context, List<Map<String, dynamic>> productList, int? id,
+      bool? isFromBuyNow) async {
+    var loadingIndicator = LoadingProgressDialog();
+    loadingIndicator.show(context, '');
+    //  try {
     if (networkManager.connectionType == 0) {
       loadingIndicator.hide(context);
-      showDialogForScreen(
-          context, ReviewsScreenConstant.title, Connection.noConnection,
-          callback: () {
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          Connection.noConnection, callback: () {
         Get.back();
       });
       return;
     }
-
     UserData? getUserData = await UserPreferences().getSignInInfo();
-
-    logcat('ReviewPassingData', {
-      "user_id": getUserData!.id.toString().trim(),
-      "product_id": "2",
-      "review": userRating.toString(),
-      "comment": commentctr.text.toString().trim(),
-    });
+    String currentDate = getCurrentDate();
+    String currentTime = getCurrentTime();
 
     var response = await Repository.post({
-      "user_id": getUserData.id.toString().trim(),
-      "product_id": "2",
-      "review": userRating.toString(),
-      "comment": commentctr.text.toString().trim(),
-    }, ApiUrl.review, allowHeader: true);
+      "customer_id": getUserData!.id.toString(),
+      "date_of_order": currentDate,
+      "billing_address_id": int.parse(selectedAddId!.value),
+      "shipping_address_id": int.parse(selectedAddId!.value),
+      "total_amount": double.parse(totaAmount!.value).toInt(),
+      "discount": double.parse(discount!.value).toInt(),
+      "date_of_delivery": currentDate,
+      "time_of_delivery": currentTime,
+      "shiping_charge": double.parse(
+        shipinCharge!.value,
+      ).toInt(),
+      "is_packing_seperetly": 0,
+      "gst_number": 1235689781451,
+      "product": productList,
+    }, ApiUrl.addOrder, allowHeader: true);
+
+    logcat("PassingData:::", {
+      "customer_id": getUserData.id.toString(),
+      "date_of_order": currentDate,
+      "billing_address_id": int.parse(selectedAddId!.value),
+      "shipping_address_id": int.parse(selectedAddId!.value),
+      "total_amount": double.parse(totaAmount!.value).toInt(),
+      "discount": double.parse(discount!.value).toInt(),
+      "date_of_delivery": currentDate,
+      "time_of_delivery": currentTime,
+      "shiping_charge": double.parse(
+        shipinCharge!.value,
+      ).toInt(),
+      "is_packing_seperetly": 0,
+      "gst_number": 1235689781451,
+      "product": productList,
+    });
+
     loadingIndicator.hide(context);
     var data = jsonDecode(response.body);
-    logcat("tag", data);
+
     if (response.statusCode == 200) {
       if (data['status'] == 1) {
-        showDialogForScreen(
-            context, ReviewsScreenConstant.title, data['message'],
-            callback: () {
-          commentctr.text = "";
-          isFormInvalidate.value = false;
-          Get.offAll(const BottomNavScreen());
-          update();
-        });
+        // Order placed successfully, you can handle the success case here
+        if (isFromBuyNow == true) {
+          await UserPreferences().removeCartItem(id ?? 0);
+        } else {
+          await UserPreferences().clearCartItems();
+        }
+        showCustomDialog(context);
       } else {
         showDialogForScreen(
-            context, ReviewsScreenConstant.title, data['message'],
+            context, AddressScreenTextConstant.addressTitle, data['message'],
             callback: () {
           commentctr.text = "";
           isFormInvalidate.value = false;
@@ -885,15 +1084,17 @@ class AddressScreenController extends GetxController {
         });
       }
     } else {
-      showDialogForScreen(
-          context, ReviewsScreenConstant.title, data['message'] ?? "",
+      showDialogForScreen(context, AddressScreenTextConstant.addressTitle,
+          data['message'] ?? "",
           callback: () {});
     }
   }
-  // catch (e) {
-  //   logcat("Exception", e);
-  //   showDialogForScreen(
-  //       context, ReviewsScreenConstant.title, ServerError.servererror,
-  //       callback: () {});
-  // }
 }
+//     catch (e) {
+//       logcat("Exception", e);
+//       showDialogForScreen(
+//           context, AddAddressText.addressTitle, ServerError.servererror,
+//           callback: () {});
+//     }
+//   }
+// }

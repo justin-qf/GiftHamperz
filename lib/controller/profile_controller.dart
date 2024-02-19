@@ -1,13 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:gifthamperz/api_handle/Repository.dart';
+import 'package:gifthamperz/componant/dialogs/dialogs.dart';
+import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
+import 'package:gifthamperz/models/UserModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
+import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
 
 class ProfileController extends GetxController {
@@ -23,7 +32,7 @@ class ProfileController extends GetxController {
   RxString profilePic = "".obs;
   RxString email = "".obs;
   UserData? getUserData;
-  RxBool? isGuest;
+  RxBool isGuest = false.obs;
 
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
@@ -34,18 +43,20 @@ class ProfileController extends GetxController {
 
   void setData() async {
     getUserData = await UserPreferences().getSignInInfo();
+    isGuest.value = await UserPreferences().getGuestUser();
     if (getUserData != null) {
       userName.value = "${getUserData!.firstName} ${getUserData!.lastName}";
       profilePic.value = APIImageUrl.url + getUserData!.profilePic.toString();
       email.value = getUserData!.emailId;
-      //isGuest!.value = await UserPreferences().getGuestUser();
     }
     update();
   }
 
   bool states = false;
-  final RxInt isDarkModeEnable = 0.obs;
+  final RxInt isDarkModeEnable = 1.obs;
   final getStorage = GetStorage();
+  UserDetailData? loginData;
+
   Widget getMenuListItem(
       {String icon = "",
       IconData? iconDate,
@@ -119,5 +130,53 @@ class ProfileController extends GetxController {
         ),
       ),
     );
+  }
+
+  void getUserById(context) async {
+    var loadingIndicator = LoadingProgressDialog();
+    loadingIndicator.show(context, '');
+    try {
+      if (networkManager.connectionType == 0) {
+        state.value = ScreenState.apiSuccess;
+        loadingIndicator.hide(context);
+        showDialogForScreen(
+            context, BottomConstant.profile, Connection.noConnection,
+            callback: () {
+          Get.back();
+        });
+        return;
+      }
+      var response = await Repository.get(
+          {}, "${ApiUrl.getUser}/${getUserData!.id}",
+          allowHeader: true);
+      Statusbar().trasparentStatusbarProfile(false);
+      loadingIndicator.hide(context);
+      logcat("RESPONSE::", response.body);
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        if (responseData['status'] == 1) {
+          loginData = UserDetailData.fromJson(responseData['data']);
+          userName.value = loginData!.userName.toString();
+          profilePic.value = APIImageUrl.url + loginData!.profilePic.toString();
+          update();
+        } else {
+          message.value = responseData['message'];
+          showDialogForScreen(
+              context, BottomConstant.profile, responseData['message'],
+              callback: () {});
+        }
+      } else {
+        state.value = ScreenState.apiError;
+        message.value = APIResponseHandleText.serverError;
+        showDialogForScreen(
+            context, BottomConstant.profile, ServerError.servererror,
+            callback: () {});
+      }
+    } catch (e) {
+      logcat("Ecxeption", e);
+      state.value = ScreenState.apiError;
+      message.value = ServerError.servererror;
+      loadingIndicator.hide(context);
+    }
   }
 }

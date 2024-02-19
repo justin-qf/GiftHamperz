@@ -12,20 +12,30 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/edit_controller.dart';
+import 'package:gifthamperz/models/UserModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
-
+  EditProfileScreen(this.loginData, {super.key});
+  UserDetailData? loginData;
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   var controller = Get.put(EditProfileController());
+
+  @override
+  void initState() {
+    controller.initDataSet(widget.loginData);
+    setState(() {});
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Statusbar().trasparentStatusbarIsNormalScreen();
@@ -45,7 +55,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             getForgetToolbar(EditScreenConstant.title, showBackButton: true,
                 callback: () {
-              Get.back();
+              Get.back(result: false);
             }),
             Expanded(
               child: SingleChildScrollView(
@@ -155,6 +165,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         context: context,
                                         initialDate: controller.selectedDate,
                                         firstDate: DateTime(1950),
+                                        builder: (BuildContext context,
+                                            Widget? child) {
+                                          return Theme(
+                                            data: isDarkMode()
+                                                ? getDarkModeDatePicker()
+                                                : getLightModeDatePicker(),
+                                            child: child!,
+                                          );
+                                        },
                                         lastDate: DateTime.now()
                                             .add(const Duration(days: 0)));
                                     if (pickedDate != null &&
@@ -189,8 +208,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           duration: const Duration(milliseconds: 300),
                           child: Container(
                               margin: EdgeInsets.only(
-                                left: 8.w,
-                                right: 8.w,
+                                left: 6.w,
+                                right: 6.w,
                               ),
                               child: Obx(
                                 () {

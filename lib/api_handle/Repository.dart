@@ -84,7 +84,7 @@ class Repository {
   static Future<http.StreamedResponse> multiPartPost(var body, String endPoint,
       {bool allowHeader = false,
       http.MultipartFile? multiPart,
-      http.MultipartFile? multiPartData}) async {
+      List<http.MultipartFile>? multiPartData}) async {
     String token = await UserPreferences().getToken();
     logcat("Token::::", token.toString());
     Map<String, String> headers = {
@@ -99,14 +99,13 @@ class Repository {
     if (allowHeader) request.headers.addAll(headers);
     if (multiPart != null) {
       request.files.add(multiPart);
-      logcat("FILE", request.files.length.toString());
-
-      if (multiPartData != null) {
-        request.files.add(multiPartData);
-      }
+      logcat("files", request.files.length);
     }
-
+    if (multiPartData != null) {
+      request.files.addAll(multiPartData);
+    }
     request.fields.addAll(body);
+
     var response = await request.send();
 
     return response;

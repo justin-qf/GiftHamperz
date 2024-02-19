@@ -29,6 +29,7 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   flutter_staggered_grid_view: ^0.7.0
   syncfusion_flutter_sliders: ^22.2.12
+  photo_view: ^0.14.0
   flutter_rating_bar: ^4.0.1
   get_storage: ^2.1.1
   animated_theme_switcher: ^2.0.8

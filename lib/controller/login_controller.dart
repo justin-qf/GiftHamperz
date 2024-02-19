@@ -11,6 +11,7 @@ import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
+import 'package:gifthamperz/views/OtpScreen/OtpScreen.dart';
 import '../../configs/string_constant.dart';
 import '../../componant/dialogs/dialogs.dart';
 
@@ -74,8 +75,6 @@ class LoginController extends GetxController {
   void enableSignUpButton() {
     if (numberModel.value.isValidate == false) {
       isFormInvalidate.value = false;
-    } else if (passModel.value.isValidate == false) {
-      isFormInvalidate.value = false;
     } else {
       isFormInvalidate.value = true;
     }
@@ -88,7 +87,7 @@ class LoginController extends GetxController {
     }
   }
 
-  void getSignIn(context) async {
+  void getSignIn(context, String number) async {
     var loadingIndicator = LoadingProgressDialog();
     try {
       if (networkManager.connectionType == 0) {
@@ -102,23 +101,31 @@ class LoginController extends GetxController {
       loadingIndicator.show(context, '');
       logcat('loginPassingData', {
         "mobile_no": numberCtr.text.toString().trim(),
-        "password": passwordctr.text.toString().trim()
+        // "password": passwordctr.text.toString().trim()
       });
 
       var response = await Repository.post({
         "mobile_no": numberCtr.text.toString().trim(),
-        "password": passwordctr.text.toString().trim()
+        //"password": passwordctr.text.toString().trim()
       }, ApiUrl.login);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       logcat("tag", data);
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
-          var loginData = LoginModel.fromJson(data);
-          UserPreferences().saveSignInInfo(loginData.user);
-          UserPreferences().setToken(loginData.user.token);
-          UserPreferences().setIsGuestUser(false);
-          Get.offAll(const BottomNavScreen());
+          // var loginData = LoginModel.fromJson(data);
+          showDialogForScreen(
+              context, LoginConst.signIn, data['otp'].toString(), callback: () {
+            Get.to(OtpScreen(
+              mobile: number.toString().trim(),
+              otp: data['otp'].toString(),
+              isFromSignUp: true,
+            ));
+          });
+          // UserPreferences().saveSignInInfo(loginData.user);
+          // UserPreferences().setToken(loginData.user.token);
+          // UserPreferences().setIsGuestUser(false);
+          // Get.offAll(const BottomNavScreen());
         } else {
           showDialogForScreen(context, LoginConst.signIn, data['message'],
               callback: () {});

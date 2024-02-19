@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:ffi';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
-import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
-import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/search_chat_widgets.dart';
@@ -18,13 +15,10 @@ import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/homeController.dart';
-import 'package:gifthamperz/models/BannerModel.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
-import 'package:gifthamperz/models/categoryModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/CategoryScreen/CategoryScreen.dart';
 import 'package:gifthamperz/views/MainScreen/HomeScreen/DetailScreen/DetailScreen.dart';
@@ -44,21 +38,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var controller = Get.put(HomeScreenController());
-  //int? totalItemsCount = 0;
   bool dialogShown = false;
   bool? isGuest = true;
 
   @override
   void initState() {
     super.initState();
-    getGuestLogin();
     controller.pageController =
         PageController(initialPage: controller.currentPage);
-    controller.getCategoryList(context);
-    controller.getBannerList(context);
     controller.getHome(context);
     startAutoScroll();
-    //getTotalProductInCart();
     controller.getTotalProductInCart();
     showGuestUserLogin();
   }
@@ -66,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   showGuestUserLogin() async {
     isGuest = await UserPreferences().getGuestUser();
     bool isDialogVisible = await UserPreferences().getGuestUserDialogVisible();
-
     if (isGuest == true && !isDialogVisible) {
       dialogShown = true;
       UserPreferences().setGuestUserDialogVisible(true);
@@ -86,22 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Make sure to update the state if necessary
     //setState(() {});
-  }
-
-  // getTotalProductInCart() async {
-  //   // Fetch the current cart items from preferences
-  //   List<CommonProductList> cartItems = await UserPreferences().loadCartItems();
-  //   logcat("cartItems", cartItems.length.toString());
-  //   // Get the total length of the list
-  //   controller.totalItemsCount.value = cartItems.length;
-  //   setState(() {});
-  // }
-
-  void getGuestLogin() async {
-    bool isGuest = await UserPreferences().getGuestUser();
-    logcat('USER:', isGuest);
   }
 
   void startAutoScroll() {
@@ -150,7 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   controller.totalItemsCount.value;
               return homeAppbar(DashboardText.dashboard, () {
                 // widget.callBack(1);
-                Get.to(const SearchScreen());
+                Get.to(const SearchScreen())!.then((value) {
+                  controller.getHome(context);
+                  controller.getTotalProductInCart();
+                });
                 //controller.isSearch = !controller.isSearch;
                 setState(() {});
               }, () {
@@ -162,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.only(bottom: 5.h),
+                padding: EdgeInsets.only(bottom: 3.h),
                 physics: const BouncingScrollPhysics(),
                 child: Obx(() {
                   switch (controller.state.value) {
@@ -171,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     case ScreenState.noDataFound:
                     case ScreenState.apiError:
                       return SizedBox(
-                        height: SizerUtil.height / 1.2,
+                        height: SizerUtil.height / 1.3,
                         child: apiOtherStates(controller.state.value),
                       );
                     case ScreenState.apiSuccess:
@@ -192,7 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget apiSuccess(ScreenState state) {
     // ignore: unrelated_type_equality_checks
     if (controller.state == ScreenState.apiSuccess &&
-        controller.bannerList.isNotEmpty) {
+        controller.homeData != null &&
+        controller.homeData!.data.trendList.isNotEmpty) {
       return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -202,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
               setSearchBar(context, controller.searchCtr, 'home',
                   onCancleClick: () {
                 controller.searchCtr.text = '';
-                logcat("onCANCLE", "DONE");
                 setState(() {
                   controller.isSearch = false;
                 });
@@ -212,9 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
               })
             else
               Container(),
-            getDynamicSizedBox(height: 1.h),
             SizedBox(
-              height: 18.h,
+              height: 20.h,
               child: Obx(() {
                 return Stack(
                   children: [
@@ -225,14 +200,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         BannerList bannerItems = controller.bannerList[index];
                         return Container(
-                            margin: EdgeInsets.only(left: 4.w, right: 4.w),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                APIImageUrl.url + bannerItems.url,
+                          margin: EdgeInsets.only(
+                              top: 1.h, left: 2.w, right: 3.w, bottom: 1.h),
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: isDarkMode() ? black : white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: isDarkMode()
+                                      ? white.withOpacity(0.2)
+                                      : black.withOpacity(0.2),
+                                  spreadRadius: 0.1,
+                                  blurRadius: 10,
+                                  offset: const Offset(0.5, 0.5)),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              height: 18.h,
+                              imageUrl: APIImageUrl.url + bannerItems.url,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(
+                                    color: primaryColor),
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                Asset.productPlaceholder,
+                                height: 18.h,
                                 fit: BoxFit.cover,
                               ),
-                            ));
+                            ),
+                          ),
+                        );
                       },
                       onPageChanged: (index) {
                         setState(() {
@@ -241,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     Positioned(
-                        bottom: 10,
+                        bottom: 15,
                         left: 0,
                         right: 0,
                         child: Row(
@@ -267,15 +269,14 @@ class _HomeScreenState extends State<HomeScreen> {
               }),
             ),
             SizedBox(
-              height: 2.h,
+              height: 0.5.h,
             ),
-            getHomeLable("Category", () {
-              Get.to(const CategoryScreen());
-              // Get.to(DetailScreen(
-              //   title: DashboardText.categoryTitle,
-              // ));
+            getHomeLable(DashboardText.categoryTitle, () {
+              Get.to(const CategoryScreen())!.then((value) {
+                controller.getHome(context);
+                controller.getTotalProductInCart();
+              });
             }),
-            //getDynamicSizedBox(height: 1.0.h),
             SizedBox(
               height: 13.h,
               child: Obx(
@@ -283,15 +284,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   return controller.categoryList.isNotEmpty
                       ? ListView.builder(
                           physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.only(left: 4.w, top: 0.5.h),
+                          padding: EdgeInsets.only(
+                              left: 2.w, right: 1.w, top: 0.5.h),
                           shrinkWrap: false,
                           scrollDirection: Axis.horizontal,
                           clipBehavior: Clip.antiAlias,
                           itemBuilder: (context, index) {
-                            // CategoryItem data =
-                            //     controller.categoryList[index];
-                            // return controller.getCategoryListItem(data);
-                            CategoryData data = controller.categoryList[index];
+                            CategoryList data = controller.categoryList[index];
                             return controller.getCategoryListItem(data);
                           },
                           itemCount: controller.categoryList.length)
@@ -300,11 +299,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             getDynamicSizedBox(height: 1.h),
-            getHomeLable("Trending", () {
+            getHomeLable(DashboardText.trendingTitle, () {
               Get.to(DetailScreen(
                 title: DashboardText.trendingTitle,
+                isFromTrending: true,
               ))!
                   .then((value) {
+                controller.getHome(context);
                 controller.getTotalProductInCart();
               });
             }),
@@ -313,15 +314,13 @@ class _HomeScreenState extends State<HomeScreen> {
               () {
                 return controller.trendingItemList.isNotEmpty
                     ? SizedBox(
-                        height: 25.h,
+                        height: 26.h,
                         child: ListView.builder(
-                            padding: EdgeInsets.only(left: 4.w, right: 2.w),
+                            padding: EdgeInsets.only(left: 2.w, right: 1.w),
                             physics: const BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
                             clipBehavior: Clip.antiAlias,
                             itemBuilder: (context, index) {
-                              // HomeItem data = controller.staticData[index];
-                              // return controller.getListItem(data);
                               CommonProductList data =
                                   controller.trendingItemList[index];
                               return controller.getListItem(context, data,
@@ -334,36 +333,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     : Container();
               },
             ),
-            Container(
-              width: SizerUtil.width,
-              height: 15.h,
-              padding: EdgeInsets.all(0.2.h),
-              margin: EdgeInsets.only(left: 5.w, right: 4.w),
-              decoration: BoxDecoration(
-                  color: isDarkMode() ? darkBackgroundColor : white,
-                  boxShadow: const [
-                    BoxShadow(
-                        color: grey,
-                        blurRadius: 1.0,
-                        offset: Offset(0, 3),
-                        spreadRadius: 0.5)
-                  ],
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(2.h),
-                  )),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(2.h),
-                  child: Image.asset(
-                    Asset.homeBanner,
-                    fit: BoxFit.cover,
-                  )),
-            ),
+            homeOfferBanner(),
             getDynamicSizedBox(height: 2.h),
-            getHomeLable(DashboardText.populerTitle, () {
+            getHomeLable(DashboardText.populerTitle, () async {
               Get.to(DetailScreen(
                 title: DashboardText.populerTitle,
+                isFromTrending: false,
               ))!
                   .then((value) {
+                controller.getHome(context);
                 controller.getTotalProductInCart();
               });
             }),
@@ -374,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? SizedBox(
                         height: 27.h,
                         child: ListView.builder(
-                            padding: EdgeInsets.only(left: 4.w, right: 2.w),
+                            padding: EdgeInsets.only(left: 2.w, right: 1.w),
                             physics: const BouncingScrollPhysics(),
                             shrinkWrap: true,
                             scrollDirection: Axis.horizontal,
@@ -395,19 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
             getDynamicSizedBox(height: 6.h)
           ]);
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
-              Common.datanotfound,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
-            ),
-          ),
-        ],
-      );
+      return noDataFoundWidget();
     }
   }
 
@@ -455,7 +421,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Text(
                     controller.message.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: fontMedium, fontSize: 12.sp),
+                    style: TextStyle(
+                        fontFamily: fontMedium,
+                        fontSize: 12.sp,
+                        color: isDarkMode() ? white : black),
                   )
                 : button),
       ],

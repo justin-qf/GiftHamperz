@@ -12,6 +12,7 @@ class CustomParentScaffold extends StatelessWidget {
   bool isSafeArea;
   bool isNormalScreen;
   bool isFormScreen;
+  bool isDetailScreen;
 
   Function()? onTap;
   CustomParentScaffold({
@@ -21,6 +22,7 @@ class CustomParentScaffold extends StatelessWidget {
     required this.isSafeArea,
     this.isNormalScreen = false,
     this.isFormScreen = false,
+    this.isDetailScreen = false,
     this.onTap,
   });
 
@@ -48,12 +50,16 @@ class CustomParentScaffold extends StatelessWidget {
               }
               return isNormalScreen == true
                   ? Scaffold(body: SafeArea(child: body))
-                  : isFormScreen == true
-                      ? Scaffold(extendBodyBehindAppBar: true, body: body)
-                      : WillPopScope(
-                          onWillPop: onWillPop,
-                          child: body,
-                        );
+                  : isDetailScreen == true
+                      ? Scaffold(
+                          extendBodyBehindAppBar: true,
+                          body: SafeArea(child: body))
+                      : isFormScreen == true
+                          ? Scaffold(extendBodyBehindAppBar: true, body: body)
+                          : WillPopScope(
+                              onWillPop: onWillPop,
+                              child: body,
+                            );
             }),
           );
   }

@@ -37,8 +37,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     setState(() {});
     controller.setDataInFormFields(
         context, widget.isFromEdit!, widget.itemData);
-    //controller.getCityList(context, '');
     getCity(context);
+    controller.getGuestUser();
     super.initState();
   }
 
@@ -77,8 +77,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         color: isDarkMode() ? darkBackgroundColor : transparent,
         child: Column(
           children: [
-            getForgetToolbar(AddAddressText.title, showBackButton: true,
-                callback: () {
+            getForgetToolbar(AddressScreenTextConstant.title,
+                showBackButton: true, callback: () {
               Get.back(result: false);
             }),
             Expanded(
@@ -90,7 +90,61 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     SizedBox(
                       height: 1.0.h,
                     ),
-                    getLable(AddAddressText.deliveryName),
+                    Obx(
+                      () {
+                        return controller.isGuest.value == true
+                            ? Column(
+                                children: [
+                                  getLable(AddressScreenTextConstant.userName),
+                                  FadeInDown(
+                                    child: AnimatedSize(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      child: Obx(() {
+                                        return getReactiveFormField(
+                                            node: controller.userNameNode,
+                                            controller: controller.userNameCtr,
+                                            hintLabel: AddressScreenTextConstant
+                                                .userNameHint,
+                                            onChanged: (val) {
+                                              controller.validateName(val);
+                                            },
+                                            obscuretext: false,
+                                            inputType: TextInputType.name,
+                                            errorText: controller
+                                                .userNameModel.value.error);
+                                      }),
+                                    ),
+                                  ),
+                                  getLable(
+                                      AddressScreenTextConstant.emailAddress),
+                                  FadeInDown(
+                                    child: AnimatedSize(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      child: Obx(() {
+                                        return getReactiveFormField(
+                                            node: controller.emailIdNode,
+                                            controller: controller.emailIdCtr,
+                                            hintLabel: AddressScreenTextConstant
+                                                .emailAddresValidsHint,
+                                            onChanged: (val) {
+                                              controller.validateEmail(val);
+                                            },
+                                            obscuretext: false,
+                                            inputType:
+                                                TextInputType.emailAddress,
+                                            errorText: controller
+                                                .emailIdModel.value.error);
+                                      }),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Container();
+                      },
+                    ),
+                    getLable(AddressScreenTextConstant.deliveryName),
                     FadeInDown(
                       child: AnimatedSize(
                         duration: const Duration(milliseconds: 300),
@@ -98,7 +152,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           return getReactiveFormField(
                               node: controller.deliverynamenode,
                               controller: controller.deliverynamectr,
-                              hintLabel: AddAddressText.deliveryName,
+                              hintLabel: AddressScreenTextConstant.deliveryName,
                               onChanged: (val) {
                                 controller.validateDeliveryName(val);
                               },
@@ -109,7 +163,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       ),
                     ),
                     SizedBox(height: 1.0.h),
-                    getLable(AddAddressText.addressline),
+                    getLable(AddressScreenTextConstant.addressline),
                     FadeInDown(
                       child: AnimatedSize(
                         duration: const Duration(milliseconds: 300),
@@ -117,7 +171,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           return getReactiveFormField(
                               node: controller.addressLinenode,
                               controller: controller.addressLinectr,
-                              hintLabel: AddAddressText.addressHint,
+                              hintLabel: AddressScreenTextConstant.addressHint,
                               onChanged: (val) {
                                 controller.validateAddressline(val);
                               },
@@ -131,7 +185,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     SizedBox(
                       height: 1.0.h,
                     ),
-                    getLable(AddAddressText.street),
+                    getLable(AddressScreenTextConstant.street),
                     FadeInDown(
                       child: AnimatedSize(
                         duration: const Duration(milliseconds: 300),
@@ -139,7 +193,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           return getReactiveFormField(
                               node: controller.streetnode,
                               controller: controller.streetctr,
-                              hintLabel: AddAddressText.streetHint,
+                              hintLabel: AddressScreenTextConstant.streetHint,
                               onChanged: (val) {
                                 controller.validateStreet(val);
                               },
@@ -152,7 +206,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     SizedBox(
                       height: 1.0.h,
                     ),
-                    getLable(AddAddressText.landmark),
+                    getLable(AddressScreenTextConstant.landmark),
                     FadeInDown(
                       child: AnimatedSize(
                         duration: const Duration(milliseconds: 300),
@@ -160,7 +214,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           return getReactiveFormField(
                               node: controller.landMarknode,
                               controller: controller.landMarkctr,
-                              hintLabel: AddAddressText.landmarkHint,
+                              hintLabel: AddressScreenTextConstant.landmarkHint,
                               onChanged: (val) {
                                 controller.validateLandMark(val);
                               },
@@ -173,7 +227,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     SizedBox(
                       height: 1.0.h,
                     ),
-                    getLable(AddAddressText.pincode),
+                    getLable(AddressScreenTextConstant.pincode),
                     FadeInDown(
                       child: AnimatedSize(
                         duration: const Duration(milliseconds: 300),
@@ -181,7 +235,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           return getReactiveFormField(
                               node: controller.pinCodenode,
                               controller: controller.pincodectr,
-                              hintLabel: AddAddressText.pinCodeHint,
+                              hintLabel: AddressScreenTextConstant.pinCodeHint,
                               onChanged: (val) {
                                 controller.validatePinCode(val);
                               },
@@ -194,7 +248,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     SizedBox(
                       height: 1.0.h,
                     ),
-                    getLable(AddAddressText.city),
+                    getLable(AddressScreenTextConstant.city),
                     SizedBox(
                       height: 1.0.h,
                     ),
@@ -223,90 +277,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         }),
                       ),
                     ),
-                    // Container(
-                    //   margin: EdgeInsets.only(left: 7.w, right: 7.w),
-                    //   child: DropdownButtonHideUnderline(
-                    //     child: DropdownButton2(
-                    //       buttonPadding: EdgeInsets.only(
-                    //           left: 1.w,
-                    //           top: SizerUtil.deviceType == DeviceType.mobile
-                    //               ? 0.5.h
-                    //               : 1.2.w,
-                    //           bottom: SizerUtil.deviceType == DeviceType.mobile
-                    //               ? 0.5.h
-                    //               : 1.2.w),
-                    //       isExpanded: true,
-                    //       buttonDecoration: BoxDecoration(
-                    //         border: Border.all(color: inputBorderColor),
-                    //         borderRadius: BorderRadius.circular(1.5.h),
-                    //       ),
-                    //       hint: Text(
-                    //         AddFamilylist.city,
-                    //         style: styleTextForFieldHint(),
-                    //       ),
-                    //       items: controller.city
-                    //           .map((item) => DropdownMenuItem<String>(
-                    //                 value: item,
-                    //                 child: SizerUtil.deviceType ==
-                    //                         DeviceType.mobile
-                    //                     ? Text(
-                    //                         item,
-                    //                         style: styleTextFormFieldText(),
-                    //                       )
-                    //                     : Padding(
-                    //                         padding: const EdgeInsets.only(
-                    //                             top: 15, bottom: 15, left: 10),
-                    //                         child: Text(
-                    //                           item,
-                    //                           style: styleTextFormFieldText(),
-                    //                         ),
-                    //                       ),
-                    //               ))
-                    //           .toList(),
-                    //       value: controller.selectCity,
-                    //       onChanged: (value) {
-                    //         //controller.validategender(value);
-                    //         setState(() {
-                    //           controller.selectCity = value as String;
-                    //         });
-                    //       },
-                    //       itemHeight: SizerUtil.deviceType == DeviceType.mobile
-                    //           ? 30
-                    //           : 60,
-                    //       dropdownMaxHeight:
-                    //           SizerUtil.deviceType == DeviceType.mobile
-                    //               ? SizerUtil.height / 2
-                    //               : SizerUtil.height / 1,
-                    //       dropdownDecoration: BoxDecoration(
-                    //         color: isDarkMode() ? darkBackgroundColor : white,
-                    //         borderRadius: BorderRadius.circular(2.h),
-                    //         boxShadow: [
-                    //           BoxShadow(
-                    //               color: grey.withOpacity(0.2),
-                    //               blurRadius: 10.0,
-                    //               offset: const Offset(0, 1),
-                    //               spreadRadius: 3.0)
-                    //         ],
-                    //       ),
-                    //       icon: Container(
-                    //         padding: EdgeInsets.only(right: 1.h),
-                    //         child: Icon(
-                    //           Icons.keyboard_arrow_down_rounded,
-                    //           size: SizerUtil.deviceType == DeviceType.mobile
-                    //               ? 40
-                    //               : 40,
-                    //           color: isDarkMode()
-                    //               ? rightMenuDarkBackgroundColor
-                    //               : grey.withOpacity(0.7),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    SizedBox(
-                      height: 2.h,
-                    ),
-                    getLable(AddAddressText.addressType),
+                    getDynamicSizedBox(height: 2.h),
+                    getLable(AddressScreenTextConstant.addressType),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -314,80 +286,24 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         Expanded(
                           child: Obx(
                             () {
-                              return getRadio(
-                                  "HOME", controller.addressType.value,
-                                  (value) {
+                              return getRadio(AddressScreenTextConstant.home,
+                                  controller.addressType.value, (value) {
                                 controller.addressType.value = value.toString();
                                 controller.apiPassingAddressType.value = "0";
                                 setState(() {});
                               });
-
-                              RadioListTile(
-                                activeColor: primaryColor,
-                                contentPadding: EdgeInsets.only(
-                                    left: SizerUtil.deviceType ==
-                                            DeviceType.mobile
-                                        ? 5.5.w
-                                        : 15.w),
-                                visualDensity:
-                                    const VisualDensity(horizontal: -4),
-                                title: Text(
-                                  "HOME",
-                                  style: TextStyle(
-                                      fontSize: SizerUtil.deviceType ==
-                                              DeviceType.mobile
-                                          ? 12.sp
-                                          : 10.sp),
-                                ),
-                                value: "HOME",
-                                groupValue: controller.addressType.value,
-                                onChanged: (value) {
-                                  controller.addressType.value =
-                                      value.toString();
-                                  controller.apiPassingAddressType.value = "1";
-                                  setState(() {});
-                                },
-                              );
                             },
                           ),
                         ),
                         Expanded(
                           child: Obx(
                             () {
-                              return getRadio(
-                                  "WORK", controller.addressType.value,
-                                  (value) {
+                              return getRadio(AddressScreenTextConstant.work,
+                                  controller.addressType.value, (value) {
                                 controller.addressType.value = value.toString();
                                 controller.apiPassingAddressType.value = "1";
                                 setState(() {});
                               });
-
-                              RadioListTile(
-                                activeColor: primaryColor,
-                                contentPadding: EdgeInsets.only(
-                                    left: SizerUtil.deviceType ==
-                                            DeviceType.mobile
-                                        ? 5.5.w
-                                        : 15.w),
-                                visualDensity:
-                                    const VisualDensity(horizontal: -4),
-                                title: Text(
-                                  "WORK",
-                                  style: TextStyle(
-                                      fontSize: SizerUtil.deviceType ==
-                                              DeviceType.mobile
-                                          ? 12.sp
-                                          : 10.sp),
-                                ),
-                                value: "WORK",
-                                groupValue: controller.addressType.value,
-                                onChanged: (value) {
-                                  controller.addressType.value =
-                                      value.toString();
-                                  controller.apiPassingAddressType.value = "0";
-                                  setState(() {});
-                                },
-                              );
                             },
                           ),
                         ),

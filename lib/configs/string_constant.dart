@@ -21,23 +21,28 @@ class LoginConst {
 }
 
 class APIImageUrl {
-  static const url = 'http://192.168.1.9/qfs_ecommerce/public/storage/';
+  static const url = 'http://192.168.1.12/qfs_ecommerce/public/storage/';
 }
 
-class AddAddressText {
+class AddressScreenTextConstant {
   static const title = 'New Delivery Address';
   static const addressTitle = 'My Address';
+  static const userName = 'User Name';
+  static const userNameHint = 'Enter User Name';
+  static const emailAddress = 'Email';
+  static const emailAddressHint = 'Enter Email';
+  static const emailAddresValidsHint = 'Enter Valid Email Id';
   static const deliveryName = 'Name';
   static const deliveryAddress = 'Delivery Address';
   static const deliveryOrganization = 'Organization';
   static const deliveryOrganizationHint = 'Enter Organization';
-  static const addressHint = 'Enter Address Line';
-  static const streetHint = 'Enter Street';
+  static const addressHint = 'House No,Building Name';
+  static const streetHint = 'Road Name,Area,Colony';
   static const cityHint = 'Enter City';
-  static const landmarkHint = 'Enter Landmark';
+  static const landmarkHint = 'Nearest Landmark';
   static const pinCodeHint = '6 digits [0-9] PIN code';
   static const name = 'Enter Name';
-  static const addressline = 'Address line 1';
+  static const addressline = 'Address';
   static const street = 'Street';
   static const city = 'City';
   static const addressType = 'Type Of Address';
@@ -48,6 +53,11 @@ class AddAddressText {
   static const add = 'ADD';
   static const payment = 'PAYMENT';
   static const startShopping = 'Start Shopping';
+  static const orderSuccess = 'Order Successfull!';
+  static const orderPlaced =
+      'Your order has been placed successfully!\nFor more detail, go to my orders.';
+  static const home = 'HOME';
+  static const work = 'WORK';
 }
 
 class OtpConstant {
@@ -72,6 +82,7 @@ class Button {
   static const clear = 'Clear';
   static const save = 'Save';
   static const update = 'Update';
+  static const apply = 'Apply';
   static const check = 'ORDER';
   static const checkOut = 'PROCEED TO CHECKOUT';
   static const close = 'Close';
@@ -151,10 +162,18 @@ class CartScreenConstant {
   static const title = "Cart";
 }
 
+class IndiaRupeeConstant {
+  static const inrCode = "\u{20B9}";
+}
+
 class OrderScreenConstant {
   static const title = "My Orders";
   static const editPic = "Edit Photo";
   static const update = "Update";
+  static const delivered = "Delivered";
+  static const orderId = "Order Id:";
+  static const orderDate = "Order Date:";
+  static const viewDetails = "View Details";
 }
 
 class ProductScreenConstant {
@@ -189,6 +208,7 @@ class FilterScreenConstant {
   static const type = "Flower Type";
   static const occassions = "Occassions";
   static const color = "Colors";
+  static const review = "Rating";
   static const price = "Prices";
 }
 
@@ -270,6 +290,11 @@ class DashboardText {
   static const viewuploads = 'View\nUploads';
   static const text =
       'Doctors are people \nwho practice medicine \nDoctors are trained to \nkeep people healthy \nand to heal the sick.';
+}
+
+class LoginDialogText {
+  static const loginTitle = 'Login!';
+  static const msg = 'Please login for a smooth experience.';
 }
 
 class SavedScreenText {

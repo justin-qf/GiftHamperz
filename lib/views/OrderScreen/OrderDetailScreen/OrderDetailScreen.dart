@@ -10,11 +10,13 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/OrderDetailController.dart';
 import 'package:gifthamperz/models/OrderModel.dart';
+import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
 import 'package:easy_stepper/easy_stepper.dart';
 
+// ignore: must_be_immutable
 class OrderDetailScreen extends StatefulWidget {
   OrderDetailScreen({super.key, required this.data});
   OrderData? data;
@@ -26,12 +28,12 @@ class OrderDetailScreen extends StatefulWidget {
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   var controller = Get.put(OrderDetailScreenController());
 
-  int activeStep = 2;
-  double progress = 0.2;
+  int activeStep = 3;
+  double progress = 0.3;
 
   void increaseProgress() {
     if (progress < 1) {
-      setState(() => progress += 0.2);
+      setState(() => progress += 0.3);
     } else {
       setState(() => progress = 0);
     }
@@ -92,7 +94,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   // CategoryItem data =
                                   //     controller.categoryList[index];
                                   // return controller.getCategoryListItem(data);
-                                  OrderDetail data =
+                                  CommonProductList data =
                                       controller.orderDetailList[index];
                                   logcat("categoryList", data.name.toString());
                                   return controller.getListItem(data);
@@ -145,22 +147,21 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       activeStep: activeStep,
                       //padding: EdgeInsets.only(top: 0.5.h, bottom: 0),
                       showScrollbar: true,
-                      lineStyle: const LineStyle(
+                      lineStyle: LineStyle(
                           lineLength: 93,
                           lineThickness: 1,
                           lineSpace: 5,
-                          activeLineColor: primaryColor,
-                          defaultLineColor: grey),
+                          activeLineColor: isDarkMode() ? white : primaryColor,
+                          defaultLineColor: isDarkMode() ? white : grey),
                       stepRadius: 20,
-                      
-                      activeStepTextColor: primaryColor,
-                      finishedStepTextColor: black,
+                      activeStepTextColor: isDarkMode() ? white : primaryColor,
+                      finishedStepTextColor: isDarkMode() ? grey : black,
                       alignment: Alignment.center,
                       unreachedStepIconColor: primaryColor,
                       activeStepIconColor: lightGrey,
                       finishedStepIconColor: tileColour,
                       unreachedStepBorderColor: Colors.black54,
-                      unreachedStepTextColor: black,
+                      unreachedStepTextColor: isDarkMode() ? grey : black,
                       finishedStepBackgroundColor: primaryColor,
                       showLoadingAnimation: false,
                       activeStepBorderColor: primaryColor,
@@ -306,7 +307,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   controller.getLableText('Delivery Informations',
                       isMainTitle: false),
                   getDynamicSizedBox(height: 0.5.h),
-                  controller.getCommonText('Delivery Address'),
+                  controller.getCommonText('Delivery Address:'),
+                  getDynamicSizedBox(height: 0.5.h),
+                  controller.getCommonText(controller.userName!.toUpperCase(),
+                      isfromAddressName: true),
                   getDynamicSizedBox(height: 0.5.h),
                   controller.getCommonText(
                       '${widget.data!.address}. ${widget.data!.shippingAddressPincode}'),
@@ -326,33 +330,33 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   getDynamicSizedBox(height: 1.h),
                   controller.getLableText('Order Summary'),
                   getDynamicSizedBox(height: 1.h),
-                  controller.getOrderText(
-                      'Product Cost', '\u{20B9}${widget.data!.totalAmount}',
+                  controller.getOrderText('Product Cost',
+                      '${IndiaRupeeConstant.inrCode}${formatPrice(double.parse(controller.finalProductCost.value.toString()))}',
                       isNormal: true),
                   getDynamicSizedBox(height: 1.h),
-                  controller.getOrderText(
-                      'Shiping Charge', '\u{20B9}${widget.data!.shipingCharge}',
+                  controller.getOrderText('Shiping Charge',
+                      '${IndiaRupeeConstant.inrCode}${widget.data!.shipingCharge}',
                       isNormal: true),
                   getDynamicSizedBox(height: 1.h),
-                  controller.getOrderText(
-                      'Discount', '-\u{20B9}${widget.data!.discount}',
+                  controller.getOrderText('Discount',
+                      '-${IndiaRupeeConstant.inrCode}${widget.data!.discount}',
                       isNormal: true),
                   getDynamicSizedBox(height: 1.h),
-                  controller.getOrderText(
-                      'Total', '\u{20B9}${controller.totalAmount}',
+                  controller.getOrderText('Total',
+                      '${IndiaRupeeConstant.inrCode}${formatPrice(double.parse(widget.data!.totalAmount))}',
                       isNormal: false),
-                  getDynamicSizedBox(height: 3.h),
-                  Container(
-                    margin: EdgeInsets.only(
-                      left: 5.w,
-                      right: 5.w,
-                    ),
-                    child: FadeInUp(
-                      from: 50,
-                      child: getSecondaryFormButton(() {}, Button.check,
-                          isvalidate: true),
-                    ),
-                  ),
+                  //getDynamicSizedBox(height: 3.h),
+                  // Container(
+                  //   margin: EdgeInsets.only(
+                  //     left: 5.w,
+                  //     right: 5.w,
+                  //   ),
+                  //   child: FadeInUp(
+                  //     from: 50,
+                  //     child: getSecondaryFormButton(() {}, Button.check,
+                  //         isvalidate: true),
+                  //   ),
+                  // ),
                   getDynamicSizedBox(height: 3.h),
                 ],
               ),

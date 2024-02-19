@@ -107,10 +107,9 @@ class SignUpController extends GetxController {
         });
         return;
       }
-
       var response = await Repository.post({
         "mobile_no": number,
-      }, ApiUrl.getSignUpOtp, allowHeader: false);
+      }, ApiUrl.login, allowHeader: false);
       loadingIndicator.hide(context);
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -125,8 +124,7 @@ class SignUpController extends GetxController {
             ));
           });
         } else {
-          showDialogForScreen(
-              context, SignupConstant.title, data['message'],
+          showDialogForScreen(context, SignupConstant.title, data['message'],
               callback: () {});
         }
       } else {
@@ -145,5 +143,4 @@ class SignUpController extends GetxController {
           callback: () {});
     }
   }
-
 }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,10 +13,9 @@ import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/CartController.dart';
-import 'package:gifthamperz/main.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -25,6 +23,8 @@ import 'package:gifthamperz/views/DeliveryScreen/AddressScreen.dart';
 import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../models/UpdateDashboardModel.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -39,7 +39,6 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   void initState() {
-    controller.getTotal();
     loadCartItems();
     controller.initLoginData();
     super.initState();
@@ -62,10 +61,18 @@ class _CartScreenState extends State<CartScreen> {
     setState(() {
       cartItems = loadedCartItems;
     });
+
+    double finalPrice = controller.calculateFinalPrice(cartItems);
+    controller.calculateFinalPrice(cartItems);
+    // controller.calculateFinalPrice(cartItems);
+    controller.totalProductList.value = cartItems.length.toString();
+    logcat("FINAL_PRICE", finalPrice.toString());
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    Statusbar().trasparentStatusbarIsNormalScreen();
     return CustomParentScaffold(
       onWillPop: () async {
         return true;
@@ -116,15 +123,22 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                                 child: Row(children: [
-                                  Text("2 Items",
-                                      style: TextStyle(
-                                        color: isDarkMode() ? white : black,
-                                        fontFamily: fontBold,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14.sp,
-                                      )),
+                                  Obx(
+                                    () {
+                                      controller.totalProductList.value;
+                                      return Text(
+                                          "${controller.totalProductList.value} Items",
+                                          style: TextStyle(
+                                            color: isDarkMode() ? white : black,
+                                            fontFamily: fontBold,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14.sp,
+                                          ));
+                                    },
+                                  ),
                                   const Spacer(),
-                                  Text('${'Total: '}\u20B9 120',
+                                  Text(
+                                      '${'Total: '}${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
                                       style: TextStyle(
                                         color: isDarkMode() ? white : black,
                                         fontFamily: fontBold,
@@ -212,7 +226,9 @@ class _CartScreenState extends State<CartScreen> {
                                         //Get.back(result: true);
                                         Get.offAll(const BottomNavScreen());
                                         // onClick!();
-                                      }, AddAddressText.startShopping,
+                                      },
+                                          AddressScreenTextConstant
+                                              .startShopping,
                                           isvalidate: true)),
                                 ),
                               )
@@ -248,57 +264,77 @@ class _CartScreenState extends State<CartScreen> {
                                     topRight: Radius.circular(5.h))),
                             child: SingleChildScrollView(
                               physics: const BouncingScrollPhysics(),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  controller.getLableText('Payment Summery'),
-                                  getDynamicSizedBox(height: 1.h),
-                                  getDivider(),
-                                  getDynamicSizedBox(height: 1.h),
-                                  controller.getOrderText('Product Cost',
-                                      '\$${controller.productCost.value}',
-                                      isNormal: true),
-                                  getDynamicSizedBox(height: 1.h),
-                                  controller.getOrderText('Delivery',
-                                      '\$${controller.deliveryCharge.value}',
-                                      isNormal: true),
-                                  getDynamicSizedBox(height: 1.h),
-                                  controller.getOrderText('Discount',
-                                      '- \$${controller.discount.value}',
-                                      isNormal: true),
-                                  getDynamicSizedBox(height: 1.h),
-                                  controller.getOrderText(
-                                      'Total', '\$${controller.total.value}',
-                                      isNormal: false),
-                                  getDynamicSizedBox(height: 3.h),
-                                  Container(
-                                      margin: EdgeInsets.only(
-                                        left: 5.w,
-                                        right: 5.w,
-                                      ),
-                                      child: FadeInUp(
-                                          from: 50,
-                                          child: Obx(() {
-                                            return getSecondaryFormButton(
-                                                () async {
-                                              // bool isGuest = await UserPreferences()
-                                              //     .getGuestUser();
-                                              if (controller.isGuest.value ==
-                                                  true) {
-                                                // ignore: use_build_context_synchronously
-                                                getGuestUserAlertDialog(context,
-                                                    CartScreenConstant.title);
-                                              } else {
-                                                Get.to(const AddressScreen());
-                                              }
-                                            }, Button.checkOut,
-                                                isvalidate: true,
-                                                isEnable:
-                                                    controller.isGuest.value);
-                                          }))),
-                                  getDynamicSizedBox(height: 0.5.h),
-                                ],
+                              child: Obx(
+                                () {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      controller
+                                          .getLableText('Payment Summery'),
+                                      getDynamicSizedBox(height: 1.h),
+                                      getDivider(),
+                                      getDynamicSizedBox(height: 1.h),
+                                      controller.getOrderText('Product Cost',
+                                          '${IndiaRupeeConstant.inrCode}${formatPrice(controller.productPrice.value)}',
+                                          isNormal: true),
+                                      getDynamicSizedBox(height: 1.h),
+                                      controller.getOrderText('Delivery Charge',
+                                          '+ ${IndiaRupeeConstant.inrCode}${formatPrice(controller.deliveryPrice.value)}',
+                                          isNormal: true),
+                                      getDynamicSizedBox(height: 1.h),
+                                      controller.getOrderText('Discount',
+                                          '- ${IndiaRupeeConstant.inrCode}${formatPrice(controller.discountPrice.value)}',
+                                          isNormal: true),
+                                      getDynamicSizedBox(height: 1.h),
+                                      controller.getOrderText('Total',
+                                          '${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
+                                          isNormal: false),
+                                      getDynamicSizedBox(height: 3.h),
+                                      Container(
+                                          margin: EdgeInsets.only(
+                                            left: 5.w,
+                                            right: 5.w,
+                                          ),
+                                          child: FadeInUp(
+                                              from: 50,
+                                              child: Obx(() {
+                                                return getSecondaryFormButton(
+                                                    () async {
+                                                  // bool isGuest = await UserPreferences()
+                                                  //     .getGuestUser();
+                                                  if (controller
+                                                          .isGuest.value ==
+                                                      true) {
+                                                    // ignore: use_build_context_synchronously
+                                                    getGuestUserAlertDialog(
+                                                        context,
+                                                        CartScreenConstant
+                                                            .title);
+                                                  } else {
+                                                    Get.to(AddressScreen(
+                                                      totaAmount: controller
+                                                          .finalProductPrice
+                                                          .value
+                                                          .toString(),
+                                                      discount: controller
+                                                          .discountPrice.value
+                                                          .toString(),
+                                                      shipinCharge: controller
+                                                          .deliveryPrice.value
+                                                          .toString(),
+                                                    ));
+                                                  }
+                                                }, Button.checkOut,
+                                                    isvalidate: true,
+                                                    isEnable: controller
+                                                        .isGuest.value);
+                                              }))),
+                                      getDynamicSizedBox(height: 0.5.h),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -322,9 +358,9 @@ class _CartScreenState extends State<CartScreen> {
           builder: (BuildContext context) {
             // Statusbar().trasparentStatusbarProfile(true);
             return CustomCartItemDetailDialog(
-                APIImageUrl.url + data.images,
+                APIImageUrl.url + data.images[0],
                 data.name,
-                data.sku.toString(),
+                data.price.toString(),
                 data.description); // Use your custom dialog widget
           },
         );
@@ -377,7 +413,7 @@ class _CartScreenState extends State<CartScreen> {
                                 fit: BoxFit.cover,
                                 height: 13.h,
                                 width: 30.w,
-                                imageUrl: APIImageUrl.url + data.images,
+                                imageUrl: APIImageUrl.url + data.images[0],
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
                                       color: primaryColor),
@@ -421,9 +457,11 @@ class _CartScreenState extends State<CartScreen> {
                                 softWrap: true,
                                 textScaleFactor: 1,
                                 text: TextSpan(
-                                  text: '\$${data.sku}',
+                                  text:
+                                      '${IndiaRupeeConstant.inrCode}${formatPrice(data.price.toDouble())}',
                                   style: TextStyle(
-                                      color: primaryColor,
+                                      color:
+                                          isDarkMode() ? white : primaryColor,
                                       fontWeight: FontWeight.w500,
                                       fontSize: 11.sp),
                                   children: [
@@ -501,6 +539,15 @@ class _CartScreenState extends State<CartScreen> {
                                                 data,
                                                 -1, // Pass a negative quantity for decrement
                                               );
+                                              // Update the totalProductList in the controller
+                                              controller
+                                                      .totalProductList.value =
+                                                  cartItems.length.toString();
+                                              controller.calculateFinalPrice(
+                                                  cartItems);
+                                              // controller.calculateTotalPrice(
+                                              //     cartItems);
+                                              loadCartItems();
                                               setState(() {});
                                             },
                                             child: Icon(
@@ -533,6 +580,8 @@ class _CartScreenState extends State<CartScreen> {
                                                 data,
                                                 data.quantity!.value,
                                               );
+                                              controller.calculateFinalPrice(
+                                                  cartItems);
                                               setState(() {});
                                             },
                                             child: Icon(

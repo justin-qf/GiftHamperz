@@ -43,6 +43,7 @@ class CustomFormField extends StatefulWidget {
       this.isPass,
       this.onAddBtn,
       this.isVisible = true,
+      this.isWhite = false,
       this.isAddressField = false,
       this.isReferenceField = false,
       this.isFromAddStory = false,
@@ -84,6 +85,7 @@ class CustomFormField extends StatefulWidget {
   bool obsecuretext = false;
   bool isVisible = true;
   final bool? isReadOnly;
+  final bool? isWhite;
 
   @override
   State<CustomFormField> createState() => _CustomFormFieldState();
@@ -158,7 +160,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
           : widget.isReferenceField
               ? 6
               : null,
-      style: styleTextFormFieldText(),
+      style: styleTextFormFieldText(isWhite: widget.isWhite),
       decoration: InputDecoration(
         labelStyle: styleTextForFieldLabel(widget.node),
         contentPadding: EdgeInsets.only(
@@ -174,7 +176,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
             bottom: SizerUtil.deviceType == DeviceType.mobile ? 1.8.h : 2.5.w),
         hintText: widget.hintText,
         errorText: widget.errorText,
-        hintStyle: styleTextHintFieldLabel(),
+        hintStyle: styleTextHintFieldLabel(isWhite: widget.isWhite),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.h),
           borderSide: const BorderSide(

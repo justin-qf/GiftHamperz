@@ -108,6 +108,7 @@ class AddressListItem {
   int isOffice;
   int isActive;
   String cityName;
+  String stateName;
   int stateId;
   String name;
   int stateCode;
@@ -121,6 +122,7 @@ class AddressListItem {
     required this.isOffice,
     required this.isActive,
     required this.cityName,
+    required this.stateName,
     required this.stateId,
     required this.name,
     required this.stateCode,
@@ -130,14 +132,15 @@ class AddressListItem {
       AddressListItem(
         id: json["id"],
         userId: json["user_id"],
-        address: json["address"],
+        address: json["address"] ?? '',
         cityId: json["city_id"],
-        pincode: json["pincode"],
+        pincode: json["pincode"] ?? '',
         isOffice: json["is_office"],
         isActive: json["is_active"],
-        cityName: json["city_name"],
+        cityName: json["city_name"] ?? '',
+        stateName: json["state_name"] ?? '',
         stateId: json["state_id"],
-        name: json["name"],
+        name: json["name"] ?? '',
         stateCode: json["state_code"],
       );
 
@@ -150,6 +153,7 @@ class AddressListItem {
         "is_office": isOffice,
         "is_active": isActive,
         "city_name": cityName,
+        "state_name": stateName,
         "state_id": stateId,
         "name": name,
         "state_code": stateCode,

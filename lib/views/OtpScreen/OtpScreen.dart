@@ -18,16 +18,19 @@ import 'package:pinput/pinput.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../configs/colors_constant.dart';
 
+// ignore: must_be_immutable
 class OtpScreen extends StatefulWidget {
   OtpScreen({
     this.mobile,
     this.otp,
     this.isFromSignUp,
+    this.isFromLogin,
     Key? key,
   }) : super(key: key);
   String? otp;
   String? mobile;
   bool? isFromSignUp;
+  bool? isFromLogin;
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
@@ -221,7 +224,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                       if (controller.isFormInvalidate.value ==
                                           true) {
                                         if (widget.isFromSignUp == true) {
-                                          controller.getSignUpOtpApi(
+                                          controller.getLoginOtpApi(
                                               context,
                                               widget.otp.toString(),
                                               widget.mobile.toString());

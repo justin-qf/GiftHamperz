@@ -115,13 +115,13 @@ class PasswordController extends GetxController {
         }
       } else {
         showDialogForScreen(
-            context, RegistrationConstant.title, ServerError.servererror,
+            context, ForgotPassScreenConstant.title, ServerError.servererror,
             callback: () {});
       }
     } catch (e) {
       logcat("Exception", e);
       showDialogForScreen(
-          context, RegistrationConstant.title, ServerError.servererror,
+          context, ForgotPassScreenConstant.title, ServerError.servererror,
           callback: () {});
     }
   }

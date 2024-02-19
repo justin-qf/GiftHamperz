@@ -74,7 +74,7 @@ setActionButton(context, String tag, bool? isEnable,
             from: 50,
             child: getAddressButton(() {
               onClick!();
-            }, AddAddressText.payment, isvalidate: isEnable)),
+            }, AddressScreenTextConstant.payment, isvalidate: isEnable)),
       ),
     ],
   );

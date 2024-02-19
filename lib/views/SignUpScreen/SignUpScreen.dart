@@ -12,7 +12,6 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/signup_controller.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/LoginScreen/LoginScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../componant/input/form_inputs.dart';
@@ -46,7 +45,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Statusbar().trasparentStatusbarProfile(false);
     return CustomParentScaffold(
       onWillPop: () async {
-        logcat("onWillPop", "DONE");
         return true;
       },
       onTap: () {
@@ -94,15 +92,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // FadeInLeft(
-                  //   child: Container(
-                  //     margin: EdgeInsets.only(left: 10.w, bottom: 2.h),
-                  //     child: SvgPicture.asset(
-                  //       Asset.logo,
-                  //       height: 17.h,
-                  //     ),
-                  //   ),
-                  // ),
                   FadeInUp(
                     child: Container(
                       padding: EdgeInsets.symmetric(
@@ -170,7 +159,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             controller.validateMobile(val);
                                           },
                                           obscuretext: false,
-                                          inputType: TextInputType.emailAddress,
+                                          inputType: TextInputType.number,
                                           errorText: controller
                                               .mobileModel.value.error);
                                     }),
@@ -239,7 +228,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               context,
                                               controller.mobileCtr.text
                                                   .toString());
-                                          //Get.to(const PrepareScreen());
                                         }
                                       }, SignupConstant.buttonLabel,
                                           isvalidate: controller

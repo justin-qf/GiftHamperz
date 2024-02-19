@@ -274,7 +274,7 @@ getCommonToolbar(title,
     {bool showBackButton = true, bool isForget = true, Function? callback}) {
   return Row(
     children: [
-      if (showBackButton) viewFamilyBackPress(callback, fromFilter: true),
+      if (showBackButton) backButtonWidget(callback, fromFilter: true),
       Expanded(
         flex: 2,
         child: Row(
@@ -411,7 +411,7 @@ getFilterToolbar(title,
                           searchClick!();
                         },
                         child: Container(
-                          margin: EdgeInsets.only(right: 3.w),
+                          margin: EdgeInsets.only(right: 5.w),
                           child: Icon(
                             Icons.search,
                             size: 3.5.h,
@@ -420,19 +420,19 @@ getFilterToolbar(title,
                         ),
                       )
                     : Container(),
-                GestureDetector(
-                  onTap: () {
-                    callback!();
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(right: 5.w),
-                    child: Icon(
-                      isFilter == true ? Icons.cancel : Icons.tune_rounded,
-                      size: 3.5.h,
-                      color: isDarkMode() ? white : primaryColor,
-                    ),
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () {
+                //     callback!();
+                //   },
+                //   child: Container(
+                //     margin: EdgeInsets.only(right: 5.w),
+                //     child: Icon(
+                //       isFilter == true ? Icons.cancel : Icons.tune_rounded,
+                //       size: 3.5.h,
+                //       color: isDarkMode() ? white : primaryColor,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           )),
@@ -505,7 +505,7 @@ getViewFamilyMember(title,
   return Row(
     children: [
       if (showBackButton)
-        isForget ? iosBackPress(callback) : viewFamilyBackPress(callback),
+        isForget ? iosBackPress(callback) : backButtonWidget(callback),
       Expanded(
         flex: 2,
         child: Row(
@@ -922,7 +922,7 @@ Widget backPressCommon(callback, {bool? isList}) {
   );
 }
 
-Widget viewFamilyBackPress(callback, {bool? fromFilter}) {
+Widget backButtonWidget(callback, {bool? fromFilter, bool? fromReviewImage}) {
   return FadeInDown(
     child: Container(
       margin: EdgeInsets.only(
@@ -939,7 +939,11 @@ Widget viewFamilyBackPress(callback, {bool? fromFilter}) {
             padding: EdgeInsets.only(bottom: 2.w, left: 3.w),
             child: SvgPicture.asset(
               Asset.arrowBack,
-              color: isDarkMode() ? white : black,
+              color: fromReviewImage == true
+                  ? white
+                  : isDarkMode()
+                      ? white
+                      : black,
               height: SizerUtil.deviceType == DeviceType.mobile ? 4.h : 5.h,
             )),
       ),
@@ -949,7 +953,7 @@ Widget viewFamilyBackPress(callback, {bool? fromFilter}) {
 
 Widget getLogo() {
   return Container(
-      padding: EdgeInsets.only(left: 2.5.w, right: 1.w),
+      padding: EdgeInsets.only(left: 2.w, right: 1.w),
       height: 3.6.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
@@ -1029,7 +1033,7 @@ Future<Object?> PopupDialogs(BuildContext context, bool? isFromPayment) {
                             fontWeight: FontWeight.bold,
                           )),
                     ),
-                    
+
                   CupertinoDialogAction(
                     onPressed: () {
                       Navigator.pop(context);
@@ -1060,4 +1064,35 @@ Future<Object?> PopupDialogs(BuildContext context, bool? isFromPayment) {
       pageBuilder: (context, animation1, animation2) {
         return Container();
       });
+}
+
+getImage(title,
+    {bool showBackButton = true, bool isForget = true, Function? callback}) {
+  return Row(
+    children: [
+      backButtonWidget(callback, fromReviewImage: true),
+      Expanded(
+        flex: 2,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            FadeInDown(
+              child: Container(
+                margin: EdgeInsets.only(right: 15.w),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                      fontFamily: fontBold,
+                      color: white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.sp),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
 }
