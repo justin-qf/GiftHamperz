@@ -110,6 +110,7 @@ class ConnectivityHelper {
   final Connectivity _connectivity = Connectivity();
 
   Future<bool> hasConnection() async {
+    logcat('initCommite', "DONE");
     final result = await _connectivity.checkConnectivity();
     return result != ConnectivityResult.none;
   }
