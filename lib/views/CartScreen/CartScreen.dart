@@ -10,6 +10,7 @@ import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
@@ -35,40 +36,66 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   var controller = Get.put(CartScreenController());
-  late List<CommonProductList> cartItems;
+  late List<CommonProductList> cartItems = [];
 
   @override
   void initState() {
-    loadCartItems();
+    getCartItem();
     controller.initLoginData();
     super.initState();
   }
 
-  Future<void> loadCartItems() async {
-    // Your existing logic to load cart items
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? cartItemsJson = prefs.getString('cartItems');
-    List<CommonProductList> loadedCartItems = [];
-
-    if (cartItemsJson != null && cartItemsJson.isNotEmpty) {
-      List<Map<String, dynamic>> itemsList =
-          json.decode(cartItemsJson).cast<Map<String, dynamic>>();
-
-      loadedCartItems =
-          itemsList.map((item) => CommonProductList.fromJson(item)).toList();
-    }
-
-    setState(() {
-      cartItems = loadedCartItems;
-    });
-
-    double finalPrice = controller.calculateFinalPrice(cartItems);
+  void getCartItem() async {
+    cartItems = await UserPreferences().loadCartItems();
+    //double finalPrice = controller.calculateFinalPrice(cartItems);
     controller.calculateFinalPrice(cartItems);
-    // controller.calculateFinalPrice(cartItems);
     controller.totalProductList.value = cartItems.length.toString();
-    logcat("FINAL_PRICE", finalPrice.toString());
+    //logcat("FINAL_PRICE", finalPrice.toString());
     setState(() {});
   }
+
+  // Future<void> loadCartItems() async {
+  //   // Your existing logic to load cart items
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? cartItemsJson = prefs.getString('cartItems');
+
+  //   if (cartItemsJson != null && cartItemsJson.isNotEmpty) {
+  //     List<Map<String, dynamic>> itemsList =
+  //         json.decode(cartItemsJson).cast<Map<String, dynamic>>();
+
+  //     cartItems =
+  //         itemsList.map((item) => CommonProductList.fromJson(item)).toList();
+
+  //     setState(() {});
+  //   }
+
+  //   double finalPrice = controller.calculateFinalPrice(cartItems);
+  //   controller.calculateFinalPrice(cartItems);
+  //   controller.totalProductList.value = cartItems.length.toString();
+  //   logcat("FINAL_PRICE", finalPrice.toString());
+  //   setState(() {});
+  // }
+  // Future<List<CommonProductList>> loadCartItems() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? cartItemsJson = prefs.getString('cartItems');
+
+  //   if (cartItemsJson != null && cartItemsJson.isNotEmpty) {
+  //     List<Map<String, dynamic>> itemsList =
+  //         json.decode(cartItemsJson).cast<Map<String, dynamic>>();
+
+  //     cartItems =
+  //         itemsList.map((item) => CommonProductList.fromJson(item)).toList();
+
+  //     double finalPrice = controller.calculateFinalPrice(cartItems);
+  //     controller.calculateFinalPrice(cartItems);
+  //     controller.totalProductList.value = cartItems.length.toString();
+  //     logcat("FINAL_PRICE", finalPrice.toString());
+  //     setState(() {});
+  //     return itemsList.map((item) => CommonProductList.fromJson(item)).toList();
+  //   } else {
+  //     return []; // Return an empty list if cart items are not available
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -93,149 +120,316 @@ class _CartScreenState extends State<CartScreen> {
                   Get.back();
                 }),
                 Expanded(
-                  child: cartItems.isNotEmpty
-                      ? Container(
-                          padding: EdgeInsets.only(left: 6.w, right: 6.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: SizerUtil.width,
-                                margin:
-                                    EdgeInsets.only(right: 2.w, bottom: 2.0.h),
-                                padding: EdgeInsets.only(
-                                    left: 3.w,
-                                    right: 3.w,
-                                    top: 2.w,
-                                    bottom: 2.w),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(1.5.h),
-                                  color: isDarkMode()
-                                      ? primaryColor
-                                      : grey.withOpacity(0.2),
-                                  border: Border.all(
-                                    color: isDarkMode()
-                                        ? primaryColor
-                                        : grey.withOpacity(
-                                            0.2), // Set the border color here
-                                    width: 2.0, // Set the border width
-                                  ),
-                                ),
-                                child: Row(children: [
-                                  Obx(
-                                    () {
-                                      controller.totalProductList.value;
-                                      return Text(
-                                          "${controller.totalProductList.value} Items",
+                    child: FutureBuilder<List<CommonProductList>>(
+                  future: UserPreferences().loadCartItems(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      // List<CommonProductList> cartItems = snapshot.data ?? [];
+                      cartItems = snapshot.data ?? [];
+                      return cartItems.isNotEmpty
+                          ? Container(
+                              padding: EdgeInsets.only(left: 6.w, right: 6.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: SizerUtil.width,
+                                    margin: EdgeInsets.only(
+                                        right: 2.w, bottom: 2.0.h),
+                                    padding: EdgeInsets.only(
+                                        left: 3.w,
+                                        right: 3.w,
+                                        top: 2.w,
+                                        bottom: 2.w),
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(1.5.h),
+                                      color: isDarkMode()
+                                          ? primaryColor
+                                          : grey.withOpacity(0.2),
+                                      border: Border.all(
+                                        color: isDarkMode()
+                                            ? primaryColor
+                                            : grey.withOpacity(
+                                                0.2), // Set the border color here
+                                        width: 2.0, // Set the border width
+                                      ),
+                                    ),
+                                    child: Row(children: [
+                                      Obx(
+                                        () {
+                                          controller.totalProductList.value;
+                                          return Text(
+                                              "${controller.totalProductList.value} Items",
+                                              style: TextStyle(
+                                                color: isDarkMode()
+                                                    ? white
+                                                    : black,
+                                                fontFamily: fontBold,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14.sp,
+                                              ));
+                                        },
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                          '${'Total: '}${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
                                           style: TextStyle(
                                             color: isDarkMode() ? white : black,
                                             fontFamily: fontBold,
                                             fontWeight: FontWeight.w500,
                                             fontSize: 14.sp,
-                                          ));
-                                    },
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                      '${'Total: '}${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
-                                      style: TextStyle(
-                                        color: isDarkMode() ? white : black,
-                                        fontFamily: fontBold,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14.sp,
-                                      )),
-                                ]),
-                              ),
-                              // controller.getLableText(
-                              //     'You Have 2 items in cart',
-                              //     isMainTitle: true),
-                              Expanded(
-                                  child: SingleChildScrollView(
-                                      physics: const BouncingScrollPhysics(),
-                                      child: Column(
-                                        children: [
-                                          ListView.builder(
-                                              padding:
-                                                  EdgeInsets.only(bottom: 32.h),
-                                              shrinkWrap: true,
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              scrollDirection: Axis.vertical,
-                                              clipBehavior: Clip.antiAlias,
-                                              itemBuilder: (context, index) {
-                                                // CartItem data =
-                                                //     controller.cartItems[index];
-                                                CommonProductList cartItem =
-                                                    cartItems[index];
-                                                return getListItem(
-                                                    cartItem, index, cartItems);
-                                              },
-                                              itemCount: cartItems.length),
-                                          getDynamicSizedBox(height: 0.5.h),
-                                        ],
-                                      ))),
-                            ],
-                          ),
-                        )
-                      : FadeInDown(
-                          child: Stack(
-                            children: [
-                              SizedBox(
-                                height: SizerUtil.height,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      margin: EdgeInsets.only(right: 5.w),
-                                      child: SvgPicture.asset(
-                                        Asset.cartEmpty,
-                                        fit: BoxFit.cover,
-                                        height: 20.h,
-                                      ),
-                                    ),
-                                    getDynamicSizedBox(height: 2.h),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 5.w, right: 5.w),
-                                      child: Text(
-                                          'Your basket is empty!!!\nAdd your item and buy what you want us',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontFamily: fontMedium,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12.sp,
                                           )),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Positioned(
-                                left: 0,
-                                right: 0,
-                                bottom: 2.h,
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                    left: 5.5.w,
-                                    right: 5.w,
+                                    ]),
                                   ),
-                                  child: FadeInUp(
-                                      from: 50,
-                                      child: getSecondaryFormButton(() {
-                                        //Get.back(result: true);
-                                        Get.offAll(const BottomNavScreen());
-                                        // onClick!();
-                                      },
-                                          AddressScreenTextConstant
-                                              .startShopping,
-                                          isvalidate: true)),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                                  // controller.getLableText(
+                                  //     'You Have 2 items in cart',
+                                  //     isMainTitle: true),
+                                  Expanded(
+                                      child: SingleChildScrollView(
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          child: Column(
+                                            children: [
+                                              ListView.builder(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 32.h),
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  clipBehavior: Clip.antiAlias,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    // CartItem data =
+                                                    //     controller.cartItems[index];
+                                                    CommonProductList cartItem =
+                                                        cartItems[index];
+                                                    return getListItem(cartItem,
+                                                        index, cartItems);
+                                                  },
+                                                  itemCount: cartItems.length),
+                                              getDynamicSizedBox(height: 0.5.h),
+                                            ],
+                                          ))),
+                                ],
+                              ),
+                            )
+                          // Your existing logic goes here
+                          : FadeInDown(
+                              child: Stack(
+                                children: [
+                                  SizedBox(
+                                    height: SizerUtil.height,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(right: 5.w),
+                                          child: SvgPicture.asset(
+                                            Asset.cartEmpty,
+                                            fit: BoxFit.cover,
+                                            height: 20.h,
+                                          ),
+                                        ),
+                                        getDynamicSizedBox(height: 2.h),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 5.w, right: 5.w),
+                                          child: Text(
+                                              'Your basket is empty!!!\nAdd your item and buy what you want us',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontFamily: fontMedium,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 12.sp,
+                                              )),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Positioned(
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 2.h,
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                        left: 5.5.w,
+                                        right: 5.w,
+                                      ),
+                                      child: FadeInUp(
+                                          from: 50,
+                                          child: getSecondaryFormButton(() {
+                                            //Get.back(result: true);
+                                            Get.offAll(const DashboardScreen());
+                                            // onClick!();
+                                          },
+                                              AddressScreenTextConstant
+                                                  .startShopping,
+                                              isvalidate: true)),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                    }
+                  },
                 )
+
+                    // cartItems.isNotEmpty
+                    //     ?
+                    //      Container(
+                    //         padding: EdgeInsets.only(left: 6.w, right: 6.w),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           mainAxisAlignment: MainAxisAlignment.start,
+                    //           children: [
+                    //             Container(
+                    //               width: SizerUtil.width,
+                    //               margin:
+                    //                   EdgeInsets.only(right: 2.w, bottom: 2.0.h),
+                    //               padding: EdgeInsets.only(
+                    //                   left: 3.w,
+                    //                   right: 3.w,
+                    //                   top: 2.w,
+                    //                   bottom: 2.w),
+                    //               decoration: BoxDecoration(
+                    //                 borderRadius: BorderRadius.circular(1.5.h),
+                    //                 color: isDarkMode()
+                    //                     ? primaryColor
+                    //                     : grey.withOpacity(0.2),
+                    //                 border: Border.all(
+                    //                   color: isDarkMode()
+                    //                       ? primaryColor
+                    //                       : grey.withOpacity(
+                    //                           0.2), // Set the border color here
+                    //                   width: 2.0, // Set the border width
+                    //                 ),
+                    //               ),
+                    //               child: Row(children: [
+                    //                 Obx(
+                    //                   () {
+                    //                     controller.totalProductList.value;
+                    //                     return Text(
+                    //                         "${controller.totalProductList.value} Items",
+                    //                         style: TextStyle(
+                    //                           color: isDarkMode() ? white : black,
+                    //                           fontFamily: fontBold,
+                    //                           fontWeight: FontWeight.w500,
+                    //                           fontSize: 14.sp,
+                    //                         ));
+                    //                   },
+                    //                 ),
+                    //                 const Spacer(),
+                    //                 Text(
+                    //                     '${'Total: '}${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
+                    //                     style: TextStyle(
+                    //                       color: isDarkMode() ? white : black,
+                    //                       fontFamily: fontBold,
+                    //                       fontWeight: FontWeight.w500,
+                    //                       fontSize: 14.sp,
+                    //                     )),
+                    //               ]),
+                    //             ),
+                    //             // controller.getLableText(
+                    //             //     'You Have 2 items in cart',
+                    //             //     isMainTitle: true),
+                    //             Expanded(
+                    //                 child: SingleChildScrollView(
+                    //                     physics: const BouncingScrollPhysics(),
+                    //                     child: Column(
+                    //                       children: [
+                    //                         ListView.builder(
+                    //                             padding:
+                    //                                 EdgeInsets.only(bottom: 32.h),
+                    //                             shrinkWrap: true,
+                    //                             physics:
+                    //                                 const NeverScrollableScrollPhysics(),
+                    //                             scrollDirection: Axis.vertical,
+                    //                             clipBehavior: Clip.antiAlias,
+                    //                             itemBuilder: (context, index) {
+                    //                               // CartItem data =
+                    //                               //     controller.cartItems[index];
+                    //                               CommonProductList cartItem =
+                    //                                   cartItems[index];
+                    //                               return getListItem(
+                    //                                   cartItem, index, cartItems);
+                    //                             },
+                    //                             itemCount: cartItems.length),
+                    //                         getDynamicSizedBox(height: 0.5.h),
+                    //                       ],
+                    //                     ))),
+                    //           ],
+                    //         ),
+                    //       )
+
+                    //     :
+                    //     FadeInDown(
+                    //         child: Stack(
+                    //           children: [
+                    //             SizedBox(
+                    //               height: SizerUtil.height,
+                    //               child: Column(
+                    //                 crossAxisAlignment: CrossAxisAlignment.center,
+                    //                 mainAxisAlignment: MainAxisAlignment.center,
+                    //                 children: [
+                    //                   Container(
+                    //                     margin: EdgeInsets.only(right: 5.w),
+                    //                     child: SvgPicture.asset(
+                    //                       Asset.cartEmpty,
+                    //                       fit: BoxFit.cover,
+                    //                       height: 20.h,
+                    //                     ),
+                    //                   ),
+                    //                   getDynamicSizedBox(height: 2.h),
+                    //                   Padding(
+                    //                     padding: EdgeInsets.only(
+                    //                         left: 5.w, right: 5.w),
+                    //                     child: Text(
+                    //                         'Your basket is empty!!!\nAdd your item and buy what you want us',
+                    //                         textAlign: TextAlign.center,
+                    //                         style: TextStyle(
+                    //                           fontFamily: fontMedium,
+                    //                           fontWeight: FontWeight.w500,
+                    //                           fontSize: 12.sp,
+                    //                         )),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //             Positioned(
+                    //               left: 0,
+                    //               right: 0,
+                    //               bottom: 2.h,
+                    //               child: Container(
+                    //                 margin: EdgeInsets.only(
+                    //                   left: 5.5.w,
+                    //                   right: 5.w,
+                    //                 ),
+                    //                 child: FadeInUp(
+                    //                     from: 50,
+                    //                     child: getSecondaryFormButton(() {
+                    //                       //Get.back(result: true);
+                    //                       Get.offAll(const DashboardScreen());
+                    //                       // onClick!();
+                    //                     },
+                    //                         AddressScreenTextConstant
+                    //                             .startShopping,
+                    //                         isvalidate: true)),
+                    //               ),
+                    //             )
+                    //           ],
+                    //         ),
+                    //       ),
+
+                    )
               ],
             ),
             cartItems.isNotEmpty
@@ -358,7 +552,7 @@ class _CartScreenState extends State<CartScreen> {
           builder: (BuildContext context) {
             // Statusbar().trasparentStatusbarProfile(true);
             return CustomCartItemDetailDialog(
-                APIImageUrl.url + data.images[0],
+                ApiUrl.imageUrl + data.images[0],
                 data.name,
                 data.price.toString(),
                 data.description); // Use your custom dialog widget
@@ -413,7 +607,7 @@ class _CartScreenState extends State<CartScreen> {
                                 fit: BoxFit.cover,
                                 height: 13.h,
                                 width: 30.w,
-                                imageUrl: APIImageUrl.url + data.images[0],
+                                imageUrl: ApiUrl.imageUrl + data.images[0],
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
                                       color: primaryColor),
@@ -455,7 +649,6 @@ class _CartScreenState extends State<CartScreen> {
                                 overflow: TextOverflow.clip,
                                 textAlign: TextAlign.start,
                                 softWrap: true,
-                                textScaleFactor: 1,
                                 text: TextSpan(
                                   text:
                                       '${IndiaRupeeConstant.inrCode}${formatPrice(data.price.toDouble())}',
@@ -475,6 +668,7 @@ class _CartScreenState extends State<CartScreen> {
                                     )
                                   ],
                                 ),
+                                textScaler: const TextScaler.linear(1),
                               ),
                               getDynamicSizedBox(height: 0.5.h),
                               Row(
@@ -483,7 +677,6 @@ class _CartScreenState extends State<CartScreen> {
                                     overflow: TextOverflow.clip,
                                     textAlign: TextAlign.start,
                                     softWrap: true,
-                                    textScaleFactor: 1,
                                     text: TextSpan(
                                       text: 'Quantity: ',
                                       style: TextStyle(
@@ -504,6 +697,7 @@ class _CartScreenState extends State<CartScreen> {
                                         )
                                       ],
                                     ),
+                                    textScaler: const TextScaler.linear(1),
                                   ),
                                   const Spacer(),
                                   Container(
@@ -547,7 +741,7 @@ class _CartScreenState extends State<CartScreen> {
                                                   cartItems);
                                               // controller.calculateTotalPrice(
                                               //     cartItems);
-                                              loadCartItems();
+                                              getCartItem();
                                               setState(() {});
                                             },
                                             child: Icon(

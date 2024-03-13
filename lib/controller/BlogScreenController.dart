@@ -27,7 +27,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class BlogScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isLiked = true.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -383,7 +382,7 @@ class BlogScreenController extends GetxController {
                     fit: BoxFit.cover,
                     width: 30.w,
                     height: 20.h,
-                    imageUrl: APIImageUrl.url + data.imgUrl,
+                    imageUrl: ApiUrl.imageUrl + data.imgUrl,
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(color: primaryColor),
                     ),

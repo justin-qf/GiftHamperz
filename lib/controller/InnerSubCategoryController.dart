@@ -6,7 +6,6 @@ import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
-import 'package:gifthamperz/models/SubCategoryModel.dart';
 import 'package:gifthamperz/models/innerSubCategoryModel.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:sizer/sizer.dart';
@@ -14,7 +13,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class InnerSubCategoryController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isLiked = true.obs;
   RxBool isTreeModeVertical = true.obs;

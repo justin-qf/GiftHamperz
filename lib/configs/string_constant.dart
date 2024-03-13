@@ -21,7 +21,7 @@ class LoginConst {
 }
 
 class APIImageUrl {
-  static const url = 'http://192.168.1.8/qfs_ecommerce/public/storage';
+  // static const url = 'http://192.168.1.5/qfs_ecommerce/public/storage';
 }
 
 class AddressScreenTextConstant {
@@ -215,6 +215,7 @@ class FilterScreenConstant {
 class IntroPageConstant {
   static const skip = 'Skip';
   static const signIn = 'LOG IN';
+  static const home = 'Home';
   static const signUp = 'SIGN UP';
   static const alreadyHaveAccount = 'Already have an account?';
   static const mymeditrack = 'MYMEDITRACK';
@@ -281,6 +282,7 @@ class AddPrescriptionHintText {
 
 class DashboardText {
   static const dashboard = 'Dashboard';
+  static const addtoCart = 'Add to Cart';
   static const categoryTitle = 'Category';
   static const trendingTitle = 'Trending';
   static const populerTitle = 'Popular';
@@ -317,6 +319,7 @@ class Common {
   static const error = 'Error';
   static const datanotfound = "Data Not Found";
   static const viewMore = "View More";
+  static const viewAll = "View All";
 }
 
 class Connection {
@@ -533,4 +536,22 @@ class DatatableText {
   static const datanotfound = "Data Not Found";
   static const prescriptionNotFound = "Prescription Item Not Found";
   static const prescriptionImgNotFound = "Prescription Image Not Found";
+}
+
+class DashboardTextWeb {
+  static const headerLoginTxt = "Sign Up/Sign In";
+  static const policyTxtOne =
+      "Free Shipping over ${IndiaRupeeConstant.inrCode} 500";
+  static const policyTxtTwo = "10 Days Return Service";
+  static const policyTxtThree = "Same Days Delivery";
+  static const policyTxtFour = "100% Secure Payment";
+  static const sellingTitle = "Best Selling";
+  static const offerTitle = "Best Offers";
+  static const occasionstitle = "Occasions";
+  static const footerDesc =
+      "An online gift shop for unique, funny and creative gifts for guys and girls. At bigsmall.in, explore the most unique gifts for any kind of person, or occasion.";
+  static const popularCatTitle = "Most Popular Categories";
+  static const helpfulLinkTitle = "Helpful Links";
+  static const contactusTitle = "Contact Us";
+  static const rightsTxt = "© 2023 All rights reserved. Gifthamperz.com";
 }

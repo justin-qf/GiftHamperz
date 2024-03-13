@@ -578,7 +578,7 @@ class RegistrationController extends GetxController {
         if (json['status'] == 1) {
           var loginData = LoginModel.fromJson(json);
           UserPreferences().saveSignInInfo(loginData.user);
-          Get.offAll(const BottomNavScreen());
+          Get.offAll(const DashboardScreen());
         } else {
           showDialogForScreen(
               context, RegistrationConstant.title, json['message'],
@@ -596,5 +596,4 @@ class RegistrationController extends GetxController {
           callback: () {});
     }
   }
-
 }

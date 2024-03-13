@@ -7,7 +7,6 @@ import 'internet_controller.dart';
 class MainScreenController extends GetxController {
   var currentPage = 0;
 
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
 
   RxBool isExpanded = false.obs;

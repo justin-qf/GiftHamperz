@@ -457,7 +457,7 @@ class AddressScreenController extends GetxController {
                               child: InkWell(
                                 onTap: () {
                                   Navigator.pop(context);
-                                  Get.offAll(const BottomNavScreen());
+                                  Get.offAll(const DashboardScreen());
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.only(
@@ -766,7 +766,7 @@ class AddressScreenController extends GetxController {
                                 child: FadeInUp(
                                     from: 50,
                                     child: commonBtn(Common.continues, () {
-                                      Get.offAll(const BottomNavScreen());
+                                      Get.offAll(const DashboardScreen());
                                     }, isvalidate: true))),
                           ],
                         ),
@@ -972,7 +972,7 @@ class AddressScreenController extends GetxController {
               callback: () {
             commentctr.text = "";
             isFormInvalidate.value = false;
-            Get.offAll(const BottomNavScreen());
+            Get.offAll(const DashboardScreen());
             update();
           });
         } else {

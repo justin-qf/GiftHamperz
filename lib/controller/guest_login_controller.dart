@@ -216,7 +216,7 @@ class GuestLoginController extends GetxController {
             logcat("isGuestLogin-2", loginData.user.isGuestLogin.toString());
             UserPreferences().setIsGuestUserFromApi(true);
           }
-
+          logcat("verifyOtpAPI", screenName.toString());
           if (screenName == DashboardText.dashboard) {
             Get.find<HomeScreenController>().getHome(context);
           }

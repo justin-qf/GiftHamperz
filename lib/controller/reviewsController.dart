@@ -387,7 +387,7 @@ class ReviewsScreenController extends GetxController {
                             fit: BoxFit.cover,
                             height: 7.h,
                             imageUrl:
-                                APIImageUrl.url + data.profilePic.toString(),
+                                ApiUrl.imageUrl + data.profilePic.toString(),
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(
                                   color: primaryColor),
@@ -505,7 +505,7 @@ class ReviewsScreenController extends GetxController {
                                     // Handle image tap
                                     Get.to(FullScreenImage(
                                       imageUrl:
-                                          APIImageUrl.url + data.images[index],
+                                          ApiUrl.imageUrl + data.images[index],
                                       title: 'Review Image',
                                     ))!
                                         .then((value) => {
@@ -535,7 +535,7 @@ class ReviewsScreenController extends GetxController {
                                       child: CachedNetworkImage(
                                         fit: BoxFit.cover,
                                         height: 9.h,
-                                        imageUrl: APIImageUrl.url +
+                                        imageUrl: ApiUrl.imageUrl +
                                             data.images[index],
                                         placeholder: (context, url) => SizedBox(
                                           height: 9.h,
@@ -700,7 +700,7 @@ class ReviewsScreenController extends GetxController {
                     child: CachedNetworkImage(
                       fit: BoxFit.cover,
                       height: 7.h,
-                      imageUrl: APIImageUrl.url,
+                      imageUrl: ApiUrl.imageUrl,
                       placeholder: (context, url) => const Center(
                         child: CircularProgressIndicator(color: primaryColor),
                       ),

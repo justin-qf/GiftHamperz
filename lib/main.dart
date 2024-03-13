@@ -16,8 +16,6 @@ import 'package:gifthamperz/core/theme/app_theme.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/LocalizationService.dart';
 import 'package:gifthamperz/views/SplashScreen/SplashScreen.dart';
-import 'package:responsive_framework/breakpoint.dart';
-import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:sizer/sizer.dart';
 
 void main() async {
@@ -73,17 +71,6 @@ class HomeState extends State<MainScreen> {
                 init: ThemeController(),
                 builder: (ctr) {
                   return GetMaterialApp(
-                    supportedLocales: const [
-                      Locale('en', ''),
-                      Locale('es', ''),
-                    ],
-                    translations: localizationService,
-                    locale: const Locale('en', 'US'),
-                    fallbackLocale: const Locale('en', 'US'),
-                    localizationsDelegates: const [
-                      GlobalMaterialLocalizations.delegate,
-                      GlobalWidgetsLocalizations.delegate,
-                    ],
                     builder: (context, child) {
                       return MediaQuery(
                         data: MediaQuery.of(context)

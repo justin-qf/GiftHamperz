@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
 
@@ -60,7 +59,7 @@ class LoadingProgressDialog {
   show(BuildContext context, message) {
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) {
-        Statusbar().trasparentStatusbarProfile(true);
+        Statusbar().trasparentStatusbar();
         return Container(
           height: SizerUtil.height,
           width: SizerUtil.width,
@@ -107,9 +106,7 @@ class LoadingProgressDialog {
   }
 
   hide(BuildContext context) {
-    logcat('BuildContext', 'CONTEXXXXX');
     if (_overlayEntry != null) {
-      logcat('isHIDE', 'HIDEEEEEE');
       _overlayEntry!.remove();
       _overlayEntry = null;
     }

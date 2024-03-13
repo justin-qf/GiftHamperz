@@ -3,10 +3,8 @@ import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
-import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/dialogs/dialogs.dart';
 import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
@@ -25,7 +23,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class OrderScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isLiked = true.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -75,6 +72,11 @@ class OrderScreenController extends GetxController {
 
     try {
       if (networkManager.connectionType == 0) {
+        if (hideloading != true) {
+          loadingIndicator.hide(
+            context,
+          );
+        }
         showDialogForScreen(
             context, OrderScreenConstant.title, Connection.noConnection,
             callback: () {
@@ -210,7 +212,7 @@ class OrderScreenController extends GetxController {
                     fit: BoxFit.cover,
                     height: 12.h,
                     width: 12.h,
-                    imageUrl: APIImageUrl.url +
+                    imageUrl: ApiUrl.imageUrl +
                         data.orderDetails[0].images[0].toString(),
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(color: primaryColor),

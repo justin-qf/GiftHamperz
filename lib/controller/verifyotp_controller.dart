@@ -233,7 +233,7 @@ class OtpController extends GetxController {
             logcat("isGuestLogin-2", loginData.user.isGuestLogin.toString());
             UserPreferences().setIsGuestUserFromApi(true);
           }
-          Get.offAll(const BottomNavScreen());
+          Get.offAll(const DashboardScreen());
         } else {
           showDialogForScreen(
               context, VerificationScreen.title, data['message'],

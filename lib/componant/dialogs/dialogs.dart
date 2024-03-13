@@ -566,6 +566,8 @@ Future<Future> getLoginBottomSheetDialog(
                                         controller: controller.numberCtr,
                                         hintLabel: LoginConst.mobile,
                                         onChanged: (val) {
+                                          logcat(
+                                              "getReactiveFormField", 'CLICK');
                                           controller.validatePhone(val);
                                         },
                                         isWhite: true,
@@ -589,7 +591,6 @@ Future<Future> getLoginBottomSheetDialog(
                                   return commonBtn(Button.submit, () {
                                     if (controller.isOtpVisible!.value ==
                                         true) {
-                                      logcat("ISOTP::::", 'DONE');
                                       if (controller
                                               .isOtpFormInvalidate.value ==
                                           true) {
@@ -603,7 +604,6 @@ Future<Future> getLoginBottomSheetDialog(
                                     } else {
                                       if (controller.isFormInvalidate.value ==
                                           true) {
-                                        logcat("IS__SINUP", 'DONE');
                                         controller.getSignUpOtp(
                                             context,
                                             controller.numberCtr.text

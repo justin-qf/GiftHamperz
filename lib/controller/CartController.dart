@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
@@ -96,7 +97,7 @@ class CartScreenController extends GetxController {
                               fit: BoxFit.cover,
                               height: 13.h,
                               width: 30.w,
-                              imageUrl: APIImageUrl.url + data.images[0],
+                              imageUrl: ApiUrl.imageUrl + data.images[0],
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
                                     color: primaryColor),
@@ -137,7 +138,6 @@ class CartScreenController extends GetxController {
                               overflow: TextOverflow.clip,
                               textAlign: TextAlign.start,
                               softWrap: true,
-                              textScaleFactor: 1,
                               text: TextSpan(
                                 text: '\$${data.price}',
                                 style: TextStyle(
@@ -155,6 +155,7 @@ class CartScreenController extends GetxController {
                                   )
                                 ],
                               ),
+                              textScaler: const TextScaler.linear(1),
                             ),
                             getDynamicSizedBox(height: 0.5.h),
                             Row(
@@ -163,7 +164,6 @@ class CartScreenController extends GetxController {
                                   overflow: TextOverflow.clip,
                                   textAlign: TextAlign.start,
                                   softWrap: true,
-                                  textScaleFactor: 1,
                                   text: TextSpan(
                                     text: 'Quantity: ',
                                     style: TextStyle(
@@ -184,6 +184,7 @@ class CartScreenController extends GetxController {
                                       )
                                     ],
                                   ),
+                                  textScaler: const TextScaler.linear(1),
                                 ),
                                 const Spacer(),
                                 Container(

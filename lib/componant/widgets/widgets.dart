@@ -6,9 +6,11 @@ import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:gifthamperz/componant/dialogs/customDialog.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
+import 'package:gifthamperz/models/webModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:pinput/pinput.dart';
 import 'package:readmore/readmore.dart';
@@ -226,40 +228,43 @@ Widget getRichText(title, desc) {
 
 Widget getHomeLable(String title, Function onCLick) {
   return FadeInRight(
-    child: Container(
-      margin: EdgeInsets.only(left: 3.w, right: 2.w),
-      width: SizerUtil.width,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(title,
-              style: TextStyle(
-                color: isDarkMode() ? white : black,
-                fontFamily: fontBold,
-                fontWeight: FontWeight.w800,
-                fontSize: 16.sp,
-              )),
-          const Spacer(),
-          GestureDetector(
-            onTap: () {
-              onCLick();
-            },
-            child: Text("See All",
+    child: Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: EdgeInsets.only(left: 3.w, right: 2.w),
+        width: double.infinity,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(title,
                 style: TextStyle(
-                  color: isDarkMode() ? white : primaryColor,
-                  fontFamily: fontRegular,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12.sp,
+                  color: isDarkMode() ? white : black,
+                  fontFamily: fontBold,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16.sp,
                 )),
-          ),
-          getDynamicSizedBox(width: 0.3.w),
-          Icon(
-            Icons.chevron_right_sharp,
-            color: isDarkMode() ? white : primaryColor,
-            size: 6.w,
-          )
-        ],
+            const Spacer(),
+            GestureDetector(
+              onTap: () {
+                onCLick();
+              },
+              child: Text("See All",
+                  style: TextStyle(
+                    color: isDarkMode() ? white : primaryColor,
+                    fontFamily: fontRegular,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12.sp,
+                  )),
+            ),
+            getDynamicSizedBox(width: 0.3.w),
+            Icon(
+              Icons.chevron_right_sharp,
+              color: isDarkMode() ? white : primaryColor,
+              size: 6.w,
+            )
+          ],
+        ),
       ),
     ),
   );
@@ -358,13 +363,6 @@ Widget getPriceLable(String startPrice, String endPrice) {
             )),
       ],
     ),
-  );
-}
-
-Widget getDivider() {
-  return Divider(
-    height: 0.1.h,
-    color: grey,
   );
 }
 
@@ -690,11 +688,11 @@ Widget homeCartIncDecUi(
   return Center(
     child: Container(
       margin: EdgeInsets.only(
-          left: isFromPopular == true ? 5.w : 2.w,
-          right: isFromPopular == true ? 5.w : 2.w),
+          left: isFromPopular == true ? 5.w : 1.w,
+          right: isFromPopular == true ? 5.w : 1.w),
       padding: EdgeInsets.only(
-          left: isFromPopular == true ? 2.w : 1.5.w,
-          right: isFromPopular == true ? 2.w : 1.5.w,
+          left: isFromPopular == true ? 2.w : 1.0.w,
+          right: isFromPopular == true ? 2.w : 1.0.w,
           top: 0.2.h,
           bottom: 0.2.h),
       decoration: BoxDecoration(
@@ -711,7 +709,7 @@ Widget homeCartIncDecUi(
           )),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
             onTap: () async {
@@ -723,16 +721,16 @@ Widget homeCartIncDecUi(
               color: isDarkMode() ? white : black,
             ),
           ),
-          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 2.w),
+          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 1.w),
           getVerticalDivider(),
-          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 2.w),
+          getDynamicSizedBox(width: isFromPopular == true ? 3.w : 1.w),
           Text(
             qty.toString(),
             style: TextStyle(
               color: isDarkMode() ? white : black,
               fontWeight: FontWeight.w600,
               fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 12.sp : 13.sp,
+                  SizerUtil.deviceType == DeviceType.mobile ? 11.sp : 13.sp,
             ),
           ),
           getDynamicSizedBox(width: isFromPopular == true ? 3.w : 2.w),
@@ -803,7 +801,7 @@ Widget homeOfferBanner(String item) {
       child: CachedNetworkImage(
           fit: BoxFit.cover,
           height: 15.h,
-          imageUrl: APIImageUrl.url + item.toString(),
+          imageUrl: ApiUrl.imageUrl + item.toString(),
           placeholder: (context, url) => SizedBox(
                 height: 15.h,
                 child: const Center(
@@ -827,5 +825,264 @@ Widget homeOfferBanner(String item) {
     //       Asset.homeBanner,
     //       fit: BoxFit.cover,
     //     )),
+  );
+}
+
+Widget getBannerLeftRightSwiper(isLeft) {
+  return Positioned(
+    left: isLeft == true ? 0 : null,
+    right: isLeft == true ? null : 0,
+    top: 0,
+    bottom: 0,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 10.h,
+          width: 10.h,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: white,
+          ),
+          padding: const EdgeInsets.all(2),
+          child: Container(
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle, color: lightGreyBlueColor),
+            child: Icon(
+              color: isDarkMode() ? white : secondaryColor,
+              isLeft == true
+                  ? Icons.chevron_left_sharp
+                  : Icons.chevron_right_sharp,
+              size: 5.h,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget getPoliciesWeb(String text, String icon) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Container(
+        height: 5.h,
+        width: 5.w,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: bgprimaryColor,
+        ),
+        padding: EdgeInsets.all(1.4.h),
+        child: SvgPicture.asset(
+          icon,
+        ),
+      ),
+      getDynamicSizedBox(width: 0.5.w),
+      Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            fontFamily: fontBold,
+            color: headingTextColor,
+            fontWeight: FontWeight.w500,
+            fontSize: 4.sp),
+      ),
+    ],
+  );
+}
+
+Widget getDivider() {
+  return Divider(
+    height: 0.1.h,
+    color: grey,
+  );
+}
+
+Widget headerDivider() {
+  return Container(
+    decoration: const BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      color: grey,
+    ),
+    height: 5.h,
+    width: 0.1.w,
+  );
+}
+
+Widget getHomeLableWeb(String title, Function onCLick) {
+  return FadeInRight(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(title,
+                style: TextStyle(
+                  color: isDarkMode() ? white : black,
+                  fontFamily: fontBold,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 6.sp,
+                )),
+            const Spacer(),
+            GestureDetector(
+              onTap: () {
+                onCLick();
+              },
+              child: Text(Common.viewAll,
+                  style: TextStyle(
+                    color: isDarkMode() ? white : primaryColor,
+                    fontFamily: fontRegular,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 4.sp,
+                  )),
+            ),
+            getDynamicSizedBox(width: 0.3.w),
+            Icon(
+              Icons.chevron_right_sharp,
+              color: isDarkMode() ? white : secondaryColor,
+              size: 4.h,
+            )
+          ],
+        ),
+        getDynamicSizedBox(height: 1.h),
+        getBgDividerWeb(lineColor)
+      ],
+    ),
+  );
+}
+
+getBgDividerWeb(Color? selectedColor, {size}) {
+  return Container(
+    width: size,
+    height: 0.3.h,
+    decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(15)),
+        color: selectedColor),
+  );
+}
+
+Widget getFooterLogoWeb() {
+  return FadeInLeft(
+    child: SvgPicture.asset(
+      Asset.logo,
+      width: 120,
+    ),
+  );
+}
+
+Widget footerCommonUi(title, List<FooterModel> list, selectedSize,
+    {isContactList}) {
+  return SizedBox(
+    width: 20.w,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          textAlign: TextAlign.start,
+          style: TextStyle(
+            fontSize: 4.sp,
+            color: isDarkMode() ? white : black,
+            fontFamily: fontBold,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        getBgDividerWeb(black, size: selectedSize),
+        getDynamicSizedBox(height: 2.h),
+        Expanded(
+          child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              clipBehavior: Clip.antiAlias,
+              itemBuilder: (context, index) {
+                FooterModel data = list[index];
+                return isContactList == true
+                    ? footerContactItem(data.title, data.subTitle, data.icon)
+                    : footerItem(data.title);
+              },
+              itemCount: list.length),
+        )
+      ],
+    ),
+  );
+}
+
+Widget footerItem(title) {
+  return Padding(
+    padding: EdgeInsets.only(top: 1.h),
+    child: Row(
+      children: [
+        Container(
+          height: 0.5.h,
+          width: 0.5.h,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: black,
+          ),
+        ),
+        getDynamicSizedBox(width: 1.w),
+        Text(
+          title,
+          textAlign: TextAlign.start,
+          style: TextStyle(
+            fontSize: 3.sp,
+            color: isDarkMode() ? white : black,
+            fontFamily: fontBold,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget footerContactItem(title, subTitle, icon) {
+  return Padding(
+    padding: EdgeInsets.only(top: 1.h),
+    child: Row(
+      children: [
+        SvgPicture.asset(icon, fit: BoxFit.cover, width: 3.h),
+        getDynamicSizedBox(width: 0.5.w),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 3.sp,
+                color: isDarkMode() ? white : black,
+                fontFamily: fontBold,
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            getDynamicSizedBox(height: 0.2.h),
+            Text(
+              subTitle,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 3.sp,
+                color: isDarkMode() ? white : black,
+                fontFamily: fontBold,
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
   );
 }

@@ -27,6 +27,10 @@ styleTextForFieldLabel(usernameNode) {
   );
 }
 
+styleTextForErrorFieldHint() {
+  return TextStyle(fontSize: 11.sp, fontFamily: fontRegular, color: red);
+}
+
 styleTextHintFieldLabel({isWhite}) {
   return TextStyle(
       fontFamily: fontRegular,

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -7,7 +5,6 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/get_storage_key.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/controller/homeController.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/DeliveryScreen/AddressScreen.dart';
@@ -292,7 +289,6 @@ getDarkModeDatePicker() {
           borderRadius: BorderRadius.circular(50), // Set your border radius
         ),
       ),
-      useMaterial3: true,
       colorScheme: const ColorScheme.dark(
           //   primary:
           //       primaryColor, // Set your primary color
@@ -307,7 +303,6 @@ getLightModeDatePicker() {
         borderRadius: BorderRadius.circular(10.0), // Set your border radius
       ),
     ),
-    useMaterial3: true,
     colorScheme: const ColorScheme.light(
       primary: primaryColor, // Set your primary color
       background: white,

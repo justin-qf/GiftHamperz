@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
@@ -20,7 +21,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class OrderDetailScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isLiked = true.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -260,7 +260,7 @@ class OrderDetailScreenController extends GetxController {
                               : 2.2.w),
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
-                        imageUrl: APIImageUrl.url + data.images[0].toString(),
+                        imageUrl: ApiUrl.imageUrl + data.images[0].toString(),
                         height: 12.h,
                         width: 12.h,
                         placeholder: (context, url) => const Center(
@@ -296,7 +296,6 @@ class OrderDetailScreenController extends GetxController {
                         overflow: TextOverflow.clip,
                         textAlign: TextAlign.center,
                         softWrap: true,
-                        textScaleFactor: 1,
                         text: TextSpan(
                           text: '${IndiaRupeeConstant.inrCode}${data.price} | ',
                           style: TextStyle(
@@ -317,13 +316,13 @@ class OrderDetailScreenController extends GetxController {
                             ),
                           ],
                         ),
+                        textScaler: const TextScaler.linear(1),
                       ),
                       getDynamicSizedBox(height: 0.5.h),
                       RichText(
                         overflow: TextOverflow.clip,
                         textAlign: TextAlign.center,
                         softWrap: true,
-                        textScaleFactor: 1,
                         text: TextSpan(
                           text: 'Quantity : ',
                           style: TextStyle(
@@ -343,6 +342,7 @@ class OrderDetailScreenController extends GetxController {
                             ),
                           ],
                         ),
+                        textScaler: const TextScaler.linear(1),
                       ),
                       getDynamicSizedBox(height: 1.h),
                       //getDivider(),
@@ -403,7 +403,7 @@ class OrderDetailScreenController extends GetxController {
                             fit: BoxFit.cover,
                             height: 15.h,
                             imageUrl:
-                                APIImageUrl.url + data.images[0].toString(),
+                                ApiUrl.imageUrl + data.images[0].toString(),
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(
                                   color: primaryColor),

@@ -18,7 +18,6 @@ import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/filter_controller.dart';
-import 'package:gifthamperz/controller/productDetailController.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/favouriteModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
@@ -34,7 +33,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class SavedScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isLiked = true.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -176,7 +174,7 @@ class SavedScreenController extends GetxController {
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
                           height: 15.h,
-                          imageUrl: APIImageUrl.url + item!.images[0],
+                          imageUrl: ApiUrl.imageUrl + item!.images[0],
                           placeholder: (context, url) => const Center(
                             child:
                                 CircularProgressIndicator(color: primaryColor),

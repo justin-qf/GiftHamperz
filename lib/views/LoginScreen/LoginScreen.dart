@@ -14,7 +14,6 @@ import 'package:gifthamperz/controller/login_controller.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/ForgotPassword/ForgotPasswordScreen.dart';
-import 'package:gifthamperz/views/RegistrationScreen/RegistrationScreen.dart';
 import 'package:gifthamperz/views/SignUpScreen/SignUpScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../componant/input/form_inputs.dart';

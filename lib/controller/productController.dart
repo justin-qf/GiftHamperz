@@ -28,7 +28,6 @@ import 'package:gifthamperz/views/ProductDetailScreen/ProductDetailScreen.dart';
 import 'package:sizer/sizer.dart';
 
 class ProductScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isExpanded = false.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -296,7 +295,7 @@ class ProductScreenController extends GetxController {
                                   child: CachedNetworkImage(
                                     fit: BoxFit.cover,
                                     height: 12.h,
-                                    imageUrl: APIImageUrl.url + data.images[0],
+                                    imageUrl: ApiUrl.imageUrl + data.images[0],
                                     placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator(
                                           color: primaryColor),

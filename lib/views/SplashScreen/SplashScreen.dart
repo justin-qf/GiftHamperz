@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
+import 'package:gifthamperz/configs/device_type.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/views/DeliveryScreen/AddAddressScreen.dart';
-import 'package:gifthamperz/views/DeliveryScreen/AddressScreen.dart';
 import 'package:gifthamperz/views/IntroScreen/intro.dart';
 import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
-import 'package:gifthamperz/views/ReviewsScreen/ReviewsScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../configs/assets_constant.dart';
 
@@ -29,11 +27,11 @@ class _SplashscreenState extends State<Splashscreen> {
     Timer(const Duration(seconds: 3), () async {
       UserData? retrievedObject = await UserPreferences().getSignInInfo();
       // if (retrievedObject != null) {
-      //   Get.offAll(const BottomNavScreen());
+      //   Get.offAll(const HomePageScreen());
       // } else {
       //   Get.offAll(const IntroScreen());
       // }
-      Get.offAll(const BottomNavScreen());
+      Get.offAll(const IntroScreen());
     });
   }
 
@@ -55,7 +53,11 @@ class _SplashscreenState extends State<Splashscreen> {
       child: Center(
         child: SvgPicture.asset(Asset.logo,
             fit: BoxFit.cover,
-            width: SizerUtil.deviceType == DeviceType.mobile ? 190 : 500),
+            width: SizerUtil.deviceType == DeviceType.mobile
+                ? 190
+                : DeviceScreenType.isWeb(context)
+                    ? 300
+                    : 200),
       ),
     );
   }

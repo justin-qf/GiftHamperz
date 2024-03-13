@@ -10,8 +10,7 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/controller/intro_controller.dart';
-import 'package:gifthamperz/views/LoginScreen/LoginScreen.dart';
-import 'package:gifthamperz/views/SignUpScreen/SignUpScreen.dart';
+import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
 import 'package:sizer/sizer.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -126,13 +125,16 @@ class _IntroScreenState extends State<IntroScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 getFormButton(() {
-                                  Get.to(const LoginScreen());
-                                }, IntroPageConstant.signIn, isWhite: true),
-                                getDynamicSizedBox(width: 3.w),
-                                getFormButton(() {
-                                  //Get.to(const RegistrationScreen());
-                                  Get.to(const SignUpScreen());
-                                }, IntroPageConstant.signUp, isWhite: false),
+                                  Get.offAll(const DashboardScreen());
+                                }, IntroPageConstant.home, isWhite: false),
+                                // getFormButton(() {
+                                //   Get.to(const LoginScreen());
+                                // }, IntroPageConstant.signIn, isWhite: true),
+                                // getDynamicSizedBox(width: 3.w),
+                                // getFormButton(() {
+                                //   //Get.to(const RegistrationScreen());
+                                //   Get.to(const SignUpScreen());
+                                // }, IntroPageConstant.signUp, isWhite: false),
                               ],
                             ),
                             getDynamicSizedBox(height: 5.h),

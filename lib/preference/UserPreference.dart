@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:get_storage/get_storage.dart';
-import 'package:gifthamperz/models/DashboadModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/UpdateDashboardModel.dart';

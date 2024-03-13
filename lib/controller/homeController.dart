@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
@@ -18,8 +17,8 @@ import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/BannerModel.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
-import 'package:gifthamperz/models/homeModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
+import 'package:gifthamperz/models/webModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -30,10 +29,8 @@ import 'package:sizer/sizer.dart';
 import '../models/categoryModel.dart';
 import '../utils/enum.dart';
 import 'internet_controller.dart';
-import 'dart:ui' as ui;
 
 class HomeScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isExpanded = false.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -51,11 +48,16 @@ class HomeScreenController extends GetxController {
   RxBool isShowMoreLoading = false.obs;
   // Use a Map to store the quantity for each product ID
   final Map<String, int> productQuantities = <String, int>{};
+  RxBool isHovered = false.obs;
+
+  updateHover(bool isHovere) {
+    isHovered.value = isHovere;
+    update();
+  }
 
   // Method to update the quantity for a product
   void updateQuantity(String productId, int quantity) {
     productQuantities[productId] = quantity;
-    logcat("ItemISIInCART:::", productQuantities[productId].toString());
     update(); // Notify listeners
   }
 
@@ -65,150 +67,6 @@ class HomeScreenController extends GetxController {
     super.onInit();
   }
 
-  List<HomeItem> staticData = <HomeItem>[
-    HomeItem(
-        icon: Image.asset(
-          Asset.itemOne,
-          height: 15.h,
-          width: 15.h,
-          fit: BoxFit.cover,
-        ),
-        price: '\$19.99 -\$29.99',
-        name: 'Flower Lovers'),
-    HomeItem(
-        icon: Image.asset(
-          height: 15.h,
-          width: 15.h,
-          Asset.itemTwo,
-          fit: BoxFit.cover,
-        ),
-        price: '\$30.99 -\$29.99',
-        name: 'Birthday Gifts'),
-    HomeItem(
-        icon: Image.asset(
-          height: 15.h,
-          width: 15.h,
-          Asset.itemThree,
-          fit: BoxFit.cover,
-        ),
-        price: '\$85.99 -\$90.99',
-        name: "Occations"),
-    HomeItem(
-        icon: Image.asset(
-          height: 15.h,
-          width: 15.h,
-          Asset.itemFour,
-          fit: BoxFit.cover,
-        ),
-        price: '\$35.99 -\$55.99',
-        name: "Flower Lovers"),
-    HomeItem(
-        icon: Image.asset(
-          height: 15.h,
-          width: 15.h,
-          Asset.itemFive,
-          fit: BoxFit.cover,
-        ),
-        price: '\$39.99 -\$54.99',
-        name: 'Birthday Gifts'),
-    HomeItem(
-        icon: Image.asset(
-          height: 15.h,
-          width: 15.h,
-          Asset.itemFour,
-          fit: BoxFit.cover,
-        ),
-        price: '\$58.99 -\$62.99',
-        name: "Occations"),
-    HomeItem(
-        icon: Image.asset(
-          height: 15.h,
-          width: 15.h,
-          Asset.itemSix,
-          fit: BoxFit.cover,
-        ),
-        price: '\$87.99 -\$67.99',
-        name: "Flower Lovers")
-  ];
-
-  List<Widget> bannerItems = [
-    Image.asset(
-      Asset.homeSlideOne,
-      fit: BoxFit.cover,
-    ),
-    Image.asset(
-      Asset.homeSlideTwo,
-      fit: BoxFit.cover,
-    ),
-    Image.asset(
-      Asset.homeSlideThree,
-      fit: BoxFit.cover,
-    ),
-    Image.asset(
-      Asset.homeSlideFour,
-      fit: BoxFit.cover,
-    ),
-  ];
-
-  // List<CategoryItem> categoryList = <CategoryItem>[
-  //   CategoryItem(
-  //       icon: Image.asset(
-  //         'assets/pngs/Birthday_gift.jpg',
-  //         height: 11.h,
-  //         width: 11.h,
-  //         fit: BoxFit.cover,
-  //       ),
-  //       title: 'Birthdays'),
-  //   CategoryItem(
-  //       icon: Image.asset(
-  //         height: 11.h,
-  //         width: 11.h,
-  //         'assets/pngs/Anniversary_gift.jpg',
-  //         fit: BoxFit.cover,
-  //       ),
-  //       title: 'Anniversaries'),
-  //   CategoryItem(
-  //       icon: Image.asset(
-  //         height: 11.h,
-  //         width: 11.h,
-  //         'assets/pngs/wedding_gift.jpg',
-  //         fit: BoxFit.cover,
-  //       ),
-  //       title: "Weddings"),
-  //   CategoryItem(
-  //       icon: Image.asset(
-  //         height: 11.h,
-  //         width: 11.h,
-  //         'assets/pngs/babyshower_gift.png',
-  //         fit: BoxFit.cover,
-  //       ),
-  //       title: "Baby Showers"),
-  //   CategoryItem(
-  //       icon: Image.asset(
-  //         height: 11.h,
-  //         width: 11.h,
-  //         'assets/pngs/Engagement_gift.jpg',
-  //         fit: BoxFit.cover,
-  //       ),
-  //       title: 'Engagements'),
-  //   CategoryItem(
-  //       icon: Image.asset(
-  //         height: 11.h,
-  //         width: 11.h,
-  //         'assets/pngs/graduation_gift.jpeg',
-  //         fit: BoxFit.cover,
-  //       ),
-  //       title: "Graduations"),
-  //   CategoryItem(
-  //       icon: Image.asset(
-  //         height: 11.h,
-  //         width: 11.h,
-  //         'assets/pngs/valentine_gift.png',
-  //         fit: BoxFit.cover,
-  //       ),
-  //       title: "Valentine's Day")
-  // ];
-
   void hideKeyboard(context) {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
@@ -216,16 +74,20 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  getCategoryListItem(CategoryList item) {
+  getCategoryListItem(BuildContext context, CategoryList item) {
     return FadeInUp(
         child: GestureDetector(
             onTap: () {
               Get.to(SubCategoryScreen(
                 categoryId: item.id.toString(),
-              ));
+              ))!
+                  .then((value) {
+                getHome(context);
+                getTotalProductInCart();
+              });
             },
             child: Container(
-                width: 8.h,
+                width: SizerUtil.deviceType == DeviceType.mobile ? 8.h : 9.h,
                 margin: EdgeInsets.only(right: 4.w),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,7 +110,7 @@ class HomeScreenController extends GetxController {
                             child: CachedNetworkImage(
                               fit: BoxFit.cover,
                               height: 7.h,
-                              imageUrl: APIImageUrl.url + item.thumbnailUrl,
+                              imageUrl: ApiUrl.imageUrl + item.thumbnailUrl,
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
                                     color: primaryColor),
@@ -274,7 +136,10 @@ class HomeScreenController extends GetxController {
                                 style: TextStyle(
                                   fontFamily: fontRegular,
                                   color: isDarkMode() ? white : black,
-                                  fontSize: 12.sp,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 12.sp
+                                          : 10.sp,
                                 ),
                                 text: item.name,
                                 scrollAxis: Axis
@@ -306,14 +171,13 @@ class HomeScreenController extends GetxController {
                               style: TextStyle(
                                 fontFamily: fontRegular,
                                 color: isDarkMode() ? white : black,
-                                fontSize: 12.sp,
+                                fontSize:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 12.sp
+                                        : 10.sp,
                               ),
                             )
                     ]))));
-  }
-
-  loadImageInWeb() {
-    if (SizerUtil.deviceType == DeviceType.web) {}
   }
 
   getTotalProductInCart() async {
@@ -399,7 +263,7 @@ class HomeScreenController extends GetxController {
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
                                 height: 12.h,
-                                imageUrl: APIImageUrl.url + data.images[0],
+                                imageUrl: ApiUrl.imageUrl + data.images[0],
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
                                       color: primaryColor),
@@ -585,8 +449,8 @@ class HomeScreenController extends GetxController {
                             Obx(
                               () {
                                 return data.isInCart!.value == false
-                                    ? getAddToCartBtn(
-                                        'Add to Cart', Icons.shopping_cart,
+                                    ? getAddToCartBtn(DashboardText.addtoCart,
+                                        Icons.shopping_cart,
                                         addCartClick: () async {
                                         data.isInCart!.value = true;
                                         // data.quantity!.value = 1;
@@ -720,7 +584,7 @@ class HomeScreenController extends GetxController {
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
                                 height: 12.h,
-                                imageUrl: APIImageUrl.url + data.images[0],
+                                imageUrl: ApiUrl.imageUrl + data.images[0],
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
                                       color: primaryColor),
@@ -1090,6 +954,7 @@ class HomeScreenController extends GetxController {
           categoryList.clear();
 
           if (homeData!.data.trendList.isNotEmpty) {
+            trendingItemList.addAll(homeData!.data.trendList);
             trendingItemList.addAll(homeData!.data.trendList);
             update();
           }

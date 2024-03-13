@@ -14,7 +14,6 @@ import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
-import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/homeModel.dart';
@@ -22,7 +21,6 @@ import 'package:gifthamperz/models/searchModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
-import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/FilterScreen/FIlterScreen.dart';
 import 'package:gifthamperz/views/ProductDetailScreen/ProductDetailScreen.dart';
 import 'package:sizer/sizer.dart';
@@ -30,7 +28,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class SearchScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isLiked = true.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -319,7 +316,7 @@ class SearchScreenController extends GetxController {
                             child: CachedNetworkImage(
                               fit: BoxFit.cover,
                               //height: 12.h,
-                              imageUrl: APIImageUrl.url + data.images[0],
+                              imageUrl: ApiUrl.imageUrl + data.images[0],
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
                                     color: primaryColor),

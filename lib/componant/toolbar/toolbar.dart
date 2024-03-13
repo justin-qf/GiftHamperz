@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/componant/widgets/hover_widget.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
+import 'package:gifthamperz/controller/homeController.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/views/LoginScreen/LoginScreen.dart';
@@ -15,7 +17,11 @@ import '../../configs/string_constant.dart';
 getToolbar(String title, Function onClick, Function cartOnClick, int budget) {
   return Stack(
     children: [
-      Positioned(left: 0, top: 0, child: getLogo()),
+      Positioned(
+        left: 0,
+        top: 0,
+        child: getLogo(),
+      ),
       Center(
         child: FadeInDown(
           child: Text(
@@ -115,7 +121,9 @@ homeAppbar(String title, Function onClick, Function cartOnClick, RxInt budget) {
                   maxLines: 1,
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                    fontSize: 16.5.sp,
+                    fontSize: SizerUtil.deviceType == DeviceType.mobile
+                        ? 16.5.sp
+                        : 15.sp,
                     color: isDarkMode() ? white : black,
                     fontFamily: fontBold,
                     fontStyle: FontStyle.normal,
@@ -136,7 +144,7 @@ homeAppbar(String title, Function onClick, Function cartOnClick, RxInt budget) {
             child: Icon(
               color: isDarkMode() ? white : primaryColor,
               Icons.search,
-              size: 3.3.h,
+              size: SizerUtil.deviceType == DeviceType.mobile ? 3.3.h : 4.h,
             ),
           ),
         ),
@@ -152,11 +160,12 @@ homeAppbar(String title, Function onClick, Function cartOnClick, RxInt budget) {
                   child: Icon(
                     color: isDarkMode() ? white : primaryColor,
                     Icons.shopping_cart,
-                    size: 3.3.h,
+                    size:
+                        SizerUtil.deviceType == DeviceType.mobile ? 3.3.h : 4.h,
                   )),
               Positioned(
                 right: 3,
-                top: 2,
+                top: 0.5,
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
@@ -164,14 +173,17 @@ homeAppbar(String title, Function onClick, Function cartOnClick, RxInt budget) {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   constraints: BoxConstraints(
-                    minWidth: 4.0.w,
-                    minHeight: 0.6.h,
+                    minWidth:
+                        SizerUtil.deviceType == DeviceType.mobile ? 4.2.w : 3.w,
+                    minHeight: SizerUtil.deviceType == DeviceType.mobile
+                        ? 0.3.h
+                        : 0.5.h,
                   ),
                   child: Text(
                     budget.value.toString(),
                     style: TextStyle(
                       color: isDarkMode() ? white : black,
-                      fontSize: 10,
+                      fontSize: 7.sp,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -953,7 +965,7 @@ Widget backButtonWidget(callback, {bool? fromFilter, bool? fromReviewImage}) {
 
 Widget getLogo() {
   return Container(
-      padding: EdgeInsets.only(left: 2.w, right: 1.w),
+      margin: EdgeInsets.only(left: 1.5.w, right: 1.w),
       height: 3.6.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
@@ -964,6 +976,84 @@ Widget getLogo() {
           height: 5.h,
         ),
       ));
+}
+
+Widget getLogoWithTitle() {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Container(
+          margin: EdgeInsets.only(left: 1.w, right: 0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: FadeInLeft(
+            child: Image.asset(
+              Asset.appLogoWithoutTitle,
+              height: 5.h,
+            ),
+          )),
+      Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: FadeInLeft(
+            child: Image.asset(
+              Asset.appLogo,
+              height: 4.h,
+            ),
+          )),
+    ],
+  );
+}
+
+Widget getSignInTextWidget(HomeScreenController controller) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: FadeInLeft(
+            child: SvgPicture.asset(
+              Asset.user,
+              height: 5.h,
+            ),
+          )),
+      Obx(
+        () {
+          return HoverWidget(
+            onHoverChanged: (hovered) {
+              controller.updateHover(hovered);
+            },
+            body: Container(
+                margin: EdgeInsets.only(left: 0.5.w, right: 0.5.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: FadeInLeft(
+                  child: Text(
+                    DashboardTextWeb.headerLoginTxt,
+                    style: TextStyle(
+                        color: isDarkMode()
+                            ? white
+                            : controller.isHovered.value
+                                ? secondaryColor
+                                : lightGreyColor,
+                        fontSize: 4.sp,
+                        fontFamily: fontBold),
+                    textAlign: TextAlign.center,
+                  ),
+                )),
+          );
+        },
+      ),
+      getDynamicSizedBox(width: 2.w)
+    ],
+  );
 }
 
 Widget notification(isNotify) {

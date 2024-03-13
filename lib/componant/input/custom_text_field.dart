@@ -176,6 +176,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
             bottom: SizerUtil.deviceType == DeviceType.mobile ? 1.8.h : 2.5.w),
         hintText: widget.hintText,
         errorText: widget.errorText,
+        errorStyle: styleTextForErrorFieldHint(),
         hintStyle: styleTextHintFieldLabel(isWhite: widget.isWhite),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.h),
@@ -558,7 +559,6 @@ class _CustomFormFieldState extends State<CustomFormField> {
             : Container(
                 width: 1,
               ),
-
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.h),
           borderSide: const BorderSide(

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
 import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/configs/apicall_constant.dart';
+import 'package:gifthamperz/componant/dialogs/loading_indicator.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/models/loginModel.dart';
 import 'package:gifthamperz/models/validation_model.dart';

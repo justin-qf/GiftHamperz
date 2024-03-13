@@ -46,7 +46,7 @@ class ProfileController extends GetxController {
     isGuest.value = await UserPreferences().getGuestUser();
     if (getUserData != null) {
       userName.value = "${getUserData!.firstName} ${getUserData!.lastName}";
-      profilePic.value = APIImageUrl.url + getUserData!.profilePic.toString();
+      profilePic.value = ApiUrl.imageUrl + getUserData!.profilePic.toString();
       email.value = getUserData!.emailId;
     }
     update();
@@ -157,7 +157,7 @@ class ProfileController extends GetxController {
         if (responseData['status'] == 1) {
           loginData = UserDetailData.fromJson(responseData['data']);
           userName.value = loginData!.userName.toString();
-          profilePic.value = APIImageUrl.url + loginData!.profilePic.toString();
+          profilePic.value = ApiUrl.imageUrl + loginData!.profilePic.toString();
           update();
         } else {
           message.value = responseData['message'];

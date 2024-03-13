@@ -17,10 +17,11 @@ class AppTheme {
       displayLarge: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 25.sp,
-        color: Colors.black,
+        color: 
+        black,
       ),
-      displayMedium: TextStyle(
-          fontSize: 10.sp, color: Colors.black, fontFamily: fontRegular),
+      displayMedium:
+          TextStyle(fontSize: 10.sp, color: black, fontFamily: fontRegular),
       bodyMedium: const TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
     ),
     //colorScheme: ColorScheme(background: lightBackgroundColor,brightness: Brightness.dark)
@@ -31,14 +32,15 @@ class AppTheme {
     brightness: Brightness.dark,
     primaryColor: lightPrimaryColor,
     textTheme: TextTheme(
-        displayMedium: TextStyle(
-            fontSize: 10.sp, color: Colors.white, fontFamily: fontRegular),
+        displayMedium:
+            TextStyle(fontSize: 10.sp, color: white, fontFamily: fontRegular),
         displayLarge: TextStyle(
-            fontWeight: FontWeight.bold, fontSize: 25.sp, color: Colors.white)),
+            fontWeight: FontWeight.bold, fontSize: 25.sp, color: white)),
     // colorScheme: ColorScheme(background: appDarkPrimaryColor)
   );
 
   static Brightness currentSystemBrightness() {
+    // ignore: deprecated_member_use
     return SchedulerBinding.instance.window.platformBrightness;
   }
 

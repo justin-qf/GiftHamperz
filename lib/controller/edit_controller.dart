@@ -103,7 +103,7 @@ class EditProfileController extends GetxController {
       userNamectr.text = loginData.userName!;
       emailCtr.text = loginData.emailId.toString();
       selectGender.value = loginData.gender!.capitalize.toString();
-      profilePic.value = APIImageUrl.url + loginData.profilePic.toString();
+      profilePic.value = ApiUrl.imageUrl + loginData.profilePic.toString();
 
       logcat("DATE_BIRTH", loginData.dateOfBirth.toString());
       if (loginData.dateOfBirth.toString() != "null" &&
@@ -262,6 +262,8 @@ class EditProfileController extends GetxController {
                   ? CachedNetworkImage(
                       fit: BoxFit.cover,
                       width: 30.w,
+                      filterQuality: FilterQuality.low,
+                      cacheKey: 'custom_cache_key_${100}x${100}_quality_${200}',
                       imageUrl: profilePic.value,
                       placeholder: (context, url) => Padding(
                             padding: EdgeInsets.all(10.w),

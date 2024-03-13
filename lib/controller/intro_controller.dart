@@ -14,7 +14,7 @@ class IntroController extends GetxController {
 
   RxList<IntroPage> sliderDataList = [
     IntroPage(
-      title: 'Welcome to MyApp',
+      title: 'Welcome to GiftHamperz',
       description:
           'By from thousand of curated gift and delivery\n within 3-5 hours. No matter how far you are.',
       imgPath: Asset.introOne,

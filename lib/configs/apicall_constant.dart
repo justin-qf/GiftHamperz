@@ -1,6 +1,7 @@
 class ApiUrl {
 //  static const liveApiUrl = "https://queryfinders.com/meditrack/public/api/";
-  static const buildApiUrl = "http://192.168.1.8/qfs_ecommerce/api/";
+  static const buildApiUrl = "http://192.168.1.9/qfs_ecommerce/api/";
+  static const imageUrl = 'http://192.168.1.9/qfs_ecommerce/public/storage';
   static const register = 'registration';
   static const login = 'login';
   static const banner = 'banner/list';

@@ -227,7 +227,7 @@ class ProductDetailScreenController extends GetxController {
                           child: CachedNetworkImage(
                             fit: BoxFit.cover,
                             height: 12.h,
-                            imageUrl: APIImageUrl.url + data.images[0],
+                            imageUrl: ApiUrl.imageUrl + data.images[0],
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(
                                   color: primaryColor),

@@ -10,7 +10,9 @@ import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/search_chat_widgets.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
+import 'package:gifthamperz/configs/device_type.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
@@ -23,6 +25,7 @@ import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/CategoryScreen/CategoryScreen.dart';
 import 'package:gifthamperz/views/MainScreen/HomeScreen/DetailScreen/DetailScreen.dart';
+import 'package:gifthamperz/views/MainScreen/HomeScreen/HomeScreenWeb.dart';
 import 'package:gifthamperz/views/SearchScreen/SearchScreen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
@@ -46,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     controller.pageController =
         PageController(initialPage: controller.currentPage);
-    // controller.getHome(context);
+    controller.getHome(context);
     startAutoScroll();
     controller.getTotalProductInCart();
     showGuestUserLogin();
@@ -55,15 +58,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    try {
-      if (mounted) {
-        await Future.delayed(const Duration(seconds: 0)).then((value) {
-          controller.getHome(context);
-        });
-      }
-    } catch (e) {
-      logcat("ERROR", e);
-    }
+    // try {
+    //   if (mounted) {
+    //     await Future.delayed(const Duration(seconds: 0)).then((value) {
+    //       if (!DeviceScreenType.isWeb(context)) {
+    //         controller.getHome(context);
+    //       }
+    //     });
+    //   }
+    // } catch (e) {
+    //   logcat("ERROR", e);
+    // }
     setState(() {});
   }
 
@@ -89,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       controller.timer =
           Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-        if (controller.currentPage < controller.bannerItems.length - 1) {
+        if (controller.currentPage < controller.bannerList.length - 1) {
           controller.currentPage++;
         } else {
           controller.currentPage = 0;
@@ -125,48 +130,73 @@ class _HomeScreenState extends State<HomeScreen> {
         color: isDarkMode() ? darkBackgroundColor : white,
         child: Column(
           children: [
-            getDynamicSizedBox(height: 5.h),
-            Obx(() {
-              controller.totalItemsCount.value =
-                  controller.totalItemsCount.value;
-              return homeAppbar(DashboardText.dashboard, () {
-                // widget.callBack(1);
-                Get.to(const SearchScreen())!.then((value) {
-                  controller.getHome(context);
-                  controller.getTotalProductInCart();
-                });
-                //controller.isSearch = !controller.isSearch;
-                setState(() {});
-              }, () {
-                Get.to(const CartScreen())!.then((value) {
-                  controller.getHome(context);
-                  controller.getTotalProductInCart();
-                });
-              }, controller.totalItemsCount);
-            }),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(bottom: 3.h),
-                physics: const BouncingScrollPhysics(),
-                child: Obx(() {
-                  switch (controller.state.value) {
-                    case ScreenState.apiLoading:
-                    case ScreenState.noNetwork:
-                    case ScreenState.noDataFound:
-                    case ScreenState.apiError:
-                      return SizedBox(
-                        height: SizerUtil.height / 1.3,
-                        child: apiOtherStates(controller.state.value),
-                      );
-                    case ScreenState.apiSuccess:
-                      return apiSuccess(controller.state.value);
-                    default:
-                      Container();
-                  }
-                  return Container();
-                }),
-              ),
-            ),
+            getDynamicSizedBox(
+                height: SizerUtil.deviceType == DeviceType.mobile
+                    ? 5.h
+                    : DeviceScreenType.isWeb(
+                        context,
+                      )
+                        ? 5.h
+                        : 3.h),
+            DeviceScreenType.isWeb(
+              context,
+            )
+                ? Expanded(
+                    child: SingleChildScrollView(
+                        padding: EdgeInsets.only(bottom: 3.h),
+                        physics: const BouncingScrollPhysics(),
+                        child: HomeScreenWeb(
+                          isGuest: isGuest,
+                        )),
+                  )
+                : Expanded(
+                    child: Column(
+                      children: [
+                        Obx(() {
+                          controller.totalItemsCount.value =
+                              controller.totalItemsCount.value;
+                          return homeAppbar(DashboardText.dashboard, () {
+                            // widget.callBack(1);
+                            Get.to(const SearchScreen())!.then((value) {
+                              controller.getHome(context);
+                              controller.getTotalProductInCart();
+                            });
+                            //controller.isSearch = !controller.isSearch;
+                            setState(() {});
+                          }, () {
+                            Get.to(const CartScreen())!.then((value) {
+                              controller.getHome(context);
+                              controller.getTotalProductInCart();
+                            });
+                          }, controller.totalItemsCount);
+                        }),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.only(bottom: 3.h),
+                            physics: const BouncingScrollPhysics(),
+                            child: Obx(() {
+                              switch (controller.state.value) {
+                                case ScreenState.apiLoading:
+                                case ScreenState.noNetwork:
+                                case ScreenState.noDataFound:
+                                case ScreenState.apiError:
+                                  return SizedBox(
+                                    height: SizerUtil.height / 1.3,
+                                    child:
+                                        apiOtherStates(controller.state.value),
+                                  );
+                                case ScreenState.apiSuccess:
+                                  return apiSuccess(controller.state.value);
+                                default:
+                                  Container();
+                              }
+                              return Container();
+                            }),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
           ],
         ),
       ),
@@ -176,26 +206,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget apiSuccess(ScreenState state) {
     // ignore: unrelated_type_equality_checks
     if (controller.state == ScreenState.apiSuccess &&
-        controller.homeData != null &&
-        controller.homeData!.data.trendList.isNotEmpty) {
+        controller.homeData != null) {
       return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             getDynamicSizedBox(height: 1.h),
-            if (controller.isSearch == true)
-              setSearchBar(context, controller.searchCtr, 'home',
-                  onCancleClick: () {
-                controller.searchCtr.text = '';
-                setState(() {
-                  controller.isSearch = false;
-                });
-              }, onClearClick: () {
-                controller.searchCtr.text = '';
-                setState(() {});
-              })
-            else
-              Container(),
+            controller.isSearch == true
+                ? setSearchBar(context, controller.searchCtr, 'home',
+                    onCancleClick: () {
+                    controller.searchCtr.text = '';
+                    setState(() {
+                      controller.isSearch = false;
+                    });
+                  }, onClearClick: () {
+                    controller.searchCtr.text = '';
+                    setState(() {});
+                  })
+                : Container(),
             SizedBox(
               height: 20.h,
               child: Obx(() {
@@ -230,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: CachedNetworkImage(
                               fit: BoxFit.cover,
                               height: 18.h,
-                              imageUrl: APIImageUrl.url + bannerItems.url,
+                              imageUrl: ApiUrl.imageUrl + bannerItems.url,
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
                                     color: primaryColor),
@@ -286,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             }),
             SizedBox(
-              height: SizerUtil.deviceType == DeviceType.web ? 15.h : 13.h,
+              height: SizerUtil.deviceType == DeviceType.mobile ? 13.h : 15.h,
               child: Obx(
                 () {
                   return controller.categoryList.isNotEmpty
@@ -299,7 +327,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           clipBehavior: Clip.antiAlias,
                           itemBuilder: (context, index) {
                             CategoryList data = controller.categoryList[index];
-                            return controller.getCategoryListItem(data);
+                            return controller.getCategoryListItem(
+                                context, data);
                           },
                           itemCount: controller.categoryList.length)
                       : Container();

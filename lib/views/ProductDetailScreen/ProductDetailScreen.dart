@@ -11,6 +11,7 @@ import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
@@ -239,7 +240,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                             child: CachedNetworkImage(
                                               fit: BoxFit.cover,
                                               height: 15.h,
-                                              imageUrl: APIImageUrl.url +
+                                              imageUrl: ApiUrl.imageUrl +
                                                   widget.data!.images[0],
                                               placeholder: (context, url) =>
                                                   const Center(
@@ -485,6 +486,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                               isFromIcr: false,
                                               data: widget.data!,
                                               quantity: controller.quantity);
+                                          percentage = 0.0;
                                           setState(() {});
                                         }
                                       },
@@ -518,6 +520,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                             isFromIcr: true,
                                             data: widget.data!,
                                             quantity: controller.quantity);
+                                        percentage = 0.0;
                                         setState(() {});
                                       },
                                       child: Icon(

@@ -156,7 +156,7 @@ class CategoryController extends GetxController {
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
                         height: 18.h,
-                        imageUrl: APIImageUrl.url + data.thumbnailUrl,
+                        imageUrl: ApiUrl.imageUrl + data.thumbnailUrl,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(color: primaryColor),
                         ),
@@ -286,7 +286,7 @@ class CategoryController extends GetxController {
                               child: ClipOval(
                                 child: CachedNetworkImage(
                                   fit: BoxFit.contain,
-                                  imageUrl: APIImageUrl.url + data.thumbnailUrl,
+                                  imageUrl: ApiUrl.imageUrl + data.thumbnailUrl,
                                   placeholder: (context, url) => const Center(
                                     child: CircularProgressIndicator(
                                         color: primaryColor),

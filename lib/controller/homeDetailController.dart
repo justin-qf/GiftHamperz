@@ -28,7 +28,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class HomeDetailScreenController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   Rx<ScreenState> state = ScreenState.apiLoading.obs;
   RxString message = "".obs;
@@ -286,7 +285,7 @@ class HomeDetailScreenController extends GetxController {
                                   child: CachedNetworkImage(
                                     fit: BoxFit.cover,
                                     height: 12.h,
-                                    imageUrl: APIImageUrl.url + data.images[0],
+                                    imageUrl: ApiUrl.imageUrl + data.images[0],
                                     placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator(
                                           color: primaryColor),

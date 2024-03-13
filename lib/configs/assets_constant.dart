@@ -39,6 +39,13 @@ class Asset {
   static const gift = '$assets${svgFolder}gift.svg';
   static const cartEmpty = '$assets${svgFolder}cart_empty.svg';
   static const alertLogin = '$assets${svgFolder}login.svg';
+  static const user = '$assets${svgFolder}user.svg';
+  static const policyGift = '$assets${svgFolder}policy_gift.svg';
+  static const policyReturn = '$assets${svgFolder}left_right_arrow.svg';
+  static const policyLocation = '$assets${svgFolder}location.svg';
+  static const policyPayment = '$assets${svgFolder}payment.svg';
+  static const whatsapp = '$assets${svgFolder}whats_app.svg';
+  static const call = '$assets${svgFolder}call.svg';
 
   //PNGS//
   static const introOne = '$assets${pngFolder}intro_one.png';
@@ -63,6 +70,20 @@ class Asset {
   static const avaterFiveholder = '$assets${pngFolder}avatar_five.jpg';
   static const cartEmptys = '$assets${pngFolder}cart_empty.jpg';
   static const homeBanner = '$assets${pngFolder}home_banner.jpg';
+  static const homeBannerWeb = '$assets${pngFolder}home_banner_web.png';
+  static const sellingBgWeb = '$assets${pngFolder}selling_bg.png';
+  static const helpWeb = '$assets${pngFolder}help.png';
+  static const bestOffer = '$assets${pngFolder}best_offer.png';
+  static const occasions = '$assets${pngFolder}occasions.png';
+  static const anniversary = '$assets${pngFolder}anniversary.png';
+  static const babyShower = '$assets${pngFolder}baby_shower.png';
+  static const birthday = '$assets${pngFolder}birthday.png';
+  static const diwali = '$assets${pngFolder}diwali.png';
+  static const engage = '$assets${pngFolder}engage.png';
+  static const wedding = '$assets${pngFolder}wedding.png';
+
+  static const appLogoWithoutTitle =
+      '$assets${pngFolder}app_logo_without_title.png';
 
   //Splash Screen
   static const logo = '$assets${svgFolder}logo.svg';

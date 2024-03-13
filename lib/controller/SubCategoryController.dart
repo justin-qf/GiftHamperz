@@ -22,7 +22,6 @@ import '../utils/enum.dart';
 import 'internet_controller.dart';
 
 class SubCategoryController extends GetxController {
-  List pageNavigation = [];
   RxInt currentTreeView = 2.obs;
   RxBool isLiked = true.obs;
   RxBool isTreeModeVertical = true.obs;
@@ -211,7 +210,7 @@ class SubCategoryController extends GetxController {
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
                         height: 18.h,
-                        imageUrl: APIImageUrl.url + data.thumbnailUrl,
+                        imageUrl: ApiUrl.imageUrl + data.thumbnailUrl,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(color: primaryColor),
                         ),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
-import 'package:gifthamperz/componant/input/style.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
@@ -12,9 +11,6 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/main.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/views/IntroScreen/intro.dart';
-import 'package:gifthamperz/views/MainScreen/HomeScreen/HomeScreen.dart';
-import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../configs/assets_constant.dart';
 
@@ -114,7 +110,7 @@ class _PrepareScreenState extends State<PrepareScreen>
                 from: 50,
                 child: getSecondaryFormButton(() {
                   //Get.to(() => const DashboardScreen());
-                  Get.to(const BottomNavScreen());
+                  Get.to(const MainScreen());
                 }, PrepareScreenConstant.btnLable, isvalidate: true),
               ),
             ),

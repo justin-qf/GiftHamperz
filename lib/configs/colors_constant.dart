@@ -21,6 +21,7 @@ const Color fourthTile = Color.fromARGB(255, 101, 185, 155);
 const Color black = Colors.black;
 const Color white = Colors.white;
 const Color grey = Colors.grey;
+const Color red = Colors.red;
 
 const Color darkGrey = Color(0XFFf7f7f7);
 const Color lightGrey = Color(0XFF666666);
@@ -48,3 +49,11 @@ const Color tileColour = Color(0XffFFF4F7);
 //const Color darkBackgroundColor = Color(0Xff2e2a4f);
 //const Color darkBackgroundColor = Color(0Xff2D100A);
 const Color darkBackgroundColor = Color.fromARGB(255, 31, 12, 16);
+
+//WEB
+const Color lightGreyColor = Color(0Xff666666);
+const Color lightGreyBlueColor = Color(0XffF3F9FB);
+const Color bglightGreyColor = Color(0XffF5F5F5);
+const Color bgprimaryColor = Color(0XffFFD4E0);
+const Color lineColor = Color.fromARGB(125, 237, 237, 237);
+const Color footerColor = Color(0XffFFFBF4);

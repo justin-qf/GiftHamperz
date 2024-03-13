@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
+import 'package:gifthamperz/configs/apicall_constant.dart';
 import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
 import 'package:gifthamperz/configs/font_constant.dart';
@@ -136,7 +137,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
                         height: 25.h,
-                        imageUrl: APIImageUrl.url + widget.data.imgUrl,
+                        imageUrl: ApiUrl.imageUrl + widget.data.imgUrl,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(color: primaryColor),
                         ),
