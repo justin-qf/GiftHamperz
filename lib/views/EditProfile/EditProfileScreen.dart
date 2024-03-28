@@ -232,8 +232,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       buttonDecoration: BoxDecoration(
                                         border:
                                             Border.all(color: inputBorderColor),
-                                        borderRadius:
-                                            BorderRadius.circular(1.5.h),
+                                        borderRadius: BorderRadius.circular(
+                                            SizerUtil.deviceType ==
+                                                    DeviceType.mobile
+                                                ? 30
+                                                : 50),
                                       ),
                                       hint: Text(
                                         AddFamilylist.gender,
@@ -259,12 +262,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                                             DeviceType
                                                                                 .mobile
                                                                         ? 20
-                                                                        : 1.3.h,
+                                                                        : 0.6.h,
                                                                     bottom: SizerUtil.deviceType ==
+                                                                            DeviceType
+                                                                                .mobile
+                                                                        ? 10
+                                                                        : 1.8.w,
+                                                                    left: SizerUtil.deviceType ==
                                                                             DeviceType.mobile
                                                                         ? 10
-                                                                        : 2.w,
-                                                                    left: 10),
+                                                                        : 0),
                                                                 child: Text(
                                                                   item,
                                                                   style:
@@ -287,7 +294,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       itemHeight: SizerUtil.deviceType ==
                                               DeviceType.mobile
                                           ? 40
-                                          : 60,
+                                          : 45,
                                       dropdownMaxHeight: SizerUtil.deviceType ==
                                               DeviceType.mobile
                                           ? SizerUtil.height / 1.8
@@ -319,7 +326,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                   DeviceType.mobile
                                               ? 30
                                               : 40,
-                                          color: Colors.black.withOpacity(0.2),
+                                          color: isDarkMode()
+                                              ? white
+                                              : black.withOpacity(0.2),
                                         ),
                                       ),
                                     ),
@@ -328,16 +337,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               )),
                         )),
                         SizedBox(
-                          height: 1.h,
-                        ),
-
-                        SizedBox(
                           height: 3.h,
                         ),
                         Container(
                           margin: EdgeInsets.only(
-                            left: 8.w,
-                            right: 8.w,
+                          
+                            left: SizerUtil.deviceType == DeviceType.mobile
+                                ? 8.w
+                                : 0,
+                            right: SizerUtil.deviceType == DeviceType.mobile
+                                ? 8.w
+                                : 0,
                           ),
                           child: FadeInUp(
                             from: 50,

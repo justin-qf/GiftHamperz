@@ -29,9 +29,11 @@ class AddAddressScreen extends StatefulWidget {
   State<AddAddressScreen> createState() => _AddAddressScreenState();
 }
 
-class _AddAddressScreenState extends State<AddAddressScreen> {
+class _AddAddressScreenState extends State<AddAddressScreen>
+    with WidgetsBindingObserver {
   var controller = Get.put(AddAddressController());
 
+  late double insetPaddingVertical = 0.0;
   @override
   void initState() {
     setState(() {});
@@ -39,7 +41,23 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         context, widget.isFromEdit!, widget.itemData);
     getCity(context);
     controller.getGuestUser();
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    setState(() {
+      insetPaddingVertical =
+          bottomInset > 0 ? 0.0 : MediaQuery.of(context).size.height * 0.3;
+    });
   }
 
   void getCity(BuildContext context) async {
@@ -265,8 +283,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                               },
                               onTap: () {
                                 controller.searchCityctr.text = "";
-                                showDropdownMessage(context,
-                                    controller.setCityDialog(), "City List");
+                                showDropdownMessage(
+                                    insetPaddingVertical,
+                                    context,
+                                    controller.setCityDialog(),
+                                    AlertDialogList.city);
                               },
                               isReadOnly: true,
                               wantSuffix: true,
@@ -310,7 +331,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       ],
                     ),
                     SizedBox(
-                      height: 2.h,
+                      height:
+                          SizerUtil.deviceType == DeviceType.mobile ? 2.h : 1.h,
                     ),
                     Container(
                       margin: EdgeInsets.only(
@@ -335,7 +357,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: 3.h,
+                      height:
+                          SizerUtil.deviceType == DeviceType.mobile ? 3.h : 4.h,
                     ),
                   ],
                 ),

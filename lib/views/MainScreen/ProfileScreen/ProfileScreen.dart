@@ -99,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Positioned(
                 left: 5.w,
-                top: 30.5.h,
+                top: SizerUtil.deviceType == DeviceType.mobile ? 30.5.h : 31.h,
                 child: SizedBox(
                   width: SizerUtil.width,
                   child: FadeInLeft(child: Obx(
@@ -110,12 +110,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                   Container(
-                                    padding: const EdgeInsets.all(2),
+                                    padding: EdgeInsets.all(
+                                        SizerUtil.deviceType ==
+                                                DeviceType.mobile
+                                            ? 2
+                                            : 3),
                                     decoration: BoxDecoration(
                                       color: transparent,
                                       border: Border.all(
                                         color: black,
-                                        // Set the border color here
                                         width: 1.5, // Set the border width
                                       ),
                                       borderRadius: const BorderRadius.all(
@@ -126,11 +129,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Radius.circular(50)),
                                       child: CachedNetworkImage(
                                           fit: BoxFit.cover,
-                                          height: 8.h,
+                                          height: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 8.h
+                                              : 7.h,
                                           imageUrl: controller.profilePic.value,
                                           placeholder: (context, url) =>
                                               SizedBox(
-                                                height: 8.h,
+                                                height: SizerUtil.deviceType ==
+                                                        DeviceType.mobile
+                                                    ? 8.h
+                                                    : 7.h,
+                                                width: SizerUtil.deviceType ==
+                                                        DeviceType.mobile
+                                                    ? 8.h
+                                                    : 7.h,
                                                 child: const Center(
                                                   child: Padding(
                                                     padding:
@@ -148,15 +161,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 fit: BoxFit.cover,
                                                 // ignore: deprecated_member_use
                                                 color: black,
-                                                height: 8.h,
-                                                width: 8.h,
+                                                height: SizerUtil.deviceType ==
+                                                        DeviceType.mobile
+                                                    ? 8.h
+                                                    : 7.h,
+                                                width: SizerUtil.deviceType ==
+                                                        DeviceType.mobile
+                                                    ? 8.h
+                                                    : 7.h,
                                               )),
                                     ),
                                   ),
                                   Expanded(
                                     child: Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 3.w),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 3.w
+                                              : 2.5.w),
                                       child: Obx(
                                         () {
                                           return Column(
@@ -173,7 +195,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         TextOverflow.ellipsis,
                                                     maxLines: 1,
                                                     style: TextStyle(
-                                                        fontSize: 15.sp,
+                                                        fontSize: SizerUtil
+                                                                    .deviceType ==
+                                                                DeviceType
+                                                                    .mobile
+                                                            ? 15.sp
+                                                            : 13.sp,
                                                         color: black,
                                                         fontWeight:
                                                             FontWeight.w600),
@@ -410,7 +437,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             horizontal: 3.w,
             vertical:
                 SizerUtil.deviceType == DeviceType.mobile ? 0.6.h : 0.8.h),
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.8.h),
+        padding: EdgeInsets.symmetric(
+            horizontal: SizerUtil.deviceType == DeviceType.mobile ? 4.w : 3.w,
+            vertical:
+                SizerUtil.deviceType == DeviceType.mobile ? 0.8.h : 0.9.h),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2.8.h), color: tileColour),
         child: Row(
@@ -418,8 +448,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              height: 4.5.h,
-              width: 4.5.h,
+              height: SizerUtil.deviceType == DeviceType.mobile ? 4.5.h : 4.3.h,
+              width: SizerUtil.deviceType == DeviceType.mobile ? 4.5.h : 4.3.h,
               decoration: const BoxDecoration(
                 color: primaryColor,
                 borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -434,7 +464,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             SizedBox(
-              width: 4.w,
+              width: SizerUtil.deviceType == DeviceType.mobile ? 4.w : 3.6.w,
             ),
             Flexible(
               flex: 1,
@@ -442,7 +472,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Text(
                 title,
                 style: TextStyle(
-                    fontSize: 13.sp,
+                    fontSize: SizerUtil.deviceType == DeviceType.mobile
+                        ? 13.sp
+                        : 12.sp,
                     fontWeight: FontWeight.w600,
                     color: isDarkMode() ? black : headingTextColor),
               ),
@@ -459,7 +491,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 setState(() {});
                 // Delay for a short period to ensure the state changes are processed
                 await Future.delayed(const Duration(milliseconds: 50));
-
                 setState(() {});
                 await controller.getStorage.write(GetStorageKey.IS_DARK_MODE,
                     controller.isDarkModeEnable.value);

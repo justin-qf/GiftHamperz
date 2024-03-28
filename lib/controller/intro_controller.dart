@@ -40,8 +40,11 @@ class IntroController extends GetxController {
   ].obs;
 
   void changePage() {
-    pageController.animateToPage(currentPage.value + 1,
-        duration: const Duration(milliseconds: 250), curve: Curves.bounceInOut);
+    if (pageController.hasClients) {
+      pageController.animateToPage(currentPage.value + 1,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.bounceInOut);
+    }
   }
 
   Widget getSliderPage(String image) {
@@ -53,16 +56,20 @@ class IntroController extends GetxController {
 
   void nextPage() {
     if (currentPage < 3) {
-      pageController.nextPage(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.ease,
-      );
+      if (pageController.hasClients) {
+        pageController.nextPage(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.ease,
+        );
+      }
     } else {
-      pageController.animateToPage(
-        0,
-        duration: const Duration(milliseconds: 2000),
-        curve: Curves.ease,
-      );
+      if (pageController.hasClients) {
+        pageController.animateToPage(
+          0,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.ease,
+        );
+      }
     }
   }
 

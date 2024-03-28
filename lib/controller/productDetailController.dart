@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
@@ -32,10 +33,31 @@ class ProductDetailScreenController extends GetxController {
   var pageController = PageController();
   var currentPage = 0;
   var quantity = 0;
-  late Timer timer;
+  late Timer? timer =
+      Timer.periodic(const Duration(seconds: 3), (Timer timer) {});
   RxList<Map<String, dynamic>> cartItems = <Map<String, dynamic>>[].obs;
   RxBool? isGuest = true.obs;
   RxBool? isLiked = true.obs;
+
+  void startAutoScroll(CommonProductList? data) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      controller.timer =
+          Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+        if (currentPage < data!.images.length - 1) {
+          currentPage++;
+        } else {
+          currentPage = 0;
+        }
+        if (pageController.hasClients) {
+          pageController.animateToPage(
+            currentPage,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
+      });
+    });
+  }
 
   getGuestUser() async {
     isGuest!.value = await UserPreferences().getGuestUser();
@@ -50,6 +72,14 @@ class ProductDetailScreenController extends GetxController {
   getIsProductAddedToFav(String productId) async {
     isLiked!.value = await UserPreferences.isFavorite(productId);
     update();
+  }
+
+  disposePageController() {
+    if (timer != null) {
+      timer!.cancel();
+      timer = null;
+    }
+    pageController.dispose();
   }
 
   void hideKeyboard(context) {
@@ -175,6 +205,7 @@ class ProductDetailScreenController extends GetxController {
           FadeInUp(
             child: Container(
                 width: 50.w,
+                height: SizerUtil.deviceType == DeviceType.mobile ? null : 20.h,
                 margin: EdgeInsets.only(right: 4.5.w),
                 // padding: EdgeInsets.only(
                 //     left: 5.w, right: 5.w, top: 5.w, bottom: 10.w),
@@ -188,12 +219,6 @@ class ProductDetailScreenController extends GetxController {
                   color: isDarkMode() ? itemDarkBackgroundColor : white,
                   borderRadius: BorderRadius.circular(
                       SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //       color: black.withOpacity(0.05),
-                  //       blurRadius: 10.0,
-                  //       offset: const Offset(0, 5))
-                  // ],
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(
@@ -205,20 +230,14 @@ class ProductDetailScreenController extends GetxController {
                       Container(
                         width: SizerUtil.width,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              SizerUtil.deviceType == DeviceType.mobile
-                                  ? 3.5.w
-                                  : 2.5.w),
-                          border: isDarkMode()
-                              ? Border.all(
-                                  color: grey, // Border color
-                                  width: 1, // Border width
-                                )
-                              : Border.all(
-                                  color: grey, // Border color
-                                  width: 0.2, // Border width
-                                ),
-                        ),
+                            borderRadius: BorderRadius.circular(
+                                SizerUtil.deviceType == DeviceType.mobile
+                                    ? 3.5.w
+                                    : 2.5.w),
+                            border: Border.all(
+                              color: grey, // Border color
+                              width: isDarkMode() ? 1 : 0.2, // Border width
+                            )),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(
                               SizerUtil.deviceType == DeviceType.mobile
@@ -241,7 +260,9 @@ class ProductDetailScreenController extends GetxController {
                         ),
                       ),
                       SizedBox(
-                        height: 1.0.h,
+                        height: SizerUtil.deviceType == DeviceType.mobile
+                            ? 1.0.h
+                            : 0.5.h,
                       ),
                       Container(
                         margin: EdgeInsets.only(left: 1.w, right: 1.w),
@@ -262,64 +283,70 @@ class ProductDetailScreenController extends GetxController {
                             getDynamicSizedBox(
                               height: 0.5.h,
                             ),
-                            getText(
-                              '${IndiaRupeeConstant.inrCode}${data.price}',
-                              TextStyle(
-                                  fontFamily: fontBold,
-                                  color: primaryColor,
-                                  fontSize:
-                                      SizerUtil.deviceType == DeviceType.mobile
-                                          ? 12.sp
-                                          : 7.sp,
-                                  height: 1.2),
-                            ),
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                RatingBar.builder(
-                                  initialRating: 3.5,
-                                  minRating: 1,
-                                  direction: Axis.horizontal,
-                                  allowHalfRating: true,
-                                  itemCount: 1,
-                                  itemSize: 3.5.w,
-                                  itemBuilder: (context, _) => const Icon(
-                                    Icons.star,
-                                    color: Colors.orange,
-                                  ),
-                                  onRatingUpdate: (rating) {
-                                    logcat("RATING", rating);
-                                  },
-                                ),
                                 getText(
-                                  "3.5",
+                                  '${IndiaRupeeConstant.inrCode}${data.price}',
                                   TextStyle(
-                                      fontFamily: fontSemiBold,
-                                      color: lableColor,
-                                      fontWeight:
-                                          isDarkMode() ? FontWeight.w600 : null,
+                                      fontFamily: fontBold,
+                                      color: primaryColor,
                                       fontSize: SizerUtil.deviceType ==
                                               DeviceType.mobile
-                                          ? 9.sp
+                                          ? 12.sp
                                           : 7.sp,
                                       height: 1.2),
                                 ),
-                                // const Spacer(),
-                                // GestureDetector(
-                                //   onTap: () {
-                                //     data.isSelected.value =
-                                //         !data.isSelected.value;
-                                //     update();
-                                //   },
-                                //   child: Icon(
-                                //     data.isSelected.value
-                                //         ? Icons.favorite_rounded
-                                //         : Icons.favorite_border,
-                                //     size: 3.h,
-                                //     color: primaryColor,
-                                //   ),
-                                // )
+                                const Spacer(),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    RatingBar.builder(
+                                      initialRating: 3.5,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 1,
+                                      itemSize: 3.5.w,
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.orange,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        logcat("RATING", rating);
+                                      },
+                                    ),
+                                    getText(
+                                      "3.5",
+                                      TextStyle(
+                                          fontFamily: fontSemiBold,
+                                          color: lableColor,
+                                          fontWeight: isDarkMode()
+                                              ? FontWeight.w600
+                                              : null,
+                                          fontSize: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 9.sp
+                                              : 7.sp,
+                                          height: 1.2),
+                                    ),
+                                    // const Spacer(),
+                                    // GestureDetector(
+                                    //   onTap: () {
+                                    //     data.isSelected.value =
+                                    //         !data.isSelected.value;
+                                    //     update();
+                                    //   },
+                                    //   child: Icon(
+                                    //     data.isSelected.value
+                                    //         ? Icons.favorite_rounded
+                                    //         : Icons.favorite_border,
+                                    //     size: 3.h,
+                                    //     color: primaryColor,
+                                    //   ),
+                                    // )
+                                  ],
+                                ),
                               ],
                             ),
                             getDynamicSizedBox(
@@ -356,19 +383,25 @@ class ProductDetailScreenController extends GetxController {
           color: isDarkMode() ? white : black,
           fontFamily: isMainTitle == true ? fontBold : null,
           fontWeight: isMainTitle == true ? FontWeight.w900 : FontWeight.w500,
-          fontSize: isMainTitle == true ? 15.sp : 12.sp,
+          fontSize: isMainTitle == true
+              ? SizerUtil.deviceType == DeviceType.mobile
+                  ? 15.sp
+                  : 13.sp
+              : SizerUtil.deviceType == DeviceType.mobile
+                  ? 12.sp
+                  : 11.sp,
         ));
   }
 
   Widget getCommonText(title, {bool? isHint}) {
     return Text(
       title,
+      textAlign: TextAlign.justify,
       style: isHint == true
           ? TextStyle(
               //fontFamily: fontRegular,
               color: lableColor,
-              fontSize:
-                  SizerUtil.deviceType == DeviceType.mobile ? 9.sp : 10.sp,
+              fontSize: 9.sp,
             )
           : TextStyle(
               //fontFamily: fontBold,

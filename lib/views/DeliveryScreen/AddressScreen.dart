@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
@@ -107,7 +108,12 @@ class _AddressScreenState extends State<AddressScreen> {
                                         return SizedBox(
                                           height: SizerUtil.height / 1.2,
                                           child: apiOtherStates(
-                                              controller.state.value),
+                                              controller.state.value,
+                                              controller,
+                                              controller.addressList, () {
+                                            controller.getAddressList(
+                                                context, 0, true);
+                                          }),
                                         );
                                       case ScreenState.apiSuccess:
                                         return apiSuccess(
@@ -288,7 +294,7 @@ class _AddressScreenState extends State<AddressScreen> {
           Positioned(
               left: 0,
               right: 0,
-              bottom: 3.h,
+              bottom: SizerUtil.deviceType == DeviceType.mobile ? 3.h : 2.5.h,
               child: Obx(() {
                 return setActionButton(
                   context,
@@ -366,59 +372,59 @@ class _AddressScreenState extends State<AddressScreen> {
     }
   }
 
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 35,
-            ),
-          ),
-        ),
-      );
-    }
+  // Widget apiOtherStates(state) {
+  //   if (state == ScreenState.apiLoading) {
+  //     return Center(
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(100),
+  //         child: SizedBox(
+  //           height: 30,
+  //           width: 30,
+  //           child: LoadingAnimationWidget.discreteCircle(
+  //             color: primaryColor,
+  //             size: 35,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    Widget? button;
-    if (controller.addressList.isEmpty) {
-      Container();
-    }
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {
-        controller.getAddressList(context, 0, true);
-      }, BottomConstant.tryAgain);
-    }
+  //   Widget? button;
+  //   if (controller.addressList.isEmpty) {
+  //     Container();
+  //   }
+  //   if (state == ScreenState.noDataFound) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   if (state == ScreenState.noNetwork) {
+  //     button = getMiniButton(() {
+  //       controller.getAddressList(context, 0, true);
+  //     }, BottomConstant.tryAgain);
+  //   }
 
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        fontSize: 12.sp,
-                        color: isDarkMode() ? white : black),
-                  )
-                : button),
-      ],
-    );
-  }
+  //   if (state == ScreenState.apiError) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Container(
+  //           margin: EdgeInsets.symmetric(horizontal: 20.w),
+  //           child: controller.message.value.isNotEmpty
+  //               ? Text(
+  //                   controller.message.value,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontFamily: fontMedium,
+  //                       fontSize: 12.sp,
+  //                       color: isDarkMode() ? white : black),
+  //                 )
+  //               : button),
+  //     ],
+  //   );
+  // }
 }

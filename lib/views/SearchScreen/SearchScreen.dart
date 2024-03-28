@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
@@ -12,7 +13,6 @@ import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/searchController.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
-import 'package:gifthamperz/models/searchModel.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
@@ -83,7 +83,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             case ScreenState.apiError:
                               return SizedBox(
                                 height: SizerUtil.height / 1.5,
-                                child: apiOtherStates(controller.state.value),
+                                child: apiOtherStates(controller.state.value,
+                                    controller, controller.searchList, () {
+                                  controller.getSearchList(context,
+                                      controller.searchCtr.text.toString());
+                                }),
                               );
                             case ScreenState.apiSuccess:
                               return apiSuccess(controller.state.value);
@@ -173,59 +177,59 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 35,
-            ),
-          ),
-        ),
-      );
-    }
+  // Widget apiOtherStates(state) {
+  //   if (state == ScreenState.apiLoading) {
+  //     return Center(
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(100),
+  //         child: SizedBox(
+  //           height: 30,
+  //           width: 30,
+  //           child: LoadingAnimationWidget.discreteCircle(
+  //             color: primaryColor,
+  //             size: 35,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    Widget? button;
-    if (controller.searchList.isEmpty) {
-      Container();
-    }
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {
-        controller.getSearchList(context, controller.searchCtr.text.toString());
-      }, BottomConstant.tryAgain);
-    }
+  //   Widget? button;
+  //   if (controller.searchList.isEmpty) {
+  //     Container();
+  //   }
+  //   if (state == ScreenState.noDataFound) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   if (state == ScreenState.noNetwork) {
+  //     button = getMiniButton(() {
+  //       controller.getSearchList(context, controller.searchCtr.text.toString());
+  //     }, BottomConstant.tryAgain);
+  //   }
 
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        fontSize: 12.sp,
-                        color: isDarkMode() ? white : black),
-                  )
-                : button),
-      ],
-    );
-  }
+  //   if (state == ScreenState.apiError) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Container(
+  //           margin: EdgeInsets.symmetric(horizontal: 20.w),
+  //           child: controller.message.value.isNotEmpty
+  //               ? Text(
+  //                   controller.message.value,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontFamily: fontMedium,
+  //                       fontSize: 12.sp,
+  //                       color: isDarkMode() ? white : black),
+  //                 )
+  //               : button),
+  //     ],
+  //   );
+  // }
 }

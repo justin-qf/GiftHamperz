@@ -314,7 +314,7 @@ class CartScreenController extends GetxController {
                     fontWeight: FontWeight.w800,
                     fontSize: SizerUtil.deviceType == DeviceType.mobile
                         ? 14.sp
-                        : 7.sp,
+                        : 11.sp,
                   ),
           ),
         ],

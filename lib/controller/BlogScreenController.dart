@@ -147,6 +147,7 @@ class BlogScreenController extends GetxController {
 
   RxList blogList = [].obs;
   RxString nextPageURL = "".obs;
+  RxBool isFinishBlogListApi = false.obs;
 
   void getBlogList(
     context,
@@ -164,7 +165,6 @@ class BlogScreenController extends GetxController {
       update();
     } else {
       loadingIndicator.show(context, '');
-      // isLoading.value = true;
       update();
     }
 
@@ -194,6 +194,7 @@ class BlogScreenController extends GetxController {
       if (response.statusCode == 200) {
         if (data['status'] == 1) {
           state.value = ScreenState.apiSuccess;
+          isFinishBlogListApi.value = true;
           message.value = '';
           update();
           var responseData = BlogModel.fromJson(data);
@@ -244,160 +245,193 @@ class BlogScreenController extends GetxController {
 
   getBlogListItemUi(
       BuildContext context, BlogDataList data, int index, bool isRight) {
-    return FadeInUp(
-      child: GestureDetector(
-        onTap: () {
-          Get.to(BlogDetailScreen(
-            data: data,
-          ));
-        },
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                height: 18.h,
-                margin: EdgeInsets.only(
-                    top: 1.h,
-                    bottom: 1.h,
-                    left: isRight ? 4.w : 18.w,
-                    right: isRight ? 18.w : 4.w),
-                padding: EdgeInsets.only(
-                    top: 2.h,
-                    bottom: 2.h,
-                    left: isRight ? 3.w : 19.w,
-                    right: isRight ? 20.w : 2.w),
-                decoration: BoxDecoration(
-                  border: isDarkMode()
-                      ? null
-                      : Border.all(
-                          color: grey,
-                          width: 0.5,
-                        ),
-                  color: isDarkMode() ? itemDarkBackgroundColor : white,
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDarkMode()
-                          ? grey.withOpacity(0.0)
-                          : grey.withOpacity(0.1),
-                      spreadRadius: isDarkMode() ? 0 : 2,
-                      blurRadius: isDarkMode() ? 0 : 6,
-                      offset: const Offset(0.3, 0.3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 5,
-                          child: Text(
-                            data.title.toString(),
-                            maxLines: 2,
-                            style: TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              fontSize:
-                                  SizerUtil.deviceType == DeviceType.mobile
-                                      ? 13.sp
-                                      : 6.sp,
-                              fontFamily: fontBold,
-                              fontWeight: FontWeight.w700,
-                              color: isDarkMode() ? black : black,
+    return Wrap(
+      children: [
+        FadeInUp(
+          child: GestureDetector(
+            onTap: () {
+              Get.to(BlogDetailScreen(
+                data: data,
+              ));
+            },
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    height: 18.h,
+                    margin: EdgeInsets.only(
+                        top: 1.h,
+                        bottom: 1.h,
+                        left: isRight
+                            ? SizerUtil.deviceType == DeviceType.mobile
+                                ? 4.w
+                                : 5.w
+                            : 18.w,
+                        right: isRight
+                            ? 18.w
+                            : SizerUtil.deviceType == DeviceType.mobile
+                                ? 4.w
+                                : 5.w),
+                    padding: EdgeInsets.only(
+                        top: SizerUtil.deviceType == DeviceType.mobile
+                            ? 2.h
+                            : 1.h,
+                        bottom: SizerUtil.deviceType == DeviceType.mobile
+                            ? 2.h
+                            : 1.h,
+                        left: isRight ? 3.w : 19.w,
+                        right: isRight ? 20.w : 2.w),
+                    decoration: BoxDecoration(
+                      border: isDarkMode()
+                          ? null
+                          : Border.all(
+                              color: grey,
+                              width: 0.5,
                             ),
-                          ),
+                      color: isDarkMode() ? itemDarkBackgroundColor : white,
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDarkMode()
+                              ? grey.withOpacity(0.0)
+                              : grey.withOpacity(0.1),
+                          spreadRadius: isDarkMode() ? 0 : 2,
+                          blurRadius: isDarkMode() ? 0 : 6,
+                          offset: const Offset(0.3, 0.3),
                         ),
                       ],
                     ),
-                    getDynamicSizedBox(height: 0.5.h),
-                    AbsorbPointer(
-                        absorbing: true,
-                        child: ReadMoreText(
-                          data.shortDescription.toString(),
-                          textAlign: TextAlign.start,
-                          trimLines: 3,
-                          callback: (val) {
-                            logcat("ONTAP", val.toString());
-                          },
-                          colorClickableText: isDarkMode()
-                              ? black
-                              : primaryColor, // Customize link color if desired
-                          trimMode: TrimMode.Line,
-                          trimCollapsedText:
-                              '...Show more', // Add your custom "Show More" text
-                          trimExpandedText:
-                              '', // Set this to an empty string to hide "Show Less" text
-                          delimiter:
-                              ' ', // Or use another character as your delimiter
-                          style: TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                            fontSize: SizerUtil.deviceType == DeviceType.mobile
-                                ? 11.sp
-                                : 10.sp,
-                            fontFamily: fontRegular,
-                            fontWeight: isDarkMode() ? FontWeight.w900 : null,
-                            color: isDarkMode() ? grey : lableColor,
-                          ),
-                          lessStyle: TextStyle(
-                            fontFamily: fontMedium,
-                            fontSize: 1.2.h,
-                          ), // Customize style for collapsed text
-                          moreStyle: TextStyle(
-                              fontFamily: fontBold,
-                              fontSize: 1.5.h,
-                              color:
-                                  primaryColor), // Customize style for expanded text
-                        )),
-                    getDynamicSizedBox(height: 0.5.h),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              right: isRight ? 4.w : null,
-              left: isRight ? null : 4.w,
-              top: 3.h,
-              bottom: 3.h,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDarkMode() ? itemDarkBackgroundColor : white,
-                  border: isDarkMode()
-                      ? null
-                      : Border.all(
-                          color: grey,
-                          width: 0.2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Text(
+                                data.title.toString(),
+                                maxLines: 2,
+                                style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 13.sp
+                                          : 10.sp,
+                                  fontFamily: fontBold,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDarkMode() ? black : black,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                  borderRadius: BorderRadius.circular(
-                    SizerUtil.deviceType == DeviceType.mobile ? 3.5.w : 2.5.w,
+                        getDynamicSizedBox(
+                            height: SizerUtil.deviceType == DeviceType.mobile
+                                ? 0.5.h
+                                : 0.0),
+                        AbsorbPointer(
+                            absorbing: true,
+                            child: ReadMoreText(
+                              data.shortDescription.toString(),
+                              textAlign: TextAlign.start,
+                              trimLines: 3,
+                              callback: (val) {
+                                logcat("ONTAP", val.toString());
+                              },
+                              colorClickableText: isDarkMode()
+                                  ? black
+                                  : primaryColor, // Customize link color if desired
+                              trimMode: TrimMode.Line,
+                              trimCollapsedText:
+                                  '...Show more', // Add your custom "Show More" text
+                              trimExpandedText:
+                                  '', // Set this to an empty string to hide "Show Less" text
+                              delimiter:
+                                  ' ', // Or use another character as your delimiter
+                              style: TextStyle(
+                                overflow: TextOverflow.ellipsis,
+                                fontSize:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 11.sp
+                                        : 10.sp,
+                                fontFamily: fontRegular,
+                                fontWeight:
+                                    isDarkMode() ? FontWeight.w900 : null,
+                                color: isDarkMode() ? grey : lableColor,
+                              ),
+                              lessStyle: TextStyle(
+                                fontFamily: fontMedium,
+                                fontSize: 1.2.h,
+                              ), // Customize style for collapsed text
+                              moreStyle: TextStyle(
+                                  fontFamily: fontBold,
+                                  fontSize: 1.5.h,
+                                  color:
+                                      primaryColor), // Customize style for expanded text
+                            )),
+                        getDynamicSizedBox(height: 0.5.h),
+                      ],
+                    ),
                   ),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    SizerUtil.deviceType == DeviceType.mobile ? 3.5.w : 2.5.w,
-                  ),
-                  child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    width: 30.w,
-                    height: 20.h,
-                    imageUrl: ApiUrl.imageUrl + data.imgUrl,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(color: primaryColor),
+                Positioned(
+                  right: isRight
+                      ? SizerUtil.deviceType == DeviceType.mobile
+                          ? 4.w
+                          : 5.w
+                      : null,
+                  left: isRight
+                      ? null
+                      : SizerUtil.deviceType == DeviceType.mobile
+                          ? 4.w
+                          : 5.w,
+                  top: 3.h,
+                  bottom: 3.h,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDarkMode() ? itemDarkBackgroundColor : white,
+                      border: isDarkMode()
+                          ? null
+                          : Border.all(
+                              color: grey,
+                              width: 0.2,
+                            ),
+                      borderRadius: BorderRadius.circular(
+                        SizerUtil.deviceType == DeviceType.mobile
+                            ? 3.5.w
+                            : 2.5.w,
+                      ),
                     ),
-                    errorWidget: (context, url, error) => Image.asset(
-                      Asset.placeholder,
-                      height: 9.h,
-                      fit: BoxFit.cover,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        SizerUtil.deviceType == DeviceType.mobile
+                            ? 3.5.w
+                            : 2.5.w,
+                      ),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        width: 30.w,
+                        height: 20.h,
+                        imageUrl: ApiUrl.imageUrl + data.imgUrl,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(color: primaryColor),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          Asset.placeholder,
+                          height: 9.h,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

@@ -10,10 +10,8 @@ import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/Resetpass_controller.dart';
-import 'package:gifthamperz/controller/changePasswordController.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
-import 'package:gifthamperz/views/PrepareScreen/PrepareScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../componant/input/form_inputs.dart';
 import '../../../../componant/toolbar/toolbar.dart';
@@ -188,7 +186,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 2.h,
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 2.h
+                                          : 0.h,
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(
@@ -204,7 +205,9 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                                           controller.getForgotPass(context,
                                               widget.mobile!.toString().trim());
                                         }
-                                      }, ResetPasstext.buttonLabel,
+                                      },
+                                          isFromCart: true,
+                                          ResetPasstext.buttonLabel,
                                           isvalidate: controller
                                               .isFormInvalidate.value);
                                     }),

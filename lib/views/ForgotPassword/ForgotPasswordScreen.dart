@@ -119,7 +119,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           color: isDarkMode() ? darkBackgroundColor : white,
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
+                                color: grey.withOpacity(0.2),
                                 blurRadius: 10.0,
                                 offset: const Offset(0, 1),
                                 spreadRadius: 3.0)
@@ -182,7 +182,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 2.h,
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 2.h
+                                          : 0.h,
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(
@@ -199,7 +202,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                             context,
                                           );
                                         }
-                                      }, ForgotPassScreenConstant.btnLable,
+                                      },
+                                          isFromCart: true,
+                                          ForgotPassScreenConstant.btnLable,
                                           isvalidate: controller
                                               .isFormInvalidate.value);
                                     }),
@@ -208,14 +213,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               ],
                             ),
                           ),
-                          SizedBox(
-                            height: 1.0.h,
-                          ),
-                          SizedBox(
-                            height: SizerUtil.deviceType == DeviceType.mobile
-                                ? 0.h
-                                : 2.h,
-                          )
+                          const SizedBox(height: 1.0)
                         ],
                       ),
                     ),

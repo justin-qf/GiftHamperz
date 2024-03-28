@@ -290,6 +290,7 @@ class DashboardText {
   static const viewmedicalhistory = "View Medical\nHistory";
   static const addfamilymember = 'Add Family\nMember';
   static const viewuploads = 'View\nUploads';
+  static const seeAll = 'See All';
   static const text =
       'Doctors are people \nwho practice medicine \nDoctors are trained to \nkeep people healthy \nand to heal the sick.';
 }

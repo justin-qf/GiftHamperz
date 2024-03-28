@@ -167,11 +167,11 @@ class _CustomFormFieldState extends State<CustomFormField> {
             left: widget.formType != null &&
                     widget.formType == FieldType.countryCode
                 ? 2.w
-                : 5.w,
+                : 4.w,
             right: widget.formType != null &&
                     widget.formType == FieldType.countryCode
                 ? 2.w
-                : 5.w,
+                : 4.w,
             top: SizerUtil.deviceType == DeviceType.mobile ? 1.8.h : 2.5.w,
             bottom: SizerUtil.deviceType == DeviceType.mobile ? 1.8.h : 2.5.w),
         hintText: widget.hintText,
@@ -179,7 +179,8 @@ class _CustomFormFieldState extends State<CustomFormField> {
         errorStyle: styleTextForErrorFieldHint(),
         hintStyle: styleTextHintFieldLabel(isWhite: widget.isWhite),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(1.5.h),
+          borderRadius: BorderRadius.circular(
+              SizerUtil.deviceType == DeviceType.mobile ? 30 : 50),
           borderSide: const BorderSide(
             color: inputBorderColor,
             width: 1.5,
@@ -187,11 +188,13 @@ class _CustomFormFieldState extends State<CustomFormField> {
         ),
         disabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: inputBorderColor, width: 1.2),
-          borderRadius: BorderRadius.circular(1.5.h),
+          borderRadius: BorderRadius.circular(
+              SizerUtil.deviceType == DeviceType.mobile ? 30 : 50),
         ),
         counterText: '',
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(1.5.h),
+          borderRadius: BorderRadius.circular(
+              SizerUtil.deviceType == DeviceType.mobile ? 30 : 50),
           borderSide: const BorderSide(
             color: inputBorderColor,
           ),
@@ -221,8 +224,13 @@ class _CustomFormFieldState extends State<CustomFormField> {
                   // onVerifiyButtonClick!();
                 },
                 child: widget.isStarting == true
-                    ? SvgPicture.asset(Asset.time,
-                        height: 5, width: 5, fit: BoxFit.scaleDown)
+                    ? GestureDetector(
+                        onTap: () {
+                          if (widget.onTap != null) widget.onTap!();
+                        },
+                        child: SvgPicture.asset(Asset.time,
+                            height: 5, width: 5, fit: BoxFit.scaleDown),
+                      )
                     : widget.isDropdown == true
                         ? Row(
                             mainAxisSize: MainAxisSize.min, // added line
@@ -560,19 +568,22 @@ class _CustomFormFieldState extends State<CustomFormField> {
                 width: 1,
               ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(1.5.h),
+          borderRadius: BorderRadius.circular(
+              SizerUtil.deviceType == DeviceType.mobile ? 30 : 50),
           borderSide: const BorderSide(
             color: primaryColor,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(1.5.h),
+          borderRadius: BorderRadius.circular(
+              SizerUtil.deviceType == DeviceType.mobile ? 30 : 50),
           borderSide: const BorderSide(
             color: Colors.redAccent,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(1.5.h),
+          borderRadius: BorderRadius.circular(
+              SizerUtil.deviceType == DeviceType.mobile ? 30 : 50),
           borderSide: const BorderSide(
             color: Colors.redAccent,
           ),

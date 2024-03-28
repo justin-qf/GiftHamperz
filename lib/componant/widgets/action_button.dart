@@ -23,7 +23,8 @@ setActionButton(context, String tag, bool? isEnable,
               },
               child: Container(
                 margin: EdgeInsets.only(
-                  right: 5.5.w,
+                  right:
+                      SizerUtil.deviceType == DeviceType.mobile ? 5.5.w : 6.w,
                 ),
                 padding: EdgeInsets.all(2.h),
                 decoration: BoxDecoration(
@@ -44,7 +45,9 @@ setActionButton(context, String tag, bool? isEnable,
                   children: [
                     Icon(
                       Icons.add,
-                      size: 4.h, // Size of the icon
+                      size: SizerUtil.deviceType == DeviceType.mobile
+                          ? 4.h
+                          : 3.h, // Size of the icon
                       color: isDarkMode() ? white : black,
                     ),
                     getDynamicSizedBox(height: 0.1.h),
@@ -54,7 +57,9 @@ setActionButton(context, String tag, bool? isEnable,
                         fontWeight: FontWeight.bold,
                         color:
                             isDarkMode() ? white : black, // Color of the text
-                        fontSize: 10.sp, // Font size of the text
+                        fontSize: SizerUtil.deviceType == DeviceType.mobile
+                            ? 10.sp
+                            : 9.sp, // Font size of the text
                       ),
                     ),
                   ],
@@ -64,18 +69,13 @@ setActionButton(context, String tag, bool? isEnable,
           ],
         ),
       ),
-      getDynamicSizedBox(height: 2.h),
-      Container(
-        margin: EdgeInsets.only(
-          left: 5.5.w,
-          right: 5.w,
-        ),
-        child: FadeInUp(
-            from: 50,
-            child: getAddressButton(() {
-              onClick!();
-            }, AddressScreenTextConstant.payment, isvalidate: isEnable)),
-      ),
+      getDynamicSizedBox(
+          height: SizerUtil.deviceType == DeviceType.mobile ? 2.h : 1.5.h),
+      FadeInUp(
+          from: 50,
+          child: getAddressButton(() {
+            onClick!();
+          }, AddressScreenTextConstant.payment, isvalidate: isEnable)),
     ],
   );
 }

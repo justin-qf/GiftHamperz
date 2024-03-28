@@ -300,18 +300,19 @@ class AddressScreenController extends GetxController {
                     Row(
                       children: [
                         SizedBox(
-                          width: 60.w,
+                          width: SizerUtil.deviceType == DeviceType.mobile
+                              ? 60.w
+                              : 70.w,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                "${data.name} $title",
+                                data.name.isNotEmpty
+                                    ? "${data.name} $title"
+                                    : title,
                                 style: TextStyle(
-                                    fontSize: SizerUtil.deviceType ==
-                                            DeviceType.mobile
-                                        ? 12.sp
-                                        : 13.sp,
+                                    fontSize: 12.sp,
                                     fontFamily: fontBold,
                                     fontWeight: FontWeight.bold,
                                     color: isDarkMode() ? black : black),
@@ -320,10 +321,7 @@ class AddressScreenController extends GetxController {
                               Text(
                                 '${data.address} , ${data.cityName} , ${data.stateName}',
                                 style: TextStyle(
-                                    fontSize: SizerUtil.deviceType ==
-                                            DeviceType.mobile
-                                        ? 11.sp
-                                        : 13.sp,
+                                    fontSize: 11.sp,
                                     fontFamily: fontBold,
                                     color: lableColor),
                               ),
@@ -350,19 +348,29 @@ class AddressScreenController extends GetxController {
                             width: 8.w,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Icon(
                                   Icons.mode_edit_rounded,
-                                  size: 2.3.h,
+                                  size:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 2.3.h
+                                          : 2.5.h,
                                   color: isDarkMode() ? black : primaryColor,
                                 ),
-                                Radio(
-                                  value: index,
-                                  activeColor: isDarkMode() ? black : black,
-                                  groupValue: currentIndex.value,
-                                  onChanged: (value) {
-                                    currentIndex.value = value as int;
-                                  },
+                                Transform.scale(
+                                  scale:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 1
+                                          : 1.5,
+                                  child: Radio(
+                                    value: index,
+                                    activeColor: black,
+                                    groupValue: currentIndex.value,
+                                    onChanged: (value) {
+                                      currentIndex.value = value as int;
+                                    },
+                                  ),
                                 )
                               ],
                             ),

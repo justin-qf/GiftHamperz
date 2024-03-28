@@ -476,8 +476,11 @@ class AddAddressController extends GetxController {
                   },
                   title: Text(
                     modelData.name.capitalize.toString(),
-                    style:
-                        TextStyle(fontFamily: fontRegular, fontSize: 13.5.sp),
+                    style: TextStyle(
+                        fontFamily: fontRegular,
+                        fontSize: SizerUtil.deviceType == DeviceType.mobile
+                            ? 13.5.sp
+                            : 12.sp),
                   ));
             },
           ),

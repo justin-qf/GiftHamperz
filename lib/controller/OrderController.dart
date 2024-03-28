@@ -171,7 +171,8 @@ class OrderScreenController extends GetxController {
                   )
                 : null,
             color: isDarkMode() ? itemDarkBackgroundColor : white,
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            borderRadius: BorderRadius.all(Radius.circular(
+                SizerUtil.deviceType == DeviceType.mobile ? 10 : 16)),
             boxShadow: [
               BoxShadow(
                   color: grey.withOpacity(0.5),
@@ -243,7 +244,7 @@ class OrderScreenController extends GetxController {
                           style: TextStyle(
                             fontSize: SizerUtil.deviceType == DeviceType.mobile
                                 ? 10.sp
-                                : 6.sp,
+                                : 8.sp,
                             fontFamily: fontSemiBold,
                             color: Colors.green,
                           ),
@@ -256,7 +257,7 @@ class OrderScreenController extends GetxController {
                       style: TextStyle(
                           fontSize: SizerUtil.deviceType == DeviceType.mobile
                               ? 13.sp
-                              : 6.sp,
+                              : 7.sp,
                           fontFamily: fontBold,
                           fontWeight: FontWeight.w700,
                           color: isDarkMode() ? black : black),
@@ -267,7 +268,7 @@ class OrderScreenController extends GetxController {
                       style: TextStyle(
                           fontSize: SizerUtil.deviceType == DeviceType.mobile
                               ? 10.sp
-                              : 6.sp,
+                              : 7.sp,
                           fontFamily: fontRegular,
                           fontWeight: isDarkMode() ? FontWeight.w600 : null,
                           color: isDarkMode() ? grey : lableColor),
@@ -296,8 +297,9 @@ class OrderScreenController extends GetxController {
                                       ? 10.sp
                                       : 8.sp,
                               decoration: TextDecoration.underline,
+                              decorationColor: black,
                               fontFamily: fontExtraBold,
-                              color: isDarkMode() ? black : black),
+                              color: black),
                         ),
                       ],
                     ),

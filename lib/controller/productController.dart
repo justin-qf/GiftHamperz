@@ -227,7 +227,7 @@ class ProductScreenController extends GetxController {
                 onTap: () {
                   logcat('Treanding', 'DONE');
                   Get.to(ProductDetailScreen(
-                    'Trending',
+                    DashboardText.trendingTitle,
                     data: data,
                   ));
                 },

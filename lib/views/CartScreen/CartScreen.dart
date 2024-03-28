@@ -19,10 +19,8 @@ import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/CartController.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/DeliveryScreen/AddressScreen.dart';
 import 'package:gifthamperz/views/MainScreen/MainScreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../models/UpdateDashboardModel.dart';
@@ -140,10 +138,22 @@ class _CartScreenState extends State<CartScreen> {
                                     margin: EdgeInsets.only(
                                         right: 2.w, bottom: 2.0.h),
                                     padding: EdgeInsets.only(
-                                        left: 3.w,
-                                        right: 3.w,
-                                        top: 2.w,
-                                        bottom: 2.w),
+                                        left: SizerUtil.deviceType ==
+                                                DeviceType.mobile
+                                            ? 3.w
+                                            : 2.w,
+                                        right: SizerUtil.deviceType ==
+                                                DeviceType.mobile
+                                            ? 3.w
+                                            : 2.w,
+                                        top: SizerUtil.deviceType ==
+                                                DeviceType.mobile
+                                            ? 2.w
+                                            : 1.5.w,
+                                        bottom: SizerUtil.deviceType ==
+                                                DeviceType.mobile
+                                            ? 2.w
+                                            : 1.5.w),
                                     decoration: BoxDecoration(
                                       borderRadius:
                                           BorderRadius.circular(1.5.h),
@@ -170,7 +180,11 @@ class _CartScreenState extends State<CartScreen> {
                                                     : black,
                                                 fontFamily: fontBold,
                                                 fontWeight: FontWeight.w500,
-                                                fontSize: 14.sp,
+                                                fontSize:
+                                                    SizerUtil.deviceType ==
+                                                            DeviceType.mobile
+                                                        ? 14.sp
+                                                        : 12.sp,
                                               ));
                                         },
                                       ),
@@ -181,7 +195,10 @@ class _CartScreenState extends State<CartScreen> {
                                             color: isDarkMode() ? white : black,
                                             fontFamily: fontBold,
                                             fontWeight: FontWeight.w500,
-                                            fontSize: 14.sp,
+                                            fontSize: SizerUtil.deviceType ==
+                                                    DeviceType.mobile
+                                                ? 14.sp
+                                                : 12.sp,
                                           )),
                                     ]),
                                   ),
@@ -219,7 +236,6 @@ class _CartScreenState extends State<CartScreen> {
                                 ],
                               ),
                             )
-                          // Your existing logic goes here
                           : FadeInDown(
                               child: Stack(
                                 children: [
@@ -442,7 +458,12 @@ class _CartScreenState extends State<CartScreen> {
                         FadeInUp(
                           child: Container(
                             padding: EdgeInsets.only(
-                                left: 5.w, right: 5.w, top: 2.0.h, bottom: 2.h),
+                                left: 5.w,
+                                right: 5.w,
+                                top: SizerUtil.deviceType == DeviceType.mobile
+                                    ? 2.0.h
+                                    : 1.0.h,
+                                bottom: 2.h),
                             decoration: BoxDecoration(
                                 color:
                                     isDarkMode() ? darkBackgroundColor : white,
@@ -485,17 +506,27 @@ class _CartScreenState extends State<CartScreen> {
                                       controller.getOrderText('Total',
                                           '${IndiaRupeeConstant.inrCode}${formatPrice(controller.finalProductPrice.value)}',
                                           isNormal: false),
-                                      getDynamicSizedBox(height: 3.h),
+                                      getDynamicSizedBox(
+                                          height: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 3.h
+                                              : 0.0),
                                       Container(
                                           margin: EdgeInsets.only(
-                                            left: 5.w,
-                                            right: 5.w,
+                                            left: SizerUtil.deviceType ==
+                                                    DeviceType.mobile
+                                                ? 5.w
+                                                : 2.w,
+                                            right: SizerUtil.deviceType ==
+                                                    DeviceType.mobile
+                                                ? 5.w
+                                                : 2.w,
                                           ),
                                           child: FadeInUp(
                                               from: 50,
                                               child: Obx(() {
                                                 return getSecondaryFormButton(
-                                                    () async {
+                                                    isFromCart: true, () async {
                                                   // bool isGuest = await UserPreferences()
                                                   //     .getGuestUser();
                                                   if (controller
@@ -525,7 +556,11 @@ class _CartScreenState extends State<CartScreen> {
                                                     isEnable: controller
                                                         .isGuest.value);
                                               }))),
-                                      getDynamicSizedBox(height: 0.5.h),
+                                      getDynamicSizedBox(
+                                          height: SizerUtil.deviceType ==
+                                                  DeviceType.mobile
+                                              ? 0.5.h
+                                              : 0.0),
                                     ],
                                   );
                                 },
@@ -580,7 +615,7 @@ class _CartScreenState extends State<CartScreen> {
                     borderRadius: BorderRadius.circular(
                         SizerUtil.deviceType == DeviceType.mobile
                             ? 1.5.w
-                            : 2.2.w),
+                            : 2.1.w),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -601,12 +636,19 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             ),
                             child: ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(12)),
+                              borderRadius: BorderRadius.all(Radius.circular(
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 12
+                                      : 15)),
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
-                                height: 13.h,
-                                width: 30.w,
+                                height:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 13.h
+                                        : 12.h,
+                                width: SizerUtil.deviceType == DeviceType.mobile
+                                    ? 30.w
+                                    : 25.w,
                                 imageUrl: ApiUrl.imageUrl + data.images[0],
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
@@ -621,8 +663,14 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 imageBuilder: (context, imageProvider) => Image(
                                   image: imageProvider,
-                                  height: 13.h,
-                                  width: 13.h,
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 13.h
+                                          : 12.h,
+                                  width:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 13.h
+                                          : 12.h,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -642,7 +690,10 @@ class _CartScreenState extends State<CartScreen> {
                                     overflow: TextOverflow.ellipsis,
                                     fontFamily: fontMedium,
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 12.sp,
+                                    fontSize: SizerUtil.deviceType ==
+                                            DeviceType.mobile
+                                        ? 12.sp
+                                        : 10.sp,
                                   )),
                               getDynamicSizedBox(height: 1.h),
                               RichText(
@@ -656,7 +707,10 @@ class _CartScreenState extends State<CartScreen> {
                                       color:
                                           isDarkMode() ? white : primaryColor,
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 11.sp),
+                                      fontSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 11.sp
+                                          : 10.sp),
                                   children: [
                                     TextSpan(
                                       text: '',
@@ -670,7 +724,11 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 textScaler: const TextScaler.linear(1),
                               ),
-                              getDynamicSizedBox(height: 0.5.h),
+                              getDynamicSizedBox(
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 0.5.h
+                                          : 0.0),
                               Row(
                                 children: [
                                   RichText(
@@ -685,7 +743,6 @@ class _CartScreenState extends State<CartScreen> {
                                           fontSize: 8.sp),
                                       children: [
                                         TextSpan(
-                                          // text: data.orderDate,
                                           text: data.quantity.toString(),
                                           style: TextStyle(
                                               color: isDarkMode()
@@ -700,91 +757,116 @@ class _CartScreenState extends State<CartScreen> {
                                     textScaler: const TextScaler.linear(1),
                                   ),
                                   const Spacer(),
-                                  Container(
-                                      padding: EdgeInsets.only(
-                                          left: 2.7.w,
-                                          right: 2.7.w,
-                                          top: 0.4.h,
-                                          bottom: 0.4.h),
-                                      decoration: BoxDecoration(
-                                          color: isDarkMode()
-                                              ? darkBackgroundColor
-                                              : white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: grey.withOpacity(0.2),
-                                                blurRadius: 1.0,
-                                                offset: const Offset(0, 1),
-                                                spreadRadius: 1.0)
-                                          ],
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(5.h),
-                                          )),
-                                      child: Row(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () async {
-                                              data.quantity!.value--;
-                                              if (data.quantity!.value <= 0) {
-                                                cartItems.removeAt(index);
-                                              }
-                                              // Product already in the cart, decrement the quantity
-                                              await UserPreferences().addToCart(
-                                                data,
-                                                -1, // Pass a negative quantity for decrement
-                                              );
-                                              // Update the totalProductList in the controller
-                                              controller
-                                                      .totalProductList.value =
-                                                  cartItems.length.toString();
-                                              controller.calculateFinalPrice(
-                                                  cartItems);
-                                              // controller.calculateTotalPrice(
-                                              //     cartItems);
-                                              getCartItem();
-                                              setState(() {});
-                                            },
-                                            child: Icon(
-                                              Icons.remove,
-                                              size: 3.h,
-                                            ),
-                                          ),
-                                          getDynamicSizedBox(width: 0.8.w),
-                                          getVerticalDivider(),
-                                          getDynamicSizedBox(width: 1.8.w),
-                                          Text(
-                                            data.quantity.toString(),
-                                            style: TextStyle(
-                                              //fontFamily: fontBold,
-                                              color:
-                                                  isDarkMode() ? white : black,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: SizerUtil.deviceType ==
-                                                      DeviceType.mobile
-                                                  ? 12.sp
-                                                  : 13.sp,
-                                            ),
-                                          ),
-                                          getDynamicSizedBox(width: 1.8.w),
-                                          getVerticalDivider(),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              data.quantity!.value += 1;
-                                              await UserPreferences().addToCart(
-                                                data,
-                                                data.quantity!.value,
-                                              );
-                                              controller.calculateFinalPrice(
-                                                  cartItems);
-                                              setState(() {});
-                                            },
-                                            child: Icon(
-                                              Icons.add,
-                                              size: 3.h,
-                                            ),
-                                          ),
-                                        ],
-                                      )),
+                                  cartIncrDcrUi(
+                                      qty: data.quantity.toString(),
+                                      incrementOnTap: () async {
+                                        data.quantity!.value += 1;
+                                        await UserPreferences().addToCart(
+                                          data,
+                                          data.quantity!.value,
+                                        );
+                                        controller
+                                            .calculateFinalPrice(cartItems);
+                                        setState(() {});
+                                      },
+                                      decrementOnTap: () async {
+                                        data.quantity!.value--;
+                                        if (data.quantity!.value <= 0) {
+                                          cartItems.removeAt(index);
+                                        }
+                                        await UserPreferences().addToCart(
+                                          data,
+                                          -1,
+                                        );
+                                        controller.totalProductList.value =
+                                            cartItems.length.toString();
+                                        controller
+                                            .calculateFinalPrice(cartItems);
+                                        getCartItem();
+                                        setState(() {});
+                                      }),
+                                  // Container(
+                                  //     padding: EdgeInsets.only(
+                                  //         left: 2.7.w,
+                                  //         right: 2.7.w,
+                                  //         top: 0.4.h,
+                                  //         bottom: 0.4.h),
+                                  //     decoration: BoxDecoration(
+                                  //         color: isDarkMode()
+                                  //             ? darkBackgroundColor
+                                  //             : white,
+                                  //         boxShadow: [
+                                  //           BoxShadow(
+                                  //               color: grey.withOpacity(0.2),
+                                  //               blurRadius: 1.0,
+                                  //               offset: const Offset(0, 1),
+                                  //               spreadRadius: 1.0)
+                                  //         ],
+                                  //         borderRadius: BorderRadius.all(
+                                  //           Radius.circular(5.h),
+                                  //         )),
+                                  //     child: Row(
+                                  //       children: [
+                                  //         GestureDetector(
+                                  //           onTap: () async {
+                                  //             data.quantity!.value--;
+                                  //             if (data.quantity!.value <= 0) {
+                                  //               cartItems.removeAt(index);
+                                  //             }
+
+                                  //             await UserPreferences().addToCart(
+                                  //               data,
+                                  //               -1,
+                                  //             );
+                                  //             controller
+                                  //                     .totalProductList.value =
+                                  //                 cartItems.length.toString();
+                                  //             controller.calculateFinalPrice(
+                                  //                 cartItems);
+                                  //             getCartItem();
+                                  //             setState(() {});
+                                  //           },
+                                  //           child: Icon(
+                                  //             Icons.remove,
+                                  //             size: 3.h,
+                                  //           ),
+                                  //         ),
+                                  //         getDynamicSizedBox(width: 0.8.w),
+                                  //         getVerticalDivider(),
+                                  //         getDynamicSizedBox(width: 1.8.w),
+                                  //         Text(
+                                  //           data.quantity.toString(),
+                                  //           style: TextStyle(
+                                  //             //fontFamily: fontBold,
+                                  //             color:
+                                  //                 isDarkMode() ? white : black,
+                                  //             fontWeight: FontWeight.w600,
+                                  //             fontSize: SizerUtil.deviceType ==
+                                  //                     DeviceType.mobile
+                                  //                 ? 12.sp
+                                  //                 : 13.sp,
+                                  //           ),
+                                  //         ),
+                                  //         getDynamicSizedBox(width: 1.8.w),
+                                  //         getVerticalDivider(),
+                                  //         GestureDetector(
+                                  //           onTap: () async {
+                                  //             data.quantity!.value += 1;
+                                  //             await UserPreferences().addToCart(
+                                  //               data,
+                                  //               data.quantity!.value,
+                                  //             );
+                                  //             controller.calculateFinalPrice(
+                                  //                 cartItems);
+                                  //             setState(() {});
+                                  //           },
+                                  //           child: Icon(
+                                  //             Icons.add,
+                                  //             size: 3.h,
+                                  //           ),
+                                  //         ),
+                                  //       ],
+                                  //     )),
                                 ],
                               ),
                             ],

@@ -15,7 +15,7 @@ styleTextFormFieldText({isWhite}) {
             : white
         : black,
     fontWeight: FontWeight.w300,
-    fontSize: 12.sp,
+    fontSize: SizerUtil.deviceType == DeviceType.mobile ? 12.sp : 9.sp,
   );
 }
 
@@ -28,7 +28,10 @@ styleTextForFieldLabel(usernameNode) {
 }
 
 styleTextForErrorFieldHint() {
-  return TextStyle(fontSize: 11.sp, fontFamily: fontRegular, color: red);
+  return TextStyle(
+      fontSize: SizerUtil.deviceType == DeviceType.mobile ? 11.sp : 10.sp,
+      fontFamily: fontRegular,
+      color: red);
 }
 
 styleTextHintFieldLabel({isWhite}) {
@@ -59,12 +62,11 @@ styleTextForFieldHint() {
 }
 
 styleTitle() {
-  //mavan pro
   return TextStyle(
       fontFamily: fontExtraBold,
       color: isDarkMode() ? white : headingTextColor,
       fontWeight: FontWeight.w900,
-      fontSize: 26.sp);
+      fontSize: SizerUtil.deviceType == DeviceType.mobile ? 26.sp : 22.sp);
 }
 
 styleTitleSubtaxt() {

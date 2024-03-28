@@ -411,7 +411,7 @@ class HomeScreenWebController extends GetxController {
           child: GestureDetector(
             onTap: () {
               Get.to(ProductDetailScreen(
-                'Trending',
+                DashboardText.trendingTitle,
                 data: data,
               ))!
                   .then((value) {

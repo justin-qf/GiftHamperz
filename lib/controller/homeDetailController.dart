@@ -215,9 +215,8 @@ class HomeDetailScreenController extends GetxController {
             FadeInUp(
               child: GestureDetector(
                 onTap: () {
-                  logcat('Treanding', 'DONE');
                   Get.to(ProductDetailScreen(
-                    'Trending',
+                    DashboardText.trendingTitle,
                     data: data,
                   ));
                 },
@@ -236,7 +235,6 @@ class HomeDetailScreenController extends GetxController {
                                 color: grey, // Border color
                                 width: 0.5, // Border width
                               ),
-                        //color: isDarkMode() ? itemDarkBackgroundColor : white,
                         color: isDarkMode() ? tileColour : white,
                         borderRadius: BorderRadius.circular(
                             SizerUtil.deviceType == DeviceType.mobile
@@ -252,39 +250,28 @@ class HomeDetailScreenController extends GetxController {
                               Container(
                                 width: SizerUtil.width,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                      SizerUtil.deviceType == DeviceType.mobile
-                                          ? 3.5.w
-                                          : 2.5.w),
-                                  // boxShadow: [
-                                  //   BoxShadow(
-                                  //     color: isDarkMode()
-                                  //         ? grey.withOpacity(0.2)
-                                  //         : grey.withOpacity(0.5),
-                                  //     spreadRadius: 2,
-                                  //     blurRadius:
-                                  //         5.0, // Adjust the blur radius as needed
-                                  //     offset: const Offset(0, 2),
-                                  //   )
-                                  // ],
-                                  border: isDarkMode()
-                                      ? Border.all(
-                                          color: grey, // Border color
-                                          width: 1, // Border width
-                                        )
-                                      : Border.all(
-                                          color: grey, // Border color
-                                          width: 0.2, // Border width
-                                        ),
-                                ),
+                                    borderRadius: BorderRadius.circular(
+                                        SizerUtil.deviceType ==
+                                                DeviceType.mobile
+                                            ? 3.5.w
+                                            : 2.2.w),
+                                    border: Border.all(
+                                      color: grey, // Border color
+                                      width: isDarkMode()
+                                          ? 1
+                                          : 0.2, // Border width
+                                    )),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(
                                       SizerUtil.deviceType == DeviceType.mobile
                                           ? 3.5.w
-                                          : 2.5.w),
+                                          : 2.2.w),
                                   child: CachedNetworkImage(
                                     fit: BoxFit.cover,
-                                    height: 12.h,
+                                    height: SizerUtil.deviceType ==
+                                            DeviceType.mobile
+                                        ? 12.h
+                                        : 10.h,
                                     imageUrl: ApiUrl.imageUrl + data.images[0],
                                     placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator(
@@ -337,7 +324,7 @@ class HomeDetailScreenController extends GetxController {
                                       fontSize: SizerUtil.deviceType ==
                                               DeviceType.mobile
                                           ? 10.sp
-                                          : 8.sp,
+                                          : 7.sp,
                                       height: 1.2),
                                 ),
                                 getDynamicSizedBox(
@@ -367,17 +354,20 @@ class HomeDetailScreenController extends GetxController {
                                       direction: Axis.horizontal,
                                       allowHalfRating: true,
                                       itemCount: 1,
-                                      itemSize: 3.5.w,
+                                      itemSize: SizerUtil.deviceType ==
+                                              DeviceType.mobile
+                                          ? 3.5.w
+                                          : 3.w,
                                       itemBuilder: (context, _) => const Icon(
                                         Icons.star,
                                         color: Colors.orange,
                                       ),
-                                      onRatingUpdate: (rating) {
-                                        logcat("RATING", rating);
-                                      },
+                                      onRatingUpdate: (rating) {},
                                     ),
                                     getText(
-                                      "3.5",
+                                      data.averageRating != null
+                                          ? data.averageRating.toString()
+                                          : '0.0',
                                       TextStyle(
                                           fontFamily: fontSemiBold,
                                           color: lableColor,

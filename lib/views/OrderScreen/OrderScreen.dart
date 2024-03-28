@@ -1,12 +1,11 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
-import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/OrderController.dart';
@@ -33,7 +32,9 @@ class _OrderScreenState extends State<OrderScreen>
   void initState() {
     controller.tabController =
         TabController(vsync: this, length: 4, initialIndex: 0);
-    controller.getOrderList(context, 0, true);
+    futureDelay(() {
+      controller.getOrderList(context, 0, true);
+    });
     super.initState();
   }
 
@@ -81,7 +82,12 @@ class _OrderScreenState extends State<OrderScreen>
                                     return SizedBox(
                                       height: SizerUtil.height / 1.2,
                                       child: apiOtherStates(
-                                          controller.state.value),
+                                          controller.state.value,
+                                          controller,
+                                          controller.orderList, () {
+                                        controller.getOrderList(
+                                            context, 0, true);
+                                      }),
                                     );
                                   case ScreenState.apiSuccess:
                                     return apiSuccess(controller.state.value);
@@ -167,63 +173,63 @@ class _OrderScreenState extends State<OrderScreen>
     }
   }
 
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 35,
-            ),
-          ),
-        ),
-      );
-    }
+  // Widget apiOtherStates(state) {
+  //   if (state == ScreenState.apiLoading) {
+  //     return Center(
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(100),
+  //         child: SizedBox(
+  //           height: 30,
+  //           width: 30,
+  //           child: LoadingAnimationWidget.discreteCircle(
+  //             color: primaryColor,
+  //             size: 35,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    Widget? button;
-    if (controller.orderList.isEmpty) {
-      Container();
-    }
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {
-        controller.getOrderList(context, 0, true);
-      }, BottomConstant.tryAgain);
-    }
+  //   Widget? button;
+  //   if (controller.orderList.isEmpty) {
+  //     Container();
+  //   }
+  //   if (state == ScreenState.noDataFound) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   if (state == ScreenState.noNetwork) {
+  //     button = getMiniButton(() {
+  //       controller.getOrderList(context, 0, true);
+  //     }, BottomConstant.tryAgain);
+  //   }
 
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-              child: controller.message.value.isNotEmpty
-                  ? Text(
-                      controller.message.value,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontFamily: fontMedium,
-                          fontSize: 12.sp,
-                          color: isDarkMode() ? white : black),
-                    )
-                  : button),
-        ],
-      ),
-    );
-  }
+  //   if (state == ScreenState.apiError) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       children: [
+  //         Container(
+  //             child: controller.message.value.isNotEmpty
+  //                 ? Text(
+  //                     controller.message.value,
+  //                     textAlign: TextAlign.center,
+  //                     style: TextStyle(
+  //                         fontFamily: fontMedium,
+  //                         fontSize: 12.sp,
+  //                         color: isDarkMode() ? white : black),
+  //                   )
+  //                 : button),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   // getListViewItem() {
   //   return Expanded(

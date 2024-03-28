@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
 import 'package:gifthamperz/configs/colors_constant.dart';
-import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
-import 'package:gifthamperz/controller/homeController.dart';
 import 'package:gifthamperz/controller/homeDetailController.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/utils/enum.dart';
@@ -61,7 +60,6 @@ class _DetailScreenState extends State<DetailScreen> {
     Statusbar().trasparentStatusbarIsNormalScreen();
     return CustomParentScaffold(
       onWillPop: () async {
-        logcat("onWillPop", "DONE");
         return true;
       },
       isSafeArea: false,
@@ -98,9 +96,15 @@ class _DetailScreenState extends State<DetailScreen> {
                                   case ScreenState.noDataFound:
                                   case ScreenState.apiError:
                                     return SizedBox(
-                                      height: SizerUtil.height / 1.5,
+                                      height: SizerUtil.height / 1.3,
                                       child: apiOtherStates(
-                                          controller.state.value),
+                                          controller.state.value,
+                                          controller,
+                                          widget.isFromTrending == true
+                                              ? controller.trendingList
+                                              : controller.popularList, () {
+                                        apiCall();
+                                      }),
                                     );
                                   case ScreenState.apiSuccess:
                                     return apiSuccess(controller.state.value);
@@ -166,7 +170,6 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget apiSuccess(ScreenState state) {
-    logcat("apiSuccess", '1');
     // ignore: unrelated_type_equality_checks
     if (widget.isFromTrending == true) {
       if (state == ScreenState.apiSuccess &&
@@ -176,7 +179,6 @@ class _DetailScreenState extends State<DetailScreen> {
         return noDataFoundWidget();
       }
     } else {
-      logcat("Step-2", '2');
       if (state == ScreenState.apiSuccess &&
           controller.popularList.isNotEmpty) {
         return getListViewItem();
@@ -265,66 +267,66 @@ class _DetailScreenState extends State<DetailScreen> {
     }
   }
 
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 35,
-            ),
-          ),
-        ),
-      );
-    }
+  // Widget apiOtherStates(state) {
+  //   if (state == ScreenState.apiLoading) {
+  //     return Center(
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(100),
+  //         child: SizedBox(
+  //           height: 30,
+  //           width: 30,
+  //           child: LoadingAnimationWidget.discreteCircle(
+  //             color: primaryColor,
+  //             size: 35,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    Widget? button;
-    if (widget.isFromTrending == true) {
-      if (controller.trendingList.isEmpty) {
-        Container();
-      }
-    } else {
-      if (controller.popularList.isEmpty) {
-        Container();
-      }
-    }
+  //   Widget? button;
+  //   if (widget.isFromTrending == true) {
+  //     if (controller.trendingList.isEmpty) {
+  //       Container();
+  //     }
+  //   } else {
+  //     if (controller.popularList.isEmpty) {
+  //       Container();
+  //     }
+  //   }
 
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {
-        apiCall();
-      }, BottomConstant.tryAgain);
-    }
+  //   if (state == ScreenState.noDataFound) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   if (state == ScreenState.noNetwork) {
+  //     button = getMiniButton(() {
+  //       apiCall();
+  //     }, BottomConstant.tryAgain);
+  //   }
 
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        fontSize: 12.sp,
-                        color: isDarkMode() ? white : black),
-                  )
-                : button),
-      ],
-    );
-  }
+  //   if (state == ScreenState.apiError) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Container(
+  //           margin: EdgeInsets.symmetric(horizontal: 20.w),
+  //           child: controller.message.value.isNotEmpty
+  //               ? Text(
+  //                   controller.message.value,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontFamily: fontMedium,
+  //                       fontSize: 12.sp,
+  //                       color: isDarkMode() ? white : black),
+  //                 )
+  //               : button),
+  //     ],
+  //   );
+  // }
 }

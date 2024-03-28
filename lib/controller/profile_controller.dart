@@ -73,7 +73,10 @@ class ProfileController extends GetxController {
             horizontal: 3.w,
             vertical:
                 SizerUtil.deviceType == DeviceType.mobile ? 0.6.h : 0.8.h),
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.8.h),
+        padding: EdgeInsets.symmetric(
+            horizontal: SizerUtil.deviceType == DeviceType.mobile ? 4.w : 3.w,
+            vertical:
+                SizerUtil.deviceType == DeviceType.mobile ? 0.8.h : 0.9.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(2.5.h),
           color: tileColour,
@@ -83,8 +86,8 @@ class ProfileController extends GetxController {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              height: 4.5.h,
-              width: 4.5.h,
+              height: SizerUtil.deviceType == DeviceType.mobile ? 4.5.h : 4.3.h,
+              width: SizerUtil.deviceType == DeviceType.mobile ? 4.5.h : 4.3.h,
               decoration: const BoxDecoration(
                 color: primaryColor,
                 borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -99,7 +102,7 @@ class ProfileController extends GetxController {
               ),
             ),
             SizedBox(
-              width: 4.w,
+              width: SizerUtil.deviceType == DeviceType.mobile ? 4.w : 3.6.w,
             ),
             Flexible(
               flex: 1,
@@ -107,7 +110,9 @@ class ProfileController extends GetxController {
               child: Text(
                 title,
                 style: TextStyle(
-                    fontSize: 13.sp,
+                    fontSize: SizerUtil.deviceType == DeviceType.mobile
+                        ? 13.sp
+                        : 12.sp,
                     fontWeight: FontWeight.w600,
                     color: isDarkMode() ? black : headingTextColor),
               ),
@@ -133,6 +138,10 @@ class ProfileController extends GetxController {
   }
 
   void getUserById(context) async {
+    UserData? retrievedObject = await UserPreferences().getSignInInfo();
+    if (retrievedObject == null) {
+      return;
+    }
     var loadingIndicator = LoadingProgressDialog();
     loadingIndicator.show(context, '');
     try {
@@ -146,8 +155,9 @@ class ProfileController extends GetxController {
         });
         return;
       }
+
       var response = await Repository.get(
-          {}, "${ApiUrl.getUser}/${getUserData!.id}",
+          {}, "${ApiUrl.getUser}/${retrievedObject.id}",
           allowHeader: true);
       Statusbar().trasparentStatusbarProfile(false);
       loadingIndicator.hide(context);

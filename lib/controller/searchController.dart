@@ -163,7 +163,7 @@ class SearchScreenController extends GetxController {
             searchList.addAll(searchData.data);
             update();
           } else {
-            state.value = ScreenState.noDataFound;
+            //state.value = ScreenState.noDataFound;
           }
 
           List<CommonProductList> cartItems =
@@ -301,11 +301,10 @@ class SearchScreenController extends GetxController {
                                     ? 3.5.w
                                     : 2.5.w),
                             border: Border.all(
-                              color: isDarkMode()
-                                  ? primaryColor.withOpacity(0.5)
-                                  : grey.withOpacity(
-                                      0.2), // Set the border color here
-                              width: 2.0, // Set the border width
+                              color: grey, // Set the border color here
+                              width: isDarkMode()
+                                  ? 1
+                                  : 0.2, // Set the border width
                             ),
                           ),
                           child: ClipRRect(

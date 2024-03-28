@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
@@ -34,7 +35,9 @@ class _BlocgScreenState extends State<BlocgScreen>
   void initState() {
     controller.tabController =
         TabController(vsync: this, length: 4, initialIndex: 0);
-    controller.getBlogTypeList(context);
+    futureDelay(() {
+      controller.getBlogTypeList(context);
+    });
     super.initState();
   }
 
@@ -59,68 +62,46 @@ class _BlocgScreenState extends State<BlocgScreen>
                 RefreshIndicator(
                     color: primaryColor,
                     onRefresh: () {
-                      return Future.delayed(
-                        const Duration(seconds: 1),
-                        () {
-                          controller.getBlogList(
-                              context, 1, controller.selectedBlogTypeId!, true,
-                              isRefress: true);
-                        },
-                      );
+                      return futureDelay(() {
+                        controller.getBlogList(
+                            context, 1, controller.selectedBlogTypeId!, true,
+                            isRefress: true);
+                      });
                     },
                     child: CustomScrollView(
                       physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverToBoxAdapter(
-                          child: Obx(() {
-                            return Stack(children: [
-                              Obx(() {
-                                switch (controller.state.value) {
-                                  case ScreenState.apiLoading:
-                                  case ScreenState.noNetwork:
-                                  case ScreenState.noDataFound:
-                                  case ScreenState.apiError:
-                                    return SizedBox(
-                                      height: SizerUtil.height / 1.3,
-                                      child: Center(
-                                        child: apiOtherStates(
-                                            controller.state.value),
-                                      ),
-                                    );
-                                  case ScreenState.apiSuccess:
-                                    return apiSuccess(controller.state.value);
-                                  default:
-                                    Container();
-                                }
-                                return Container();
-                              }),
-                              if (controller.isShowMoreLoading.value == true)
-                                SizedBox(
-                                    height: SizerUtil.height,
-                                    width: SizerUtil.width,
-                                    child: Center(
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: white,
-                                          ),
-                                          height: 50,
-                                          width: 50,
-                                          padding: const EdgeInsets.all(10),
-                                          child: LoadingAnimationWidget
-                                              .discreteCircle(
-                                            color: primaryColor,
-                                            size: 35,
-                                          ),
-                                        ),
-                                      ),
-                                    )),
-                            ]);
+                            child: Stack(children: [
+                          Obx(() {
+                            switch (controller.state.value) {
+                              case ScreenState.apiLoading:
+                              case ScreenState.noNetwork:
+                              case ScreenState.noDataFound:
+                              case ScreenState.apiError:
+                                return SizedBox(
+                                  height: SizerUtil.height / 1.3,
+                                  child: Center(
+                                    child: apiOtherStates(
+                                        controller.state.value,
+                                        controller,
+                                        controller.blogList, () {
+                                      controller.getBlogList(
+                                          context,
+                                          1,
+                                          controller.selectedBlogTypeId!,
+                                          false);
+                                    }),
+                                  ),
+                                );
+                              case ScreenState.apiSuccess:
+                                return apiSuccess(controller.state.value);
+                              default:
+                                Container();
+                            }
+                            return Container();
                           }),
-                        )
+                        ]))
                       ],
                     )),
               ],
@@ -136,13 +117,13 @@ class _BlocgScreenState extends State<BlocgScreen>
     // ignore: unrelated_type_equality_checks
     if (controller.state == ScreenState.apiSuccess &&
         controller.blogTypeList.isNotEmpty) {
-      return getListViewItem();
+      return getListViewItem(state);
     } else {
       return noDataFoundWidget();
     }
   }
 
-  getListViewItem() {
+  getListViewItem(ScreenState state) {
     return DefaultTabController(
         length: controller.blogTypeList.length,
         child: Column(children: [
@@ -155,62 +136,62 @@ class _BlocgScreenState extends State<BlocgScreen>
             ],
           ),
           getDynamicSizedBox(height: 1.h),
-          apiResponseUi()
+          apiResponseUi(state)
         ]));
   }
 
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: LoadingAnimationWidget.discreteCircle(
-            color: primaryColor,
-            size: 30,
-          ),
-        ),
-      );
-    }
+  // Widget apiOtherStates(state) {
+  //   if (state == ScreenState.apiLoading) {
+  //     return Center(
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(100),
+  //         child: LoadingAnimationWidget.discreteCircle(
+  //           color: primaryColor,
+  //           size: 30,
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    Widget? button;
-    if (controller.blogList.isEmpty) {
-      Container();
-    }
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {
-        controller.getBlogList(
-            context, 1, controller.selectedBlogTypeId!, false);
-      }, BottomConstant.tryAgain);
-    }
+  //   Widget? button;
+  //   if (controller.blogList.isEmpty) {
+  //     Container();
+  //   }
+  //   if (state == ScreenState.noDataFound) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   if (state == ScreenState.noNetwork) {
+  //     button = getMiniButton(() {
+  //       controller.getBlogList(
+  //           context, 1, controller.selectedBlogTypeId!, false);
+  //     }, BottomConstant.tryAgain);
+  //   }
 
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: controller.message.value.isNotEmpty
-                ? Text(controller.message.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        fontSize: 12.sp,
-                        color: isDarkMode() ? white : black))
-                : button),
-      ],
-    );
-  }
+  //   if (state == ScreenState.apiError) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Container(
+  //           margin: EdgeInsets.symmetric(horizontal: 20.w),
+  //           child: controller.message.value.isNotEmpty
+  //               ? Text(controller.message.value,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontFamily: fontMedium,
+  //                       fontSize: 12.sp,
+  //                       color: isDarkMode() ? white : black))
+  //               : button),
+  //     ],
+  //   );
+  // }
 
-  Widget apiResponseUi() {
+  Widget apiResponseUi(ScreenState state) {
     // ignore: unrelated_type_equality_checks
     if (controller.isLoading == true) {
       return Container(
@@ -274,7 +255,10 @@ class _BlocgScreenState extends State<BlocgScreen>
         },
       );
     } else {
-      return noDataFoundWidget(isFromBlog: true);
+      if (controller.isFinishBlogListApi.value == true) {
+        return noDataFoundWidget(isFromBlog: true);
+      }
+      return Container();
     }
   }
 
@@ -301,10 +285,17 @@ class _BlocgScreenState extends State<BlocgScreen>
       child: AnimatedContainer(
         width: 25.w,
         duration: const Duration(milliseconds: 300),
-        margin:
-            EdgeInsets.only(top: 1.h, bottom: 1.5.h, left: 1.2.w, right: 1.2.w),
+        margin: EdgeInsets.only(
+          top: 1.h,
+          bottom: 1.5.h,
+          left: SizerUtil.deviceType == DeviceType.mobile ? 1.2.w : 1.0.w,
+          right: SizerUtil.deviceType == DeviceType.mobile ? 1.2.w : 1.0.w,
+        ),
         padding: EdgeInsets.only(
-            top: 1.5.h, bottom: 1.5.h, left: 1.2.w, right: 1.2.w),
+            top: SizerUtil.deviceType == DeviceType.mobile ? 1.5.h : 1.h,
+            bottom: SizerUtil.deviceType == DeviceType.mobile ? 1.5.h : 1.h,
+            left: 1.2.w,
+            right: 1.2.w),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected ? primaryColor : white,
@@ -326,11 +317,13 @@ class _BlocgScreenState extends State<BlocgScreen>
         child: Center(
           child: str.length > 9
               ? SizedBox(
-                  height: 2.2.h,
+                  height:
+                      SizerUtil.deviceType == DeviceType.mobile ? 2.2.h : 3.1.h,
                   child: Marquee(
                     style: TextStyle(
-                      fontFamily: fontRegular,
+                      fontFamily: fontBold,
                       color: isSelected ? white : black,
+                      fontWeight: FontWeight.w700,
                       fontSize: 11.sp,
                     ),
                     text: str,

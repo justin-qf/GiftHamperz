@@ -97,7 +97,11 @@ class OrderDetailScreenController extends GetxController {
               color: isDarkMode() ? white : black,
               fontFamily: fontBold,
               fontWeight: FontWeight.w800,
-              fontSize: isMainTitle == true ? 18.sp : 15.sp,
+              fontSize: isMainTitle == true
+                  ? SizerUtil.deviceType == DeviceType.mobile
+                      ? 18.sp
+                      : 15.sp
+                  : 14.sp,
             )),
       ),
     );
@@ -182,9 +186,7 @@ class OrderDetailScreenController extends GetxController {
                       //fontFamily: fontBold,
                       color: isDarkMode() ? white : primaryColor,
                       fontWeight: FontWeight.w800,
-                      fontSize: SizerUtil.deviceType == DeviceType.mobile
-                          ? 10.sp
-                          : 7.sp,
+                      fontSize: 10.sp,
                     ),
             ),
           ],
@@ -197,7 +199,7 @@ class OrderDetailScreenController extends GetxController {
     return GestureDetector(
       onTap: () {
         Get.to(ProductDetailScreen(
-          'Trending',
+          DashboardText.trendingTitle,
           data: data,
         ));
       },
@@ -205,17 +207,14 @@ class OrderDetailScreenController extends GetxController {
         child: Container(
           width: SizerUtil.width,
           margin: EdgeInsets.only(right: 2.w, bottom: 2.0.h),
-          padding:
-              EdgeInsets.only(right: 2.w, top: 2.w, left: 2.w, bottom: 2.w),
+          padding: EdgeInsets.only(
+            right: 2.w,
+            top: SizerUtil.deviceType == DeviceType.mobile ? 2.w : 1.h,
+            left: 2.w,
+            bottom: SizerUtil.deviceType == DeviceType.mobile ? 2.w : 1.h,
+          ),
           decoration: BoxDecoration(
-            //color: grey.withOpacity(0.2),
             borderRadius: BorderRadius.circular(1.5.h),
-            // border: isDarkMode()
-            //     ? null
-            //     : Border.all(
-            //         color: grey, // Border color
-            //         width: 0.7, // Border width
-            //       ),
             color: isDarkMode() ? tileColour : white,
             boxShadow: [
               BoxShadow(
@@ -235,18 +234,12 @@ class OrderDetailScreenController extends GetxController {
               children: [
                 FadeInDown(
                   child: Container(
-                    //width: 30.w,
                     padding: const EdgeInsets.all(0.5),
                     decoration: BoxDecoration(
-                      border: isDarkMode()
-                          ? Border.all(
-                              color: isDarkMode() ? grey : grey, // Border color
-                              width: 0.2, // Border width
-                            )
-                          : Border.all(
-                              color: grey, // Border color
-                              width: 0.6, // Border width
-                            ),
+                      border: Border.all(
+                        color: grey,
+                        width: isDarkMode() ? 0.2 : 0.6,
+                      ),
                       color: isDarkMode() ? black : white,
                       borderRadius: BorderRadius.circular(
                           SizerUtil.deviceType == DeviceType.mobile
@@ -261,21 +254,29 @@ class OrderDetailScreenController extends GetxController {
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
                         imageUrl: ApiUrl.imageUrl + data.images[0].toString(),
-                        height: 12.h,
-                        width: 12.h,
+                        height: SizerUtil.deviceType == DeviceType.mobile
+                            ? 12.h
+                            : 11.h,
+                        width: SizerUtil.deviceType == DeviceType.mobile
+                            ? 12.h
+                            : 11.h,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(color: primaryColor),
                         ),
                         errorWidget: (context, url, error) => Image.asset(
                           Asset.productPlaceholder,
-                          height: 12.h,
+                          height: SizerUtil.deviceType == DeviceType.mobile
+                              ? 12.h
+                              : 11.h,
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
                 ),
-                getDynamicSizedBox(width: 3.w),
+                getDynamicSizedBox(
+                    width:
+                        SizerUtil.deviceType == DeviceType.mobile ? 3.w : 2.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,10 +289,15 @@ class OrderDetailScreenController extends GetxController {
                           fontFamily: fontBold,
                           fontWeight: FontWeight.w800,
                           color: isDarkMode() ? black : black,
-                          fontSize: 12.sp,
+                          fontSize: SizerUtil.deviceType == DeviceType.mobile
+                              ? 12.sp
+                              : 10.sp,
                         ),
                       ),
-                      getDynamicSizedBox(height: 1.h),
+                      getDynamicSizedBox(
+                          height: SizerUtil.deviceType == DeviceType.mobile
+                              ? 1.h
+                              : 0.0),
                       RichText(
                         overflow: TextOverflow.clip,
                         textAlign: TextAlign.center,
@@ -302,7 +308,9 @@ class OrderDetailScreenController extends GetxController {
                             color: primaryColor,
                             fontFamily: fontRegular,
                             fontWeight: FontWeight.w500,
-                            fontSize: 11.sp,
+                            fontSize: SizerUtil.deviceType == DeviceType.mobile
+                                ? 11.sp
+                                : 10.sp,
                           ),
                           children: [
                             TextSpan(
@@ -310,7 +318,10 @@ class OrderDetailScreenController extends GetxController {
                               style: TextStyle(
                                 fontFamily: fontBold,
                                 color: isDarkMode() ? lableColor : black,
-                                fontSize: 12.sp,
+                                fontSize:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 12.sp
+                                        : 11.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -318,7 +329,10 @@ class OrderDetailScreenController extends GetxController {
                         ),
                         textScaler: const TextScaler.linear(1),
                       ),
-                      getDynamicSizedBox(height: 0.5.h),
+                      getDynamicSizedBox(
+                          height: SizerUtil.deviceType == DeviceType.mobile
+                              ? 0.5.h
+                              : 0.0),
                       RichText(
                         overflow: TextOverflow.clip,
                         textAlign: TextAlign.center,
@@ -328,7 +342,9 @@ class OrderDetailScreenController extends GetxController {
                           style: TextStyle(
                             color: isDarkMode() ? black : lableColor,
                             fontWeight: FontWeight.w800,
-                            fontSize: 11.sp,
+                            fontSize: SizerUtil.deviceType == DeviceType.mobile
+                                ? 11.sp
+                                : 10.sp,
                           ),
                           children: [
                             TextSpan(
@@ -336,7 +352,10 @@ class OrderDetailScreenController extends GetxController {
                               style: TextStyle(
                                 color: isDarkMode() ? black : black,
                                 fontFamily: fontBold,
-                                fontSize: 13.sp,
+                                fontSize:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 13.sp
+                                        : 11.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

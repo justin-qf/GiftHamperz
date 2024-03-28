@@ -1,33 +1,24 @@
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:gifthamperz/componant/button/form_button.dart';
-import 'package:gifthamperz/componant/dialogs/dialogs.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/search_chat_widgets.dart';
 import 'package:gifthamperz/componant/widgets/widgets.dart';
-import 'package:gifthamperz/configs/apicall_constant.dart';
-import 'package:gifthamperz/configs/assets_constant.dart';
 import 'package:gifthamperz/configs/device_type.dart';
-import 'package:gifthamperz/configs/font_constant.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/homeController.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
-import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
-import 'package:gifthamperz/utils/log.dart';
 import 'package:gifthamperz/views/CartScreen/CartScreen.dart';
 import 'package:gifthamperz/views/CategoryScreen/CategoryScreen.dart';
 import 'package:gifthamperz/views/MainScreen/HomeScreen/DetailScreen/DetailScreen.dart';
 import 'package:gifthamperz/views/MainScreen/HomeScreen/HomeScreenWeb.dart';
 import 'package:gifthamperz/views/SearchScreen/SearchScreen.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../configs/colors_constant.dart';
 
@@ -42,7 +33,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var controller = Get.put(HomeScreenController());
-  bool? isGuest = true;
+  //bool? isGuest = true;
 
   @override
   void initState() {
@@ -50,9 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
     controller.pageController =
         PageController(initialPage: controller.currentPage);
     controller.getHome(context);
-    startAutoScroll();
+    controller.startAutoScroll();
     controller.getTotalProductInCart();
-    showGuestUserLogin();
+    controller.showGuestUserLogin(context);
   }
 
   @override
@@ -72,48 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  showGuestUserLogin() async {
-    isGuest = await UserPreferences().getGuestUser();
-    bool isDialogVisible = await UserPreferences().getGuestUserDialogVisible();
-    if (isGuest == true && !isDialogVisible) {
-      UserPreferences().setGuestUserDialogVisible(true);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Check if the current route is the home screen before showing the alert
-        Future.delayed(const Duration(seconds: 2), () {
-          getGuestUserLogin(
-            context,
-            DashboardText.dashboard,
-          );
-        });
-      });
-    }
-    setState(() {});
-  }
-
-  void startAutoScroll() {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      controller.timer =
-          Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-        if (controller.currentPage < controller.bannerList.length - 1) {
-          controller.currentPage++;
-        } else {
-          controller.currentPage = 0;
-        }
-        if (controller.pageController.hasClients) {
-          controller.pageController.animateToPage(
-            controller.currentPage,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        }
-      });
-    });
-  }
-
   @override
   void dispose() {
-    controller.pageController.dispose();
-    controller.timer.cancel();
+    controller.disposePageController();
     super.dispose();
   }
 
@@ -146,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.only(bottom: 3.h),
                         physics: const BouncingScrollPhysics(),
                         child: HomeScreenWeb(
-                          isGuest: isGuest,
+                          isGuest: controller.isGuest,
                         )),
                   )
                 : Expanded(
@@ -182,8 +134,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 case ScreenState.apiError:
                                   return SizedBox(
                                     height: SizerUtil.height / 1.3,
-                                    child:
-                                        apiOtherStates(controller.state.value),
+                                    child: apiOtherStates(
+                                        controller.state.value,
+                                        controller,
+                                        controller.bannerList,
+                                        () {}),
                                   );
                                 case ScreenState.apiSuccess:
                                   return apiSuccess(controller.state.value);
@@ -227,81 +182,11 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               height: 20.h,
               child: Obx(() {
-                return Stack(
-                  children: [
-                    PageView.builder(
-                      pageSnapping: true,
-                      controller: controller.pageController,
-                      itemCount: controller.bannerList.length,
-                      itemBuilder: (context, index) {
-                        BannerList bannerItems = controller.bannerList[index];
-                        return Container(
-                          margin: EdgeInsets.only(
-                              top: 1.h, left: 2.w, right: 3.w, bottom: 1.h),
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: isDarkMode() ? black : white,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: isDarkMode()
-                                      ? white.withOpacity(0.2)
-                                      : black.withOpacity(0.2),
-                                  spreadRadius: 0.1,
-                                  blurRadius: 10,
-                                  offset: const Offset(0.5, 0.5)),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
-                            child: CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              height: 18.h,
-                              imageUrl: ApiUrl.imageUrl + bannerItems.url,
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(
-                                    color: primaryColor),
-                              ),
-                              errorWidget: (context, url, error) => Image.asset(
-                                Asset.productPlaceholder,
-                                height: 18.h,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      onPageChanged: (index) {
-                        setState(() {
-                          controller.currentPage = index;
-                        });
-                      },
-                    ),
-                    Positioned(
-                        bottom: 15,
-                        left: 0,
-                        right: 0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(controller.bannerList.length,
-                              (index) {
-                            return Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 5.0),
-                              width: 2.w,
-                              height: 2.w,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: controller.currentPage == index
-                                    ? primaryColor
-                                    : grey,
-                              ),
-                            );
-                          }),
-                        ))
-                  ],
-                );
+                return getPageView(controller, (index) {
+                  setState(() {
+                    controller.currentPage = index;
+                  });
+                });
               }),
             ),
             SizedBox(
@@ -314,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             }),
             SizedBox(
-              height: SizerUtil.deviceType == DeviceType.mobile ? 13.h : 15.h,
+              height: SizerUtil.deviceType == DeviceType.mobile ? 13.h : 13.h,
               child: Obx(
                 () {
                   return controller.categoryList.isNotEmpty
@@ -335,7 +220,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            getDynamicSizedBox(height: 1.h),
             getHomeLable(DashboardText.trendingTitle, () {
               Get.to(DetailScreen(
                 title: DashboardText.trendingTitle,
@@ -363,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               return controller.getListItem(context, data,
                                   () async {
                                 controller.getTotalProductInCart();
-                              }, isGuest, () async {});
+                              }, controller.isGuest, () async {});
                             },
                             itemCount: controller.trendingItemList.length),
                       )
@@ -374,7 +258,9 @@ class _HomeScreenState extends State<HomeScreen> {
               () {
                 return controller.mainOfferrList.isNotEmpty
                     ? SizedBox(
-                        height: 15.h,
+                        height: SizerUtil.deviceType == DeviceType.mobile
+                            ? 15.h
+                            : 14.h,
                         child: ListView.builder(
                             padding: EdgeInsets.only(
                               left: 3.5.w,
@@ -392,7 +278,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     : Container();
               },
             ),
-            getDynamicSizedBox(height: 1.5.h),
+            getDynamicSizedBox(
+                height:
+                    SizerUtil.deviceType == DeviceType.mobile ? 1.5.h : 1.0.h),
             getHomeLable(DashboardText.populerTitle, () async {
               Get.to(DetailScreen(
                 title: DashboardText.populerTitle,
@@ -408,7 +296,9 @@ class _HomeScreenState extends State<HomeScreen> {
               () {
                 return controller.popularItemList.isNotEmpty
                     ? SizedBox(
-                        height: 27.h,
+                        height: SizerUtil.deviceType == DeviceType.mobile
+                            ? 27.h
+                            : 28.h,
                         child: ListView.builder(
                             padding: EdgeInsets.only(left: 2.w, right: 1.w),
                             physics: const BouncingScrollPhysics(),
@@ -421,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               return controller.getpopularDeal(context, data,
                                   () {
                                 controller.getTotalProductInCart();
-                              }, isGuest);
+                              }, controller.isGuest);
                             },
                             itemCount: controller.popularItemList.length),
                       )
@@ -433,59 +323,5 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       return noDataFoundWidget();
     }
-  }
-
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 35,
-            ),
-          ),
-        ),
-      );
-    }
-
-    Widget? button;
-    if (controller.bannerList.isEmpty) {
-      Container();
-    }
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {}, BottomConstant.tryAgain);
-    }
-
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        fontSize: 12.sp,
-                        color: isDarkMode() ? white : black),
-                  )
-                : button),
-      ],
-    );
   }
 }

@@ -2,18 +2,17 @@ import 'dart:async';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gifthamperz/Services/connectivity_service.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gifthamperz/configs/get_storage_key.dart';
 import 'package:gifthamperz/configs/statusbar.dart';
 import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
 import 'package:gifthamperz/controller/theme_controller.dart';
 import 'package:gifthamperz/core/theme/app_theme.dart';
-import 'package:gifthamperz/utils/log.dart';
+import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/views/LocalizationService.dart';
 import 'package:gifthamperz/views/SplashScreen/SplashScreen.dart';
 import 'package:sizer/sizer.dart';
@@ -21,10 +20,7 @@ import 'package:sizer/sizer.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  screenOrientations();
   runApp(const MainScreen());
 }
 
@@ -36,7 +32,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class HomeState extends State<MainScreen> {
-  final ConnectivityHelper connectivityHelper = ConnectivityHelper();
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
   final LocalizationService localizationService =
@@ -90,15 +85,5 @@ class HomeState extends State<MainScreen> {
                 });
           }));
     });
-  }
-}
-
-class ConnectivityHelper {
-  final Connectivity _connectivity = Connectivity();
-
-  Future<bool> hasConnection() async {
-    logcat('initCommite', "DONE");
-    final result = await _connectivity.checkConnectivity();
-    return result != ConnectivityResult.none;
   }
 }

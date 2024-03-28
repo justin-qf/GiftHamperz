@@ -58,7 +58,9 @@ getMiniButton(Function fun, str, {bool? icon}) {
       height: SizerUtil.deviceType == DeviceType.mobile ? 5.h : 4.5.h,
       alignment: Alignment.center,
       padding: const EdgeInsets.only(top: 1),
-      width: SizerUtil.width / 1,
+      width: SizerUtil.deviceType == DeviceType.mobile
+          ? SizerUtil.width / 1
+          : SizerUtil.width / 4,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
         color: primaryColor,
@@ -83,21 +85,6 @@ getMiniButton(Function fun, str, {bool? icon}) {
                 fontSize:
                     SizerUtil.deviceType == DeviceType.mobile ? 11.sp : 8.sp),
           ),
-          // SizedBox(
-          //   width: 2.w,
-          // ),
-          // icon == true
-          //     ? Container(
-          //         margin: EdgeInsets.only(bottom: 0.5.h),
-          //         child: SvgPicture.asset(
-          //           Asset.share,
-          //           alignment: Alignment.center,
-          //           height: 2.h,
-          //           width: 2.h,
-          //           color: white,
-          //         ),
-          //       )
-          //     : Container()
         ],
       ),
     ),
@@ -105,16 +92,31 @@ getMiniButton(Function fun, str, {bool? icon}) {
 }
 
 getSecondaryFormButton(Function fun, str,
-    {isvalidate, bool? isFromDialog, bool? isEnable}) {
+    {isvalidate, bool? isFromDialog, bool? isEnable, bool? isFromCart}) {
   return InkWell(
     onTap: () {
       fun();
     },
     child: Container(
+      margin: EdgeInsets.only(
+        top: SizerUtil.deviceType == DeviceType.mobile ? 0.w : 2.h,
+      ),
       padding: EdgeInsets.symmetric(
-          vertical: SizerUtil.deviceType == DeviceType.mobile ? 1.7.h : 1.h,
-          horizontal: SizerUtil.deviceType == DeviceType.mobile ? 5.h : 6.h),
-      width: SizerUtil.width,
+          vertical: SizerUtil.deviceType == DeviceType.mobile
+              ? 1.7.h
+              : isFromCart == true
+                  ? 1.5.h
+                  : 1.h,
+          horizontal: SizerUtil.deviceType == DeviceType.mobile
+              ? 5.h
+              : isFromCart == true
+                  ? 4.h
+                  : 6.h),
+      width: SizerUtil.deviceType == DeviceType.mobile
+          ? SizerUtil.width
+          : isFromCart == true
+              ? SizerUtil.width / 2
+              : SizerUtil.width / 2.8,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4.h),
         color: isvalidate ? lightPrimaryColor : grey,
@@ -134,7 +136,11 @@ getSecondaryFormButton(Function fun, str,
             color: white,
             fontFamily: fontBold,
             fontWeight: FontWeight.w900,
-            fontSize: isFromDialog == true ? 12.5.sp : 13.sp),
+            fontSize: isFromDialog == true
+                ? 12.5.sp
+                : isFromCart == true
+                    ? 9.sp
+                    : 13.sp),
       ),
     ),
   );
@@ -151,7 +157,13 @@ getAddressButton(Function fun, str, {isvalidate, bool? isFromDialog}) {
       padding: EdgeInsets.symmetric(
           vertical: SizerUtil.deviceType == DeviceType.mobile ? 1.7.h : 1.h,
           horizontal: SizerUtil.deviceType == DeviceType.mobile ? 5.h : 6.h),
-      width: SizerUtil.width,
+      margin: EdgeInsets.only(
+        left: 5.5.w,
+        right: 5.w,
+      ),
+      width: SizerUtil.deviceType == DeviceType.mobile
+          ? SizerUtil.width
+          : SizerUtil.width / 2,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4.h),
         color: isvalidate ? lightPrimaryColor : grey,

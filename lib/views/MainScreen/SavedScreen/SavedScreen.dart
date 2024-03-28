@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-import 'package:gifthamperz/componant/button/form_button.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/componant/widgets/search_chat_widgets.dart';
@@ -16,7 +16,6 @@ import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/enum.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sizer/sizer.dart';
 
 // ignore: must_be_immutable
@@ -43,8 +42,7 @@ class _SavedScreenState extends State<SavedScreen>
   apiCall() async {
     isGuest = await UserPreferences().getGuestUser();
     logcat("isGUESTUSER", isGuest.toString());
-    if (isGuest == true) {
-    } else {
+    if (isGuest != true) {
       // ignore: use_build_context_synchronously
       controller.getFavouriteList(context);
     }
@@ -70,9 +68,16 @@ class _SavedScreenState extends State<SavedScreen>
             Column(
               children: [
                 getDynamicSizedBox(
-                    height: controller.isSearch == true ? 4.5.h : 5.h),
+                    height: controller.isSearch == true
+                        ? SizerUtil.deviceType == DeviceType.mobile
+                            ? 4.5.h
+                            : 4.h
+                        : SizerUtil.deviceType == DeviceType.mobile
+                            ? 5.h
+                            : 4.h),
                 if (controller.isSearch == true)
-                  setSearchBar(context, controller.searchCtr, 'saved',
+                  setSearchBar(
+                      context, controller.searchCtr, SavedScreenText.title,
                       onCancleClick: () {
                     controller.isSearch = false;
                     controller.searchCtr.text = '';
@@ -94,7 +99,6 @@ class _SavedScreenState extends State<SavedScreen>
                     controller.isSearch = true;
                     setState(() {});
                   }),
-
                 Expanded(
                   child: isGuest != true
                       ? Stack(children: [
@@ -106,7 +110,12 @@ class _SavedScreenState extends State<SavedScreen>
                               case ScreenState.apiError:
                                 return SizedBox(
                                   height: SizerUtil.height / 1.3,
-                                  child: apiOtherStates(controller.state.value),
+                                  child: apiOtherStates(
+                                      controller.state.value,
+                                      controller,
+                                      controller.favouriteFilterList, () {
+                                    controller.getFavouriteList(context);
+                                  }),
                                 );
                               case ScreenState.apiSuccess:
                                 return apiSuccess(controller.state.value);
@@ -215,59 +224,59 @@ class _SavedScreenState extends State<SavedScreen>
     }
   }
 
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 35,
-            ),
-          ),
-        ),
-      );
-    }
+  // Widget apiOtherStates(state) {
+  //   if (state == ScreenState.apiLoading) {
+  //     return Center(
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(100),
+  //         child: SizedBox(
+  //           height: 30,
+  //           width: 30,
+  //           child: LoadingAnimationWidget.discreteCircle(
+  //             color: primaryColor,
+  //             size: 35,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    Widget? button;
-    if (controller.favouriteFilterList.isEmpty) {
-      Container();
-    }
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {
-        controller.getFavouriteList(context);
-      }, BottomConstant.tryAgain);
-    }
+  //   Widget? button;
+  //   if (controller.favouriteFilterList.isEmpty) {
+  //     Container();
+  //   }
+  //   if (state == ScreenState.noDataFound) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   if (state == ScreenState.noNetwork) {
+  //     button = getMiniButton(() {
+  //       controller.getFavouriteList(context);
+  //     }, BottomConstant.tryAgain);
+  //   }
 
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
-            child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        fontSize: 12.sp,
-                        color: isDarkMode() ? white : black),
-                  )
-                : button),
-      ],
-    );
-  }
+  //   if (state == ScreenState.apiError) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Container(
+  //           margin: EdgeInsets.symmetric(horizontal: 20.w),
+  //           child: controller.message.value.isNotEmpty
+  //               ? Text(
+  //                   controller.message.value,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontFamily: fontMedium,
+  //                       fontSize: 12.sp,
+  //                       color: isDarkMode() ? white : black),
+  //                 )
+  //               : button),
+  //     ],
+  //   );
+  // }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:gifthamperz/api_handle/apiOtherStates.dart';
 import 'package:gifthamperz/componant/button/form_button.dart';
 import 'package:gifthamperz/componant/parentWidgets/CustomeParentBackground.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
@@ -81,7 +82,17 @@ class _ProductScreenState extends State<ProductScreen>
                       case ScreenState.noNetwork:
                       case ScreenState.noDataFound:
                       case ScreenState.apiError:
-                        return apiOtherStates(controller.state.value);
+                        return apiOtherStates(controller.state.value,
+                            controller, controller.productList, () {
+                          controller.getProductList(
+                              context,
+                              controller.currentPage,
+                              false,
+                              widget.categoryId,
+                              widget.subcategoryId,
+                              widget.innerSubcategoryId,
+                              controller.selectedBrandId!);
+                        });
                       case ScreenState.apiSuccess:
                         return apiSuccess(controller.state.value);
                       default:
@@ -125,68 +136,68 @@ class _ProductScreenState extends State<ProductScreen>
         ]));
   }
 
-  Widget apiOtherStates(state) {
-    if (state == ScreenState.apiLoading) {
-      return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: SizedBox(
-            height: 30,
-            width: 30,
-            child: LoadingAnimationWidget.discreteCircle(
-              color: primaryColor,
-              size: 35,
-            ),
-          ),
-        ),
-      );
-    }
+  // Widget apiOtherStates(state) {
+  //   if (state == ScreenState.apiLoading) {
+  //     return Center(
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(100),
+  //         child: SizedBox(
+  //           height: 30,
+  //           width: 30,
+  //           child: LoadingAnimationWidget.discreteCircle(
+  //             color: primaryColor,
+  //             size: 35,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    Widget? button;
-    if (controller.productList.isEmpty) {
-      Container();
-    }
-    if (state == ScreenState.noDataFound) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    if (state == ScreenState.noNetwork) {
-      button = getMiniButton(() {
-        controller.getProductList(
-            context,
-            controller.currentPage,
-            false,
-            widget.categoryId,
-            widget.subcategoryId,
-            widget.innerSubcategoryId,
-            controller.selectedBrandId!);
-      }, BottomConstant.tryAgain);
-    }
+  //   Widget? button;
+  //   if (controller.productList.isEmpty) {
+  //     Container();
+  //   }
+  //   if (state == ScreenState.noDataFound) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   if (state == ScreenState.noNetwork) {
+  //     button = getMiniButton(() {
+  //       controller.getProductList(
+  //           context,
+  //           controller.currentPage,
+  //           false,
+  //           widget.categoryId,
+  //           widget.subcategoryId,
+  //           widget.innerSubcategoryId,
+  //           controller.selectedBrandId!);
+  //     }, BottomConstant.tryAgain);
+  //   }
 
-    if (state == ScreenState.apiError) {
-      button = getMiniButton(() {
-        Get.back();
-      }, BottomConstant.back);
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 10.w),
-            child: controller.message.value.isNotEmpty
-                ? Text(
-                    controller.message.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        fontSize: 12.sp,
-                        color: isDarkMode() ? white : black),
-                  )
-                : button),
-      ],
-    );
-  }
+  //   if (state == ScreenState.apiError) {
+  //     button = getMiniButton(() {
+  //       Get.back();
+  //     }, BottomConstant.back);
+  //   }
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Container(
+  //           margin: EdgeInsets.symmetric(horizontal: 10.w),
+  //           child: controller.message.value.isNotEmpty
+  //               ? Text(
+  //                   controller.message.value,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontFamily: fontMedium,
+  //                       fontSize: 12.sp,
+  //                       color: isDarkMode() ? white : black),
+  //                 )
+  //               : button),
+  //     ],
+  //   );
+  // }
 
   Widget apiResponseUi() {
     // ignore: unrelated_type_equality_checks

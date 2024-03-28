@@ -34,14 +34,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     controller.numberCtr.text = "";
-    controller.passwordctr.text = "";
     super.initState();
   }
 
   @override
   void dispose() {
     controller.numberCtr.text = "";
-    controller.passwordctr.text = "";
     super.dispose();
   }
 
@@ -50,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
     Statusbar().trasparentStatusbarProfile(false);
     return CustomParentScaffold(
       onWillPop: () async {
-        logcat("onWillPop", "DONE");
         return true;
       },
       onTap: () {
@@ -145,12 +142,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 getDynamicSizedBox(
-                                  height: 1.5.h,
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 1.5.h
+                                          : 0.h,
                                 ),
                                 FadeInDown(
                                   child: Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 1.6.h),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: SizerUtil.deviceType ==
+                                                DeviceType.mobile
+                                            ? 1.6.h
+                                            : 6.h),
                                     child: Text(
                                       LoginConst.subText,
                                       style: styleTitleSubtaxt(),
@@ -226,7 +229,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ],
                                 ),
                                 SizedBox(
-                                  height: 2.h,
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 2.h
+                                          : 0,
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(

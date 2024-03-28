@@ -65,14 +65,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         bottomNavigationBar: DeviceScreenType.isWeb(context)
             ? Container()
             : Container(
-                margin: const EdgeInsets.only(
-                    left: 10, right: 10, bottom: 10, top: 10),
+                margin: EdgeInsets.only(
+                    left: SizerUtil.deviceType == DeviceType.mobile
+                        ? 10
+                        : SizerUtil.width / 5,
+                    right: SizerUtil.deviceType == DeviceType.mobile
+                        ? 10
+                        : SizerUtil.width / 5,
+                    bottom: 10,
+                    top: 10),
                 padding: const EdgeInsets.only(
                     left: 10, right: 10, bottom: 10, top: 10),
                 decoration: BoxDecoration(
-                  // color: isDarkMode()
-                  //     ? bottomMenuColor.withOpacity(0.7)
-                  //     : bottomNavBackground.withOpacity(0.8),
                   color: isDarkMode()
                       ? bottomMenuColor.withOpacity(0.7)
                       : white.withOpacity(0.8),

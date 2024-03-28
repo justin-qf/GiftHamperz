@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:gifthamperz/componant/toolbar/toolbar.dart';
 import 'package:gifthamperz/controller/internet_controller.dart';
-import 'package:gifthamperz/utils/log.dart';
 
 // ignore: must_be_immutable
 class CustomParentScaffold extends StatelessWidget {

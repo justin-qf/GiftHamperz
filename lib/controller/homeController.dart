@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:gifthamperz/api_handle/Repository.dart';
@@ -18,7 +19,6 @@ import 'package:gifthamperz/configs/string_constant.dart';
 import 'package:gifthamperz/models/BannerModel.dart';
 import 'package:gifthamperz/models/UpdateDashboardModel.dart';
 import 'package:gifthamperz/models/loginModel.dart';
-import 'package:gifthamperz/models/webModel.dart';
 import 'package:gifthamperz/preference/UserPreference.dart';
 import 'package:gifthamperz/utils/helper.dart';
 import 'package:gifthamperz/utils/log.dart';
@@ -41,7 +41,8 @@ class HomeScreenController extends GetxController {
   RxList treeList = [].obs;
   var pageController = PageController();
   var currentPage = 0;
-  late Timer timer;
+  late Timer? timer =
+      Timer.periodic(const Duration(seconds: 10), (Timer timer) {});
   late TextEditingController searchCtr;
   bool isSearch = false;
   RxInt totalItemsCount = 0.obs;
@@ -49,6 +50,53 @@ class HomeScreenController extends GetxController {
   // Use a Map to store the quantity for each product ID
   final Map<String, int> productQuantities = <String, int>{};
   RxBool isHovered = false.obs;
+  bool? isGuest = true;
+
+  showGuestUserLogin(BuildContext context) async {
+    isGuest = await UserPreferences().getGuestUser();
+    bool isDialogVisible = await UserPreferences().getGuestUserDialogVisible();
+    if (isGuest == true && !isDialogVisible) {
+      UserPreferences().setGuestUserDialogVisible(true);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Check if the current route is the home screen before showing the alert
+        Future.delayed(const Duration(seconds: 2), () {
+          getGuestUserLogin(
+            context,
+            DashboardText.dashboard,
+          );
+        });
+      });
+    }
+    update();
+  }
+
+  disposePageController() {
+    if (timer != null) {
+      timer!.cancel();
+      timer = null;
+    }
+    pageController.dispose();
+  }
+
+  void startAutoScroll() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      controller.timer =
+          Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+        if (currentPage < bannerList.length - 1) {
+          currentPage++;
+        } else {
+          currentPage = 0;
+        }
+        if (pageController.hasClients) {
+          pageController.animateToPage(
+            currentPage,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
+      });
+    });
+  }
 
   updateHover(bool isHovere) {
     isHovered.value = isHovere;
@@ -87,8 +135,10 @@ class HomeScreenController extends GetxController {
               });
             },
             child: Container(
-                width: SizerUtil.deviceType == DeviceType.mobile ? 8.h : 9.h,
-                margin: EdgeInsets.only(right: 4.w),
+                width: 8.h,
+                margin: EdgeInsets.only(
+                    right:
+                        SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.w),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -105,11 +155,12 @@ class HomeScreenController extends GetxController {
                                 ),
                         ),
                         child: Container(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: ClipOval(
                             child: CachedNetworkImage(
                               fit: BoxFit.cover,
                               height: 7.h,
+                              width: 7.h,
                               imageUrl: ApiUrl.imageUrl + item.thumbnailUrl,
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
@@ -139,7 +190,7 @@ class HomeScreenController extends GetxController {
                                   fontSize:
                                       SizerUtil.deviceType == DeviceType.mobile
                                           ? 12.sp
-                                          : 10.sp,
+                                          : 9.sp,
                                 ),
                                 text: item.name,
                                 scrollAxis: Axis
@@ -174,7 +225,7 @@ class HomeScreenController extends GetxController {
                                 fontSize:
                                     SizerUtil.deviceType == DeviceType.mobile
                                         ? 12.sp
-                                        : 10.sp,
+                                        : 9.sp,
                               ),
                             )
                     ]))));
@@ -197,10 +248,9 @@ class HomeScreenController extends GetxController {
         FadeInUp(
           child: GestureDetector(
             onTap: () {
-              logcat('Treanding', 'DONE');
               Get.to(
                 ProductDetailScreen(
-                  'Trending',
+                  DashboardText.trendingTitle,
                   data: data,
                 ),
                 transition: Transition.fadeIn,
@@ -241,25 +291,19 @@ class HomeScreenController extends GetxController {
                           Container(
                             width: SizerUtil.width,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                  SizerUtil.deviceType == DeviceType.mobile
-                                      ? 3.5.w
-                                      : 2.5.w),
-                              border: isDarkMode()
-                                  ? Border.all(
-                                      color: grey, // Border color
-                                      width: 1, // Border width
-                                    )
-                                  : Border.all(
-                                      color: grey, // Border color
-                                      width: 0.2, // Border width
-                                    ),
-                            ),
+                                borderRadius: BorderRadius.circular(
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 3.5.w
+                                        : 2.2.w),
+                                border: Border.all(
+                                  color: grey, // Border color
+                                  width: isDarkMode() ? 1 : 0.2, // Border width
+                                )),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(
                                   SizerUtil.deviceType == DeviceType.mobile
                                       ? 3.5.w
-                                      : 2.5.w),
+                                      : 2.2.w),
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
                                 height: 12.h,
@@ -522,7 +566,7 @@ class HomeScreenController extends GetxController {
           child: GestureDetector(
             onTap: () {
               Get.to(ProductDetailScreen(
-                'Trending',
+                DashboardText.trendingTitle,
                 data: data,
               ))!
                   .then((value) {
@@ -544,17 +588,12 @@ class HomeScreenController extends GetxController {
                             color: grey, // Border color
                             width: 0.5, // Border width
                           ),
+                    //color: isDarkMode() ? itemDarkBackgroundColor : white,
                     color: isDarkMode() ? tileColour : white,
                     borderRadius: BorderRadius.circular(
                         SizerUtil.deviceType == DeviceType.mobile
                             ? 4.w
                             : 2.2.w),
-                    // boxShadow: [
-                    //   BoxShadow(
-                    //       color: Colors.black.withOpacity(0.05),
-                    //       blurRadius: 10.0,
-                    //       offset: const Offset(0, 5))
-                    // ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -955,7 +994,6 @@ class HomeScreenController extends GetxController {
 
           if (homeData!.data.trendList.isNotEmpty) {
             trendingItemList.addAll(homeData!.data.trendList);
-            trendingItemList.addAll(homeData!.data.trendList);
             update();
           }
 
@@ -1066,11 +1104,7 @@ class HomeScreenController extends GetxController {
       var data = jsonDecode(response.body);
       logcat("tag", data);
       if (response.statusCode == 200) {
-        if (data['status'] == 1) {
-          showCustomToast(context, data['message'].toString());
-        } else {
-          showCustomToast(context, data['message'].toString());
-        }
+        showCustomToast(context, data['message'].toString());
       } else {
         showDialogForScreen(context, BottomConstant.home, data['message'] ?? "",
             callback: () {});

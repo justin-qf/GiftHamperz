@@ -126,6 +126,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   // ),
                   FadeInUp(
                     child: Container(
+                      width: SizerUtil.width,
                       padding: EdgeInsets.symmetric(
                           horizontal: 1.h,
                           vertical: SizerUtil.deviceType == DeviceType.mobile
@@ -192,14 +193,39 @@ class _OtpScreenState extends State<OtpScreen> {
                                   controller.enableButton(value);
                                 },
                                 focusedPinTheme: getPinTheme().copyWith(
-                                  height: 68.0,
-                                  width: 64.0,
-                                  decoration:
-                                      getPinTheme().decoration!.copyWith(
-                                            border: Border.all(
-                                                color: const Color.fromRGBO(
-                                                    114, 178, 238, 1)),
-                                          ),
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 68.0
+                                          : 80.0,
+                                  width:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 68.0
+                                          : 80.0,
+                                  decoration: getPinTheme()
+                                      .decoration!
+                                      .copyWith(
+                                        border: Border.all(color: primaryColor),
+                                      ),
+                                ),
+                                submittedPinTheme: getPinTheme().copyWith(
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 58.0
+                                          : 65.0,
+                                  width:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 58.0
+                                          : 65.0,
+                                ),
+                                followingPinTheme: getPinTheme().copyWith(
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 58.0
+                                          : 70.0,
+                                  width:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 58.0
+                                          : 70.0,
                                 ),
                                 errorPinTheme: getPinTheme().copyWith(
                                   decoration: BoxDecoration(
@@ -210,7 +236,10 @@ class _OtpScreenState extends State<OtpScreen> {
                                 ),
                               ),
                               getDynamicSizedBox(
-                                height: 3.h,
+                                height:
+                                    SizerUtil.deviceType == DeviceType.mobile
+                                        ? 3.h
+                                        : 1.h,
                               ),
                               Container(
                                 margin: EdgeInsets.only(
@@ -235,7 +264,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                               widget.mobile.toString());
                                         }
                                       }
-                                    }, BottomConstant.buttonLabel,
+                                    },
+                                        isFromCart: true,
+                                        BottomConstant.buttonLabel,
                                         isvalidate:
                                             controller.isFormInvalidate.value);
                                   }),
@@ -314,7 +345,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           SizedBox(
                             height: SizerUtil.deviceType == DeviceType.mobile
                                 ? 2.h
-                                : 2.h,
+                                : 1.5.h,
                           )
                         ],
                       ),

@@ -21,7 +21,7 @@ setSearchBar(context, controller, String tag,
             decoration: BoxDecoration(
               color: isDarkMode() ? tileColour : white,
               borderRadius: BorderRadius.circular(
-                  SizerUtil.deviceType == DeviceType.mobile ? 5.h : 1.2.h),
+                  SizerUtil.deviceType == DeviceType.mobile ? 5.h : 6.h),
               boxShadow: [
                 BoxShadow(
                     color: black.withOpacity(0.05),
@@ -34,20 +34,18 @@ setSearchBar(context, controller, String tag,
                   SizerUtil.deviceType == DeviceType.mobile ? 0.w : 1.2.w,
             ),
             margin: EdgeInsets.symmetric(
-                horizontal: SizerUtil.deviceType == DeviceType.mobile
-                    ? 3.8.w
-                    : SizerUtil.deviceType == DeviceType.mobile
-                        ? 5.w
-                        : 6.0.w,
+                horizontal:
+                    SizerUtil.deviceType == DeviceType.mobile ? 3.8.w : 4.0.w,
                 vertical:
-                    SizerUtil.deviceType == DeviceType.mobile ? 0.8.h : 2.h),
+                    SizerUtil.deviceType == DeviceType.mobile ? 0.8.h : 1.5.h),
             child: TextFormField(
               controller: controller,
               cursorColor: primaryColor,
               textInputAction: TextInputAction.search,
               keyboardType: TextInputType.text,
+              textAlign: TextAlign.start,
               onEditingComplete: () {
-                if (tag == "saved") {
+                if (tag == SavedScreenText.title) {
                   Get.find<SavedScreenController>()
                       .setSearchQuery(controller.text.toString());
                   Get.find<SavedScreenController>().hideKeyboard(context);
@@ -61,7 +59,7 @@ setSearchBar(context, controller, String tag,
                 }
               },
               onChanged: (val) {
-                if (tag == "saved") {
+                if (tag == SavedScreenText.title) {
                   Get.find<SavedScreenController>()
                       .setSearchQuery(controller.text.toString());
                   Get.find<SavedScreenController>()
@@ -93,10 +91,10 @@ setSearchBar(context, controller, String tag,
                 contentPadding: EdgeInsets.only(
                     top: SizerUtil.deviceType == DeviceType.mobile
                         ? 0.7.h
-                        : 1.9.h,
+                        : 0.8.h,
                     bottom: SizerUtil.deviceType == DeviceType.mobile
                         ? 0.7.h
-                        : 1.9.h),
+                        : 1.6.h),
                 hintText: SearchConstant.hint,
                 hintStyle: styleTextForFieldHint(),
                 border: InputBorder.none,

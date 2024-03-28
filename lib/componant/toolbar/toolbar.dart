@@ -170,11 +170,13 @@ homeAppbar(String title, Function onClick, Function cartOnClick, RxInt budget) {
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     color: bottomNavBackground,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(
+                        SizerUtil.deviceType == DeviceType.mobile ? 10 : 20),
                   ),
                   constraints: BoxConstraints(
-                    minWidth:
-                        SizerUtil.deviceType == DeviceType.mobile ? 4.2.w : 3.w,
+                    minWidth: SizerUtil.deviceType == DeviceType.mobile
+                        ? 4.2.w
+                        : 3.5.w,
                     minHeight: SizerUtil.deviceType == DeviceType.mobile
                         ? 0.3.h
                         : 0.5.h,
@@ -183,7 +185,9 @@ homeAppbar(String title, Function onClick, Function cartOnClick, RxInt budget) {
                     budget.value.toString(),
                     style: TextStyle(
                       color: isDarkMode() ? white : black,
-                      fontSize: 7.sp,
+                      fontSize: SizerUtil.deviceType == DeviceType.mobile
+                          ? 7.sp
+                          : 6.sp,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -382,7 +386,9 @@ getForgetToolbar(title,
                       fontFamily: fontBold,
                       color: isDarkMode() ? white : headingTextColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 18.sp),
+                      fontSize: SizerUtil.deviceType == DeviceType.mobile
+                          ? 18.sp
+                          : 15.sp),
                 ),
               ),
             ),
@@ -406,7 +412,8 @@ getFilterToolbar(title,
                 fontFamily: fontBold,
                 color: isDarkMode() ? white : headingTextColor,
                 fontWeight: FontWeight.bold,
-                fontSize: 18.sp),
+                fontSize:
+                    SizerUtil.deviceType == DeviceType.mobile ? 18.sp : 16.sp),
           ),
         ),
       ),
@@ -879,7 +886,7 @@ Widget orderBackPress(callback) {
             Asset.arrowBack,
             // ignore: deprecated_member_use
             color: isDarkMode() ? white : black,
-            height: SizerUtil.deviceType == DeviceType.mobile ? 4.h : 5.h,
+            height: 4.h,
           )),
     ),
   );
@@ -906,7 +913,9 @@ getOrderToolbar(title) {
                       fontFamily: fontBold,
                       color: isDarkMode() ? white : headingTextColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 18.sp),
+                      fontSize: SizerUtil.deviceType == DeviceType.mobile
+                          ? 18.sp
+                          : 16.sp),
                 ),
               ),
             ),
@@ -928,7 +937,7 @@ Widget backPressCommon(callback, {bool? isList}) {
           child: SvgPicture.asset(
             Asset.arrowBack,
             color: isDarkMode() ? white : black,
-            height: SizerUtil.deviceType == DeviceType.mobile ? 4.h : 5.h,
+            height: 4.h,
           )),
     ),
   );

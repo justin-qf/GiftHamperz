@@ -26,12 +26,12 @@ class _SplashscreenState extends State<Splashscreen> {
     UserPreferences().setGuestUserDialogVisible(false);
     Timer(const Duration(seconds: 3), () async {
       UserData? retrievedObject = await UserPreferences().getSignInInfo();
-      // if (retrievedObject != null) {
-      //   Get.offAll(const HomePageScreen());
-      // } else {
-      //   Get.offAll(const IntroScreen());
-      // }
-      Get.offAll(const IntroScreen());
+      if (retrievedObject != null) {
+        Get.offAll(const DashboardScreen());
+      } else {
+        Get.offAll(const IntroScreen());
+      }
+      //Get.offAll(const ToolbarScreen());
     });
   }
 

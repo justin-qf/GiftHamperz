@@ -152,6 +152,7 @@ void showShareMessage(
 }
 
 void showDropdownMessage(
+  double insetPaddingVertical,
   BuildContext context,
   Widget content,
   String title,
@@ -161,6 +162,7 @@ void showDropdownMessage(
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
+            clipBehavior: Clip.antiAliasWithSaveLayer,
             backgroundColor:
                 isDarkMode() ? darkBackgroundColor.withOpacity(0.9) : white,
             shape: const RoundedRectangleBorder(
@@ -171,11 +173,27 @@ void showDropdownMessage(
                       SizerUtil.deviceType == DeviceType.mobile ? 0.w : 2.9.w),
               child: Text(
                 title,
-                style: TextStyle(fontFamily: fontMedium, fontSize: 20.sp),
+                style: TextStyle(
+                    fontFamily: fontMedium,
+                    fontSize: SizerUtil.deviceType == DeviceType.mobile
+                        ? 20.sp
+                        : 15.sp),
               ),
             ),
-            contentPadding:
-                EdgeInsets.only(left: 6.7.w, top: 0.5.h, right: 6.7.w),
+            // insetPadding: EdgeInsets.symmetric(
+            //     vertical:
+            //         SizerUtil.deviceType == DeviceType.mobile ? 10.h : 20.h,
+            //     horizontal:
+            //         SizerUtil.deviceType == DeviceType.mobile ? 4.h : 7.h),
+            insetPadding: EdgeInsets.symmetric(
+              vertical: insetPaddingVertical,
+              horizontal: 9.h,
+            ),
+            contentPadding: EdgeInsets.only(
+              left: SizerUtil.deviceType == DeviceType.mobile ? 6.7.w : 6.w,
+              top: 0.5.h,
+              right: SizerUtil.deviceType == DeviceType.mobile ? 6.7.w : 6.w,
+            ),
             content: content,
           );
         });

@@ -228,43 +228,49 @@ Widget getRichText(title, desc) {
 
 Widget getHomeLable(String title, Function onCLick) {
   return FadeInRight(
-    child: Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: EdgeInsets.only(left: 3.w, right: 2.w),
-        width: double.infinity,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(title,
-                style: TextStyle(
-                  color: isDarkMode() ? white : black,
-                  fontFamily: fontBold,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16.sp,
-                )),
-            const Spacer(),
-            GestureDetector(
-              onTap: () {
-                onCLick();
-              },
-              child: Text("See All",
-                  style: TextStyle(
-                    color: isDarkMode() ? white : primaryColor,
-                    fontFamily: fontRegular,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12.sp,
-                  )),
-            ),
-            getDynamicSizedBox(width: 0.3.w),
-            Icon(
-              Icons.chevron_right_sharp,
-              color: isDarkMode() ? white : primaryColor,
-              size: 6.w,
-            )
-          ],
-        ),
+    child: Container(
+      margin: EdgeInsets.only(left: 3.w, right: 2.w),
+      width: double.infinity,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(title,
+              style: TextStyle(
+                color: isDarkMode() ? white : black,
+                fontFamily: fontBold,
+                fontWeight: FontWeight.w800,
+                fontSize:
+                    SizerUtil.deviceType == DeviceType.mobile ? 16.sp : 13.sp,
+              )),
+          const Spacer(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  onCLick();
+                },
+                child: Text(DashboardText.seeAll,
+                    style: TextStyle(
+                      color: isDarkMode() ? white : primaryColor,
+                      fontFamily: fontRegular,
+                      fontWeight: FontWeight.w500,
+                      fontSize: SizerUtil.deviceType == DeviceType.mobile
+                          ? 12.sp
+                          : 10.sp,
+                    )),
+              ),
+              getDynamicSizedBox(width: 0.3.w),
+              Icon(
+                Icons.chevron_right_sharp,
+                color: isDarkMode() ? white : primaryColor,
+                size: SizerUtil.deviceType == DeviceType.mobile ? 6.w : 5.w,
+              )
+            ],
+          ),
+        ],
       ),
     ),
   );
@@ -291,7 +297,11 @@ Widget getLable(String title, {bool? isFromFilter}) {
                         : black,
                 fontFamily: isFromFilter == true ? fontExtraBold : fontBold,
                 fontWeight: FontWeight.w500,
-                fontSize: isFromFilter == true ? 13.sp : 11.sp,
+                fontSize: isFromFilter == true
+                    ? 13.sp
+                    : SizerUtil.deviceType == DeviceType.mobile
+                        ? 11.sp
+                        : 9.sp,
               )),
         ],
       ),
@@ -552,7 +562,7 @@ getPinTheme() {
     height: 60,
     textStyle: TextStyle(
       fontFamily: fontMedium,
-      fontSize: 18.sp,
+      fontSize: SizerUtil.deviceType == DeviceType.mobile ? 18.sp : 16.sp,
       color: isDarkMode() ? black : const Color.fromRGBO(30, 60, 87, 1),
     ),
     decoration: BoxDecoration(
@@ -752,6 +762,71 @@ Widget homeCartIncDecUi(
   );
 }
 
+Widget cartIncrDcrUi(
+    {String? qty,
+    Function? incrementOnTap,
+    Function? decrementOnTap,
+    bool? isFromPopular}) {
+  return Container(
+    padding: EdgeInsets.only(
+        left: SizerUtil.deviceType == DeviceType.mobile ? 2.7.w : 2.5.w,
+        right: SizerUtil.deviceType == DeviceType.mobile ? 2.7.w : 2.5.w,
+        top: 0.4.h,
+        bottom: 0.4.h),
+    decoration: BoxDecoration(
+        color: isDarkMode() ? darkBackgroundColor : white,
+        boxShadow: [
+          BoxShadow(
+              color: grey.withOpacity(0.2),
+              blurRadius: 1.0,
+              offset: const Offset(0, 1),
+              spreadRadius: 1.0)
+        ],
+        borderRadius: BorderRadius.all(
+          Radius.circular(5.h),
+        )),
+    child: Row(
+      children: [
+        GestureDetector(
+          onTap: () async {
+            decrementOnTap!();
+          },
+          child: Icon(
+            Icons.remove,
+            size: 3.h,
+          ),
+        ),
+        getDynamicSizedBox(
+            width: SizerUtil.deviceType == DeviceType.mobile ? 0.8.w : 1.w),
+        getVerticalDivider(),
+        getDynamicSizedBox(
+            width: SizerUtil.deviceType == DeviceType.mobile ? 1.8.w : 2.w),
+        Text(
+          qty!,
+          style: TextStyle(
+              color: isDarkMode() ? white : black,
+              fontWeight: FontWeight.w600,
+              fontSize: 12.sp),
+        ),
+        getDynamicSizedBox(
+            width: SizerUtil.deviceType == DeviceType.mobile ? 1.8.w : 2.w),
+        getVerticalDivider(),
+        getDynamicSizedBox(
+            width: SizerUtil.deviceType == DeviceType.mobile ? 1.8.w : 1.w),
+        GestureDetector(
+          onTap: () async {
+            incrementOnTap!();
+          },
+          child: Icon(
+            Icons.add,
+            size: 3.h,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 Widget noDataFoundWidget({bool? isFromBlog}) {
   return SizedBox(
     height:
@@ -777,7 +852,9 @@ Widget noDataFoundWidget({bool? isFromBlog}) {
 
 Widget homeOfferBanner(String item) {
   return Container(
-    width: SizerUtil.width / 1 - 30,
+    width: SizerUtil.deviceType == DeviceType.mobile
+        ? SizerUtil.width / 1 - 30
+        : SizerUtil.width / 1 - 50,
     height: 15.h,
     padding: EdgeInsets.all(0.2.h),
     margin: EdgeInsets.only(

@@ -120,7 +120,7 @@ class SavedScreenController extends GetxController {
       onTap: () {
         Get.to(
           ProductDetailScreen(
-            'Saved',
+            SavedScreenText.title,
             data: item,
           ),
           transition: Transition.fadeIn,
@@ -137,15 +137,10 @@ class SavedScreenController extends GetxController {
                 width: double.infinity,
                 margin: EdgeInsets.only(bottom: 0.6.h, left: 1.w, right: 2.w),
                 decoration: BoxDecoration(
-                  border: isDarkMode()
-                      ? Border.all(
-                          color: grey, // Border color
-                          width: 1, // Border width
-                        )
-                      : Border.all(
-                          color: grey, // Border color
-                          width: 0.2, // Border width
-                        ),
+                  border: Border.all(
+                    color: grey,
+                    width: isDarkMode() ? 1 : 0.2,
+                  ),
                   color: isDarkMode() ? itemDarkBackgroundColor : white,
                   borderRadius: BorderRadius.circular(
                       SizerUtil.deviceType == DeviceType.mobile ? 4.w : 2.2.w),
@@ -162,8 +157,8 @@ class SavedScreenController extends GetxController {
                                 ? 3.5.w
                                 : 2.5.w),
                         border: Border.all(
-                          color: grey, // Border color
-                          width: 0.3, // Border width
+                          color: grey,
+                          width: 0.3,
                         ),
                       ),
                       child: ClipRRect(
@@ -173,7 +168,9 @@ class SavedScreenController extends GetxController {
                                 : 2.5.w),
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
-                          height: 15.h,
+                          height: SizerUtil.deviceType == DeviceType.mobile
+                              ? 14.h
+                              : 12.h,
                           imageUrl: ApiUrl.imageUrl + item!.images[0],
                           placeholder: (context, url) => const Center(
                             child:

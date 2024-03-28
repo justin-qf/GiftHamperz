@@ -211,7 +211,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 //   ),
                                 // ),
                                 getDynamicSizedBox(
-                                  height: 2.h,
+                                  height:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 2.h
+                                          : 0.h,
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(
@@ -229,7 +232,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               controller.mobileCtr.text
                                                   .toString());
                                         }
-                                      }, SignupConstant.buttonLabel,
+                                      },
+                                          isFromCart: true,
+                                          SignupConstant.buttonLabel,
                                           isvalidate: controller
                                               .isFormInvalidate.value);
                                     }),
@@ -251,11 +256,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               child: getFooter(false),
                             ),
                           ),
-                          SizedBox(
-                            height: SizerUtil.deviceType == DeviceType.mobile
-                                ? 0.h
-                                : 2.h,
-                          )
                         ],
                       ),
                     ),
